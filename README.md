@@ -314,5 +314,9 @@ For issues or questions:
 
 ## License
 
-[Add your license here]
+MIT License
+
+Copyright (c) 2024 Mark Hendrickson
+
+See [LICENSE](LICENSE) for full license text.
 
