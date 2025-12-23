@@ -316,7 +316,7 @@ For issues or questions:
 
 MIT License
 
-Copyright (c) 2024 Mark Hendrickson
+Copyright (c) 2025 Mark Hendrickson
 
 See [LICENSE](LICENSE) for full license text.
 
