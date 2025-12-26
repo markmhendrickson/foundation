@@ -215,3 +215,4 @@ Strategy evaluation is optional. Enable in `foundation-config.yaml` for projects
 
 See Neotoma's `docs/feature_units/standards/discovery_process.md` for detailed implementation example.
 
+

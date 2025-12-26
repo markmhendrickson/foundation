@@ -625,3 +625,4 @@ Load this document whenever:
 - [ ] No AI-generated writing patterns (conversational transitions, soft questions, motivational language)
 - [ ] Simple, declarative sentences with active voice
 
+

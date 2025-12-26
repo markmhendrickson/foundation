@@ -152,3 +152,4 @@ security:
 5. **Use git hooks** to automate security checks
 6. **Review changes** before staging to catch issues early
 
+

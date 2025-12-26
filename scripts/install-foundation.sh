@@ -156,6 +156,13 @@ if [ -f ".gitignore" ]; then
     fi
 fi
 
+# Setup cursor rules (optional)
+if [ -f "$FOUNDATION_PATH/scripts/setup-cursor-rules.sh" ]; then
+    print_info ""
+    print_info "Setting up cursor rules..."
+    "$FOUNDATION_PATH/scripts/setup-cursor-rules.sh"
+fi
+
 print_info ""
 print_info "✅ Foundation installation complete!"
 print_info ""
@@ -163,4 +170,6 @@ print_info "Next steps:"
 print_info "  1. Customize foundation-config.yaml for your repository"
 print_info "  2. Run ./foundation/scripts/validate-setup.sh to verify installation"
 print_info "  3. See foundation/README.md for usage documentation"
+print_info "  4. See foundation/agent-instructions/CURSOR_RULES.md for cursor rules documentation"
+
 

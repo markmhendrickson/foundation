@@ -105,3 +105,4 @@ Projects implement the actual validation logic based on their needs.
 
 See project-specific `scripts/` directory for implementation examples.
 
+

@@ -99,31 +99,37 @@ Load when implementing or modifying feature X.
 
 ## Generic Cursor Rules
 
-Foundation provides templates for generic Cursor rules:
+Foundation provides generic Cursor rules in `foundation/agent-instructions/cursor-rules/`:
 
-### 1. Instruction Documentation (`cursor-rules/instruction_documentation.md`)
-Rules for documenting instructions in code and docs.
+1. **Security** (`cursor-rules/security.md`) - Pre-commit security audit with configurable protected paths
+2. **Worktree Environment** (`cursor-rules/worktree_env.md`) - Environment file handling in git worktrees
+3. **README Maintenance** (`cursor-rules/readme_maintenance.md`) - Automatic README synchronization with documentation
+4. **Downstream Doc Updates** (`cursor-rules/downstream_doc_updates.md`) - Documentation dependency management
+5. **Instruction Documentation** (`cursor-rules/instruction_documentation.md`) - Rules for documenting agent instructions
 
-### 2. Downstream Doc Updates (`cursor-rules/downstream_doc_updates.md`)
-Rules for updating dependent documentation when upstream docs change.
-
-### 3. README Maintenance (`cursor-rules/readme_maintenance.md`)
-Rules for keeping README.md in sync with documentation.
-
-### 4. Security Rules (`cursor-rules/security.md`)
-Generic security patterns and checks.
-
-### 5. Worktree Environment (`cursor-rules/worktree_env.md`)
-Rules for handling environment files in worktrees.
+See [CURSOR_RULES.md](CURSOR_RULES.md) for detailed documentation on each rule.
 
 ## Generic Cursor Commands
 
-Foundation provides templates for generic commands:
+Foundation provides generic Cursor commands in `foundation/agent-instructions/cursor-commands/`:
 
-### 1. Commit Command (`cursor-commands/commit.md`)
-Generic commit workflow with security audit and testing.
+1. **Commit** (`cursor-commands/commit.md`) - Comprehensive commit workflow with security audit, nested repo handling (optional), and configurable commit message generation
 
-### Usage
+## Installation
+
+### Automatic Installation
+
+Use the foundation installation script:
+
+```bash
+# Install foundation (includes cursor rules/commands setup)
+./foundation/scripts/install-foundation.sh
+
+# Or setup cursor rules separately
+./foundation/scripts/setup-cursor-rules.sh
+```
+
+### Manual Installation
 
 Copy generic rules/commands to your `.cursor/` directory:
 
@@ -138,6 +144,8 @@ cp foundation/agent-instructions/cursor-commands/*.md .cursor/commands/
 vim .cursor/rules/my_rule.md
 vim .cursor/commands/my_command.md
 ```
+
+**Note:** The installation script preserves existing repo-specific rules and commands, only copying generic ones that don't already exist.
 
 ## Generic vs Repo-Specific
 
@@ -209,4 +217,5 @@ See project-specific examples:
 - Neotoma: `docs/foundation/agent_instructions.md`
 - Neotoma: `.cursor/rules/` directory
 - Neotoma: `.cursor/commands/` directory
+
 

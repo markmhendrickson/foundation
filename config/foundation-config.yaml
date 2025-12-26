@@ -37,6 +37,16 @@ development:
     require_references: false  # whether "References:" line is required
     pattern: "{id}: {description}"  # or custom pattern
   
+  # Commit workflow configuration
+  commit:
+    handle_nested_repos: false  # Enable nested repository handling
+    ui_testing:
+      enabled: false
+      frontend_paths: []  # e.g., ["frontend/src/**"]
+    branch_renaming:
+      enabled: false
+      patterns: []  # e.g., ["chat-*"]
+  
   # Pull requests
   pull_requests:
     require_id_in_title: true
@@ -143,7 +153,8 @@ validation:
   
   doc_dependencies:
     enabled: false
-    dependency_map_path: "docs/doc_dependencies.yaml"
+    dependency_map_path: "docs/doc_dependencies.yaml"  # Optional, configure per repository
+    validation_script_path: "scripts/validate-doc-dependencies.js"  # Optional
     check_on_commit: false
     auto_suggest_updates: false
 
@@ -152,14 +163,13 @@ security:
   enabled: true
   pre_commit_audit:
     enabled: true
-    protected_paths:
-      - "docs/private/"  # Repo-specific
-      - "data/"          # Repo-specific
-      - ".env*"
+    protected_paths: []  # Configure per repository (e.g., ["docs/private/", "data/"])
     protected_patterns:
       - "\.env"
       - "secrets"
       - "credentials"
+    check_env_files: true
+    check_data_directory: false  # Configure per repository
   credential_management:
     enabled: true
     require_env_separation: false  # whether to require DEV_*/PROD_* prefixes
@@ -223,9 +233,19 @@ agent_instructions:
   cursor_rules:
     enabled: false
     location: ".cursor/rules/"
+    generic_rules:
+      - security
+      - worktree_env
+      - readme_maintenance
+      - downstream_doc_updates
+      - instruction_documentation
+    custom_rules: []  # Repo-specific rules (e.g., ["repo_doctrine", "feature_detection"])
   cursor_commands:
     enabled: false
     location: ".cursor/commands/"
+    generic_commands:
+      - commit
+    custom_commands: []  # Repo-specific commands
   constraints: []
     # Project-specific constraints
     # - "Never commit secrets"
@@ -288,4 +308,5 @@ orchestration:
 custom:
   # Your project-specific config
   example_setting: "value"
+
 
