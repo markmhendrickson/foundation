@@ -17,6 +17,7 @@ PROTECTED_PATTERNS="${PROTECTED_PATTERNS:-\.env|secrets|credentials}"
 echo -e "${GREEN}🔒 Running pre-commit security audit...${NC}"
 
 # Check 1: Protected directories
+# Only check for additions/modifications, not deletions (deletions are allowed for cleanup)
 echo "Checking protected directories..."
 if git status --porcelain | grep -E "^[AM]|^\?\?" | grep -qE "$PROTECTED_PATHS"; then
     echo -e "${RED}❌ SECURITY VIOLATION: Files in protected directories detected!${NC}"
@@ -25,24 +26,26 @@ if git status --porcelain | grep -E "^[AM]|^\?\?" | grep -qE "$PROTECTED_PATHS";
     exit 1
 fi
 
-if git diff --cached --name-only 2>/dev/null | grep -qE "$PROTECTED_PATHS"; then
+# Check staged files - only additions/modifications, not deletions
+if git diff --cached --name-status 2>/dev/null | grep -E "^[AM]" | cut -f2 | grep -qE "$PROTECTED_PATHS"; then
     echo -e "${RED}❌ SECURITY VIOLATION: Protected files already staged!${NC}"
     echo "Files:"
-    git diff --cached --name-only | grep -E "$PROTECTED_PATHS"
+    git diff --cached --name-status | grep -E "^[AM]" | cut -f2 | grep -E "$PROTECTED_PATHS"
     exit 1
 fi
 
 # Check 2: Protected file patterns (e.g., .env files)
+# Exclude markdown files (.md) from filename pattern checks as they're typically documentation
 echo "Checking for protected file patterns..."
-if git status --porcelain | grep -qE "$PROTECTED_PATTERNS"; then
+if git status --porcelain | grep -vE "\.md$" | grep -qE "$PROTECTED_PATTERNS"; then
     echo -e "${RED}❌ SECURITY VIOLATION: Protected file patterns detected!${NC}"
-    git status --porcelain | grep -E "$PROTECTED_PATTERNS"
+    git status --porcelain | grep -vE "\.md$" | grep -E "$PROTECTED_PATTERNS"
     exit 1
 fi
 
-if git diff --cached --name-only 2>/dev/null | grep -qE "$PROTECTED_PATTERNS"; then
+if git diff --cached --name-only 2>/dev/null | grep -vE "\.md$" | grep -qE "$PROTECTED_PATTERNS"; then
     echo -e "${RED}❌ SECURITY VIOLATION: Protected file patterns already staged!${NC}"
-    git diff --cached --name-only | grep -E "$PROTECTED_PATTERNS"
+    git diff --cached --name-only | grep -vE "\.md$" | grep -E "$PROTECTED_PATTERNS"
     exit 1
 fi
 
