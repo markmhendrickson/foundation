@@ -106,6 +106,7 @@ Foundation provides generic Cursor rules in `foundation/agent-instructions/curso
 3. **README Maintenance** (`cursor-rules/readme_maintenance.md`) - Automatic README synchronization with documentation
 4. **Downstream Doc Updates** (`cursor-rules/downstream_doc_updates.md`) - Documentation dependency management
 5. **Instruction Documentation** (`cursor-rules/instruction_documentation.md`) - Rules for documenting agent instructions
+6. **Configuration Management** (`cursor-rules/configuration_management.md`) - Configuration file placement and scope
 
 See [CURSOR_RULES.md](CURSOR_RULES.md) for detailed documentation on each rule.
 

@@ -4,13 +4,14 @@ This document describes the generic Cursor rules provided by foundation and how 
 
 ## Overview
 
-Foundation provides five generic Cursor rules that can be used across repositories:
+Foundation provides six generic Cursor rules that can be used across repositories:
 
 1. **Security** - Pre-commit security audit
 2. **Worktree Environment** - Environment file handling in worktrees
 3. **README Maintenance** - Automatic README synchronization
 4. **Downstream Doc Updates** - Documentation dependency management
 5. **Instruction Documentation** - Rules for documenting agent instructions
+6. **Configuration Management** - Configuration file placement and scope
 
 All rules are located in `foundation/agent-instructions/cursor-rules/` and can be copied to your `.cursor/rules/` directory.
 
@@ -196,6 +197,33 @@ agent_instructions:
 - `foundation/conventions/documentation-standards.md` - Documentation standards
 - `foundation/agent-instructions/README.md` - Agent instructions overview
 
+### 6. Configuration Management Rule
+
+**File:** `cursor-rules/configuration_management.md`
+
+**Purpose:** Ensures configuration files are placed in the correct location based on their scope and purpose.
+
+**Key Features:**
+- Clear distinction between repository-specific and shared configuration
+- Prevents single-repo configs from being added to foundation submodule
+- Decision tree for configuration placement
+
+**Configuration:**
+
+No configuration needed - this is a rule about configuration placement itself.
+
+**When to Use:**
+- Always enabled when working with foundation configuration
+- Prevents common mistake of adding repo-specific configs to foundation submodule
+
+**When to Customize:**
+- Add repository-specific configuration placement rules if needed
+
+**Related:**
+- `foundation/config/foundation-config.yaml` - Configuration reference
+- `foundation/config/repo-adapters/template.yaml` - Template for shared configs
+- `foundation/README.md` - Foundation documentation
+
 ## Generic Cursor Commands
 
 ### Commit Command
@@ -272,6 +300,7 @@ ln -s ../../foundation/agent-instructions/cursor-rules/worktree_env.md worktree_
 ln -s ../../foundation/agent-instructions/cursor-rules/readme_maintenance.md readme_maintenance.md
 ln -s ../../foundation/agent-instructions/cursor-rules/downstream_doc_updates.md downstream_doc_updates.md
 ln -s ../../foundation/agent-instructions/cursor-rules/instruction_documentation.md instruction_documentation.md
+ln -s ../../foundation/agent-instructions/cursor-rules/configuration_management.md configuration_management.md
 
 # Create symlink for generic commit command
 cd ../commands
@@ -338,6 +367,7 @@ agent_instructions:
       - readme_maintenance
       - downstream_doc_updates
       - instruction_documentation
+      - configuration_management
     custom_rules: []  # Your repo-specific rules
 
   cursor_commands:
