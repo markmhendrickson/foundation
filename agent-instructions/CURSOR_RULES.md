@@ -287,27 +287,29 @@ The setup script creates **symlinks** from `.cursor/rules/` and `.cursor/command
 - Single source of truth (foundation)
 - Automatic updates when foundation is updated
 - Cursor agents can still auto-load them
+- Symlink names are prefixed with "foundation-" to avoid conflicts with other repos
+- Existing "foundation-" prefixed symlinks are removed before creating new ones
 
 ### Manual Installation
 
 If you prefer to create symlinks manually:
 
 ```bash
-# Create symlinks for generic rules
+# Create symlinks for generic rules (with "foundation-" prefix)
 cd .cursor/rules
-ln -s ../../foundation/agent-instructions/cursor-rules/security.md security.md
-ln -s ../../foundation/agent-instructions/cursor-rules/worktree_env.md worktree_env.md
-ln -s ../../foundation/agent-instructions/cursor-rules/readme_maintenance.md readme_maintenance.md
-ln -s ../../foundation/agent-instructions/cursor-rules/downstream_doc_updates.md downstream_doc_updates.md
-ln -s ../../foundation/agent-instructions/cursor-rules/instruction_documentation.md instruction_documentation.md
-ln -s ../../foundation/agent-instructions/cursor-rules/configuration_management.md configuration_management.md
+ln -s ../../foundation/agent-instructions/cursor-rules/security.md foundation-security.md
+ln -s ../../foundation/agent-instructions/cursor-rules/worktree_env.md foundation-worktree_env.md
+ln -s ../../foundation/agent-instructions/cursor-rules/readme_maintenance.md foundation-readme_maintenance.md
+ln -s ../../foundation/agent-instructions/cursor-rules/downstream_doc_updates.md foundation-downstream_doc_updates.md
+ln -s ../../foundation/agent-instructions/cursor-rules/instruction_documentation.md foundation-instruction_documentation.md
+ln -s ../../foundation/agent-instructions/cursor-rules/configuration_management.md foundation-configuration_management.md
 
-# Create symlink for generic commit command
+# Create symlink for generic commit command (with "foundation-" prefix)
 cd ../commands
-ln -s ../../foundation/agent-instructions/cursor-commands/commit.md commit.md
+ln -s ../../foundation/agent-instructions/cursor-commands/commit.md foundation-commit.md
 ```
 
-**Note:** The installation script preserves existing repo-specific rules and commands, only creating symlinks for generic ones that don't already exist. If you want to customize a generic rule, remove the symlink and create your own file.
+**Note:** The installation script removes all existing "foundation-" prefixed symlinks before creating new ones, ensuring a clean refresh. It preserves existing regular files (non-symlinks) to allow customizations. If you want to customize a generic rule, remove the symlink and create your own file.
 
 ## Customization
 

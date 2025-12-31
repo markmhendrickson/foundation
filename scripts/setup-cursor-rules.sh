@@ -1,6 +1,7 @@
 #!/bin/bash
 # Setup Cursor Rules Script
 # Creates symlinks to generic cursor rules and commands from foundation to .cursor/ directory
+# Prefixes all symlink names with "foundation-" to avoid conflicts with other repos
 
 set -e
 
@@ -59,23 +60,59 @@ print_info "Foundation directory: $FOUNDATION_DIR"
 RULES_RELATIVE_PATH="../../$FOUNDATION_DIR/agent-instructions/cursor-rules"
 COMMANDS_RELATIVE_PATH="../../$FOUNDATION_DIR/agent-instructions/cursor-commands"
 
+# Prefix for symlink names to avoid conflicts with other repos
+SYMLINK_PREFIX="foundation-"
+
+# Remove all existing symlinks with the prefix
+print_info "Removing existing symlinks with prefix '$SYMLINK_PREFIX'..."
+RULES_REMOVED=0
+COMMANDS_REMOVED=0
+
+if [ -d ".cursor/rules" ]; then
+    for existing_link in .cursor/rules/${SYMLINK_PREFIX}*.md; do
+        if [ -L "$existing_link" ]; then
+            rm "$existing_link"
+            print_info "  ✓ Removed $(basename "$existing_link")"
+            RULES_REMOVED=$((RULES_REMOVED + 1))
+        fi
+    done
+fi
+
+if [ -d ".cursor/commands" ]; then
+    for existing_link in .cursor/commands/${SYMLINK_PREFIX}*.md; do
+        if [ -L "$existing_link" ]; then
+            rm "$existing_link"
+            print_info "  ✓ Removed $(basename "$existing_link")"
+            COMMANDS_REMOVED=$((COMMANDS_REMOVED + 1))
+        fi
+    done
+fi
+
+if [ $RULES_REMOVED -gt 0 ] || [ $COMMANDS_REMOVED -gt 0 ]; then
+    if [ $RULES_REMOVED -gt 0 ]; then
+        print_info "Removed $RULES_REMOVED existing rule symlink(s)"
+    fi
+    if [ $COMMANDS_REMOVED -gt 0 ]; then
+        print_info "Removed $COMMANDS_REMOVED existing command symlink(s)"
+    fi
+    print_info ""
+fi
+
 # Create symlinks for generic rules
 print_info "Creating symlinks for generic cursor rules..."
 RULES_LINKED=0
 for rule_file in "$RULES_DIR"/*.md; do
     if [ -f "$rule_file" ]; then
         rule_name=$(basename "$rule_file")
-        target_file=".cursor/rules/$rule_name"
+        symlink_name="${SYMLINK_PREFIX}${rule_name}"
+        target_file=".cursor/rules/$symlink_name"
         
         if [ -e "$target_file" ]; then
-            if [ -L "$target_file" ]; then
-                print_warn "Symlink already exists: $rule_name (skipping)"
-            else
-                print_warn "File already exists: $rule_name (skipping to preserve customizations)"
-            fi
+            # File exists but is not a symlink (preserve customizations)
+            print_warn "File already exists (not a symlink): $symlink_name (skipping to preserve existing file)"
         else
             ln -s "$RULES_RELATIVE_PATH/$rule_name" "$target_file"
-            print_info "  ✓ Linked $rule_name"
+            print_info "  ✓ Linked $rule_name -> $symlink_name"
             RULES_LINKED=$((RULES_LINKED + 1))
         fi
     fi
@@ -87,30 +124,35 @@ COMMANDS_LINKED=0
 for cmd_file in "$COMMANDS_DIR"/*.md; do
     if [ -f "$cmd_file" ]; then
         cmd_name=$(basename "$cmd_file")
-        target_file=".cursor/commands/$cmd_name"
+        symlink_name="${SYMLINK_PREFIX}${cmd_name}"
+        target_file=".cursor/commands/$symlink_name"
         
         if [ -e "$target_file" ]; then
-            if [ -L "$target_file" ]; then
-                print_warn "Symlink already exists: $cmd_name (skipping)"
-            else
-                print_warn "File already exists: $cmd_name (skipping to preserve customizations)"
-            fi
+            # File exists but is not a symlink (preserve customizations)
+            print_warn "File already exists (not a symlink): $symlink_name (skipping to preserve existing file)"
         else
             ln -s "$COMMANDS_RELATIVE_PATH/$cmd_name" "$target_file"
-            print_info "  ✓ Linked $cmd_name"
+            print_info "  ✓ Linked $cmd_name -> $symlink_name"
             COMMANDS_LINKED=$((COMMANDS_LINKED + 1))
         fi
     fi
 done
 
 print_info ""
-if [ $RULES_LINKED -gt 0 ] || [ $COMMANDS_LINKED -gt 0 ]; then
+if [ $RULES_LINKED -gt 0 ] || [ $COMMANDS_LINKED -gt 0 ] || [ $RULES_REMOVED -gt 0 ] || [ $COMMANDS_REMOVED -gt 0 ]; then
     print_info "✅ Cursor rules setup complete!"
+    if [ $RULES_REMOVED -gt 0 ]; then
+        print_info "  Rules removed: $RULES_REMOVED"
+    fi
+    if [ $COMMANDS_REMOVED -gt 0 ]; then
+        print_info "  Commands removed: $COMMANDS_REMOVED"
+    fi
     print_info "  Rules linked: $RULES_LINKED"
     print_info "  Commands linked: $COMMANDS_LINKED"
     print_info ""
     print_info "Symlinks created to foundation (single source of truth)"
     print_info "Updates to foundation will automatically apply to these rules/commands"
+    print_info "Symlink names are prefixed with 'foundation-' to avoid conflicts"
     print_info ""
     print_info "Next steps:"
     print_info "  1. Review rules in .cursor/rules/ (they link to foundation)"

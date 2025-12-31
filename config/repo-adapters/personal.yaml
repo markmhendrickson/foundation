@@ -1,0 +1,40 @@
+# Personal Repository Adapter
+# Personal-specific configuration overrides
+
+repo_name: "personal"
+extends: null
+
+# Python-focused conventions
+conventions:
+  python:
+    files: "snake_case"
+    functions: "snake_case"
+    variables: "snake_case"
+    classes: "PascalCase"
+    constants: "UPPER_SNAKE_CASE"
+
+# Documentation aligned with existing structure
+documentation:
+  structure:
+    architecture_path: "docs/"
+    foundation_path: null  # Not using foundation/ subdirectory for docs
+
+# Security for data protection
+security:
+  pre_commit_audit:
+    protected_paths:
+      - "data/imports/"  # Read-only archive
+      - "data/attachments/"  # Large files
+      - ".env*"
+      - "docs/private/"
+
+
+
+
+
+
+
+
+
+
+

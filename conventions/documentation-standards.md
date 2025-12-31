@@ -163,6 +163,9 @@ When creating planning or specification documents:
    - Detailed topics: `{topic}_{subtopic}.md`
    - YAML summaries: `{topic}_metadata.yaml` or `{topic}_config.yaml`
    - Logs/tracking: `{topic}_log.md` or `{topic}_history.md`
+   - Use descriptive, clear filenames
+   - Include dates in filenames when relevant (YYYY-MM-DD format)
+   - Mark canonical documents with clear headers indicating their status
 
 ---
 

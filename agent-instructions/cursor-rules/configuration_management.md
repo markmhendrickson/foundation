@@ -122,8 +122,8 @@ repository:
 security:
   pre_commit_audit:
     protected_paths:
-      - "truth/data/imports/"  # Specific to this repo's structure
-      - "truth/data/attachments/"
+      - "$DATA_DIR/imports/"  # Specific to this repo's structure
+      - "$DATA_DIR/attachments/"
 ```
 
 ### ❌ Incorrect: Repository-Specific Config in Foundation
@@ -134,7 +134,7 @@ repo_name: "personal"
 security:
   pre_commit_audit:
     protected_paths:
-      - "truth/data/imports/"  # This is specific to ONE repo
+      - "$DATA_DIR/imports/"  # This is specific to ONE repo
 ```
 
 ### ✅ Correct: Shared Config in Foundation
@@ -156,4 +156,11 @@ documentation:
 - `foundation/config/foundation-config.yaml` - Full configuration reference
 - `foundation/config/repo-adapters/template.yaml` - Template for shared configs
 - `foundation/README.md` - Foundation documentation
+
+
+
+
+
+
+
 
