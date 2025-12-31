@@ -309,3 +309,11 @@ When [conditions], agents MUST [action].
 - `foundation/conventions/documentation-standards.md` — Documentation standards
 - `foundation-config.yaml` — Configuration file
 
+
+
+
+
+
+
+
+

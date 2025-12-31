@@ -213,3 +213,11 @@ No exceptions. Private documentation must never be committed to public repositor
 - `foundation/security/pre-commit-audit.sh` — Pre-commit audit script
 - `foundation-config.yaml` — Configuration file
 
+
+
+
+
+
+
+
+

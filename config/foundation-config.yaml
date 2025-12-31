@@ -245,6 +245,7 @@ agent_instructions:
     location: ".cursor/commands/"
     generic_commands:
       - commit
+      - create_release
     custom_commands: []  # Repo-specific commands
   constraints: []
     # Project-specific constraints

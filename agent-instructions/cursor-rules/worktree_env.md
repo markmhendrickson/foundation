@@ -43,3 +43,11 @@ tooling:
 - `foundation/development/workflow.md` — Development workflow including worktrees
 - `foundation/security/credential-management.md` — Credential management practices
 
+
+
+
+
+
+
+
+

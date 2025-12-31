@@ -115,6 +115,7 @@ See [CURSOR_RULES.md](CURSOR_RULES.md) for detailed documentation on each rule.
 Foundation provides generic Cursor commands in `foundation/agent-instructions/cursor-commands/`:
 
 1. **Commit** (`cursor-commands/commit.md`) - Comprehensive commit workflow with security audit, nested repo handling (optional), and configurable commit message generation
+2. **Create Release** (`cursor-commands/create_release.md`) - Release orchestration workflow for coordinating multiple Feature Units into cohesive releases
 
 ## Installation
 
