@@ -217,14 +217,14 @@ Run entire test suite and resolve any errors as necessary. Proceed to analyze al
 
 **CRITICAL: PRE-COMMIT SECURITY AUDIT** - MUST RUN BEFORE STAGING:
 
-Execute security audit from `foundation/agent-instructions/cursor-rules/security.md` (or `.cursor/rules/security.md` if installed) before staging ANY files:
+Execute security audit from `foundation/agent-instructions/cursor-rules/security.md` (or `.cursor/rules/foundation_security.md` if installed) before staging ANY files:
 
 1. **Run security audit script:**
    ```bash
    # Use foundation security audit script if available
    if [ -f "foundation/security/pre-commit-audit.sh" ]; then
      ./foundation/security/pre-commit-audit.sh
-   elif [ -f ".cursor/rules/security.md" ]; then
+   elif [ -f ".cursor/rules/foundation_security.md" ]; then
      # Follow security rule checks
      # (Implementation depends on how security rules are executed)
    fi
@@ -482,7 +482,7 @@ development:
 # Use foundation security audit script or rules
 if [ -f "foundation/security/pre-commit-audit.sh" ]; then
   ./foundation/security/pre-commit-audit.sh
-elif [ -f ".cursor/rules/security.md" ]; then
+elif [ -f ".cursor/rules/foundation_security.md" ]; then
   # Follow security rule checks
 fi
 
@@ -492,7 +492,7 @@ fi
 
 If final security check passes, proceed to git commit with the comprehensive commit message and push to origin.
 
-**WORKTREE DETECTION:** Follow the Worktree Rule (`.cursor/rules/worktree_env.md` or `foundation/agent-instructions/cursor-rules/worktree_env.md`) to restrict all commit activity to the current worktree.
+**WORKTREE DETECTION:** Follow the Worktree Rule (`.cursor/rules/foundation_worktree_env.md` or `foundation/agent-instructions/cursor-rules/worktree_env.md`) to restrict all commit activity to the current worktree.
 
 **COMMIT MESSAGE DISPLAY**: After successfully committing and pushing, always display the full commit message to the user by running `git log -1 --pretty=format:"%B"` and showing the output. This allows the user to review what was committed.
 

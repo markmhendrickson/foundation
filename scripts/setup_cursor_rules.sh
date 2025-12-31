@@ -1,7 +1,7 @@
 #!/bin/bash
 # Setup Cursor Rules Script
 # Creates symlinks to generic cursor rules and commands from foundation to .cursor/ directory
-# Prefixes all symlink names with "foundation-" to avoid conflicts with other repos
+# Prefixes all symlink names with "foundation_" to avoid conflicts with other repos
 
 set -e
 
@@ -61,7 +61,7 @@ RULES_RELATIVE_PATH="../../$FOUNDATION_DIR/agent_instructions/cursor_rules"
 COMMANDS_RELATIVE_PATH="../../$FOUNDATION_DIR/agent_instructions/cursor_commands"
 
 # Prefix for symlink names to avoid conflicts with other repos
-SYMLINK_PREFIX="foundation-"
+SYMLINK_PREFIX="foundation_"
 
 # Remove all existing symlinks with the prefix (both - and _ variants)
 print_info "Removing existing symlinks with prefix '$SYMLINK_PREFIX' (including underscore variant)..."
@@ -238,7 +238,7 @@ if [ $RULES_LINKED -gt 0 ] || [ $COMMANDS_LINKED -gt 0 ] || [ $RULES_REMOVED -gt
     print_info ""
     print_info "Symlinks created to foundation (single source of truth)"
     print_info "Updates to foundation will automatically apply to these rules/commands"
-    print_info "Foundation symlinks are prefixed with 'foundation-' to avoid conflicts"
+    print_info "Foundation symlinks are prefixed with 'foundation_' to avoid conflicts"
     if [ $REPO_RULES_LINKED -gt 0 ]; then
         print_info "Repo rules use path-based naming (e.g., foundation_agent_instructions_rules.md)"
     fi
