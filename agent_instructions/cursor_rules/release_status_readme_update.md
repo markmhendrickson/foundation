@@ -42,6 +42,7 @@ When a release status changes (e.g., from `planning` to `in_progress`, `in_progr
 Valid status values (from release workflow):
 - `planning`
 - `in_progress`
+- `in_testing`
 - `ready_for_deployment`
 - `deployed`
 - `completed`

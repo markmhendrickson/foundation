@@ -650,16 +650,25 @@ g. **Cleanup worker agents** (terminate completed agents)
    - **ALWAYS define test commands for all integration tests** (REQUIRED)
      - For each test in `integration_tests.md`, add `test:` field pointing to test file path
      - Test files should be created in `tests/integration/release/{RELEASE_ID}/` directory
-     - Test commands must be defined before release can be marked `ready_for_deployment`
+     - Test commands must be defined before release can be marked `in_testing`
    - **ALWAYS run full integration test suite** (REQUIRED - orchestrator does this automatically)
      - Orchestrator calls `runFullIntegrationTestSuite(releaseId)` after all batches complete
-     - Tests may show as `not_run` if test commands aren't defined yet (blocks `ready_for_deployment`)
-     - Failed tests block release from `ready_for_deployment` status
+     - Tests may show as `not_run` if test commands aren't defined yet (blocks `in_testing`)
+     - Failed tests block release from `in_testing` status
    - **Ensure Checkpoint 2 (Pre-Release Sign-Off) is marked as `completed`** in `status.md`:
      - If still `pending`, update to `completed`
      - Add completion notes: total batches completed, release status, P0 FU completion
-   - **Generate release report with Section 9 (Testing Guidance)** containing all manual test cases from `integration_tests.md` (see `.cursor/rules/post_build_testing.md`)
-   - **Present test cases to user:** "Release build complete. See release_report.md Section 9 (Testing Guidance) for manual test cases to validate functionality."
+   - **ALWAYS generate release report (REQUIRED):**
+     - Create or update `docs/releases/{RELEASE_ID}/release_report.md`
+     - Follow `docs/feature_units/standards/release_report_generation.md` for complete structure
+     - **Section 9 (Testing Guidance) is REQUIRED** and MUST include all manual test cases from `integration_tests.md`
+     - Extract all test definitions from `integration_tests.md`
+     - Format each test as user-facing manual test instructions (see `.cursor/rules/post_build_testing.md`)
+     - Include step-by-step actions and expected results for each test
+     - Mark all manual test cases as **REQUIRED BEFORE DEPLOYMENT**
+     - Report must be complete before transitioning to `in_testing` status
+   - **Mark Release status as `in_testing`** to indicate build complete, manual testing in progress
+   - **Present test cases to user:** "Release build complete. Status: in_testing. See release_report.md Section 9 (Testing Guidance) for manual test cases to validate functionality."
    - Synthesize continuous discovery findings
    - Update Release plan based on continuous discovery learnings
    - Proceed to Step 2
@@ -716,7 +725,7 @@ g. **Cleanup worker agents** (terminate completed agents)
      - **STOP** and report coverage gaps to user
      - List services below threshold with specific coverage percentages
      - User must add tests to meet thresholds before proceeding
-     - Release status remains `in_progress` until coverage thresholds met
+     - Release status remains `in_progress` until coverage thresholds met (before transitioning to `in_testing`)
    - Document coverage results in `docs/releases/vX.Y.Z/test_coverage_report.md`
 
 4. **Run Release-level acceptance criteria checks:**
@@ -742,7 +751,7 @@ g. **Cleanup worker agents** (terminate completed agents)
    - Release status remains `in_progress` until tests pass
 
 8. **If all tests pass and coverage thresholds met:**
-   - Update release status to `ready_for_deployment` (if not already)
+   - Transition to `in_testing` status (handled in Step 1, after all batches complete)
    - **Record Development Finish Date** in `status.md` (current date/time)
    - **Calculate Actual Development Time** (Development Finish Date - Development Start Date)
    - **Calculate Estimation Accuracy** ((Actual / Estimated) × 100%)
@@ -848,7 +857,7 @@ g. **Cleanup worker agents** (terminate completed agents)
      - **STOP** and report missing tables/migrations to user
      - List specific tables missing and which FUs require them
      - User must create migrations and update `schema.sql` before proceeding
-     - Release status remains `in_progress` until schema complete
+     - Release status remains `in_progress` until schema complete (before transitioning to `in_testing`)
 
 2. **Service Persistence Validation (REQUIRED):**
    - **For each service that generates data**, verify persistence:
@@ -865,7 +874,7 @@ g. **Cleanup worker agents** (terminate completed agents)
      - **STOP** and report services not persisting data to user
      - List specific services and functions that need persistence
      - User must add persistence logic before proceeding
-     - Release status remains `in_progress` until persistence complete
+     - Release status remains `in_progress` until persistence complete (before transitioning to `in_testing`)
 
 3. **Endpoint Integration Validation (REQUIRED):**
    - **For each HTTP/MCP endpoint**, verify full pipeline integration:
@@ -880,7 +889,7 @@ g. **Cleanup worker agents** (terminate completed agents)
      - **STOP** and report incomplete endpoint integrations to user
      - List specific endpoints and missing service calls
      - User must integrate services into endpoints before proceeding
-     - Release status remains `in_progress` until integration complete
+     - Release status remains `in_progress` until integration complete (before transitioning to `in_testing`)
 
 4. **MCP Action Completeness Validation (REQUIRED):**
    - **For each MCP action specified in release plan**, verify implementation:
@@ -892,7 +901,7 @@ g. **Cleanup worker agents** (terminate completed agents)
      - **STOP** and report missing MCP actions to user
      - List specific actions missing and which FUs require them
      - User must implement missing actions before proceeding
-     - Release status remains `in_progress` until actions complete
+     - Release status remains `in_progress` until actions complete (before transitioning to `in_testing`)
 
 5. **Graph Integrity Validation (REQUIRED):**
    - **Verify graph builder handles all node types:**
@@ -903,7 +912,7 @@ g. **Cleanup worker agents** (terminate completed agents)
      - **STOP** and report incomplete graph validation to user
      - List specific node types or relationship types not validated
      - User must enhance graph builder before proceeding
-     - Release status remains `in_progress` until validation complete
+     - Release status remains `in_progress` until validation complete (before transitioning to `in_testing`)
 
 6. **Documentation Consistency Validation (REQUIRED):**
    - **Verify status documents are consistent:**
@@ -914,7 +923,7 @@ g. **Cleanup worker agents** (terminate completed agents)
      - **STOP** and report inconsistencies to user
      - List specific mismatches (e.g., "status.md shows 10/11 tests passing, release_report.md shows 11/11")
      - User must reconcile documents before proceeding
-     - Release status remains `in_progress` until documents consistent
+     - Release status remains `in_progress` until documents consistent (before transitioning to `in_testing`)
 
 7. **Generate Architectural Completeness Report:**
    - Save to `docs/releases/vX.Y.Z/architectural_completeness_report.md`
@@ -933,7 +942,7 @@ g. **Cleanup worker agents** (terminate completed agents)
 9. **If any validation fails:**
    - **STOP** and present architectural completeness report to user
    - User must address all gaps before proceeding
-   - Release status remains `in_progress` until all validations pass
+   - Release status remains `in_progress` until all validations pass (before transitioning to `in_testing`)
    - After fixes, re-run Step 3.5 validation
 
 **Critical:** This validation step prevents deployment of releases with architectural gaps (like v0.1.0 had). All checks must pass before proceeding to Step 3.6.
@@ -1027,7 +1036,7 @@ g. **Cleanup worker agents** (terminate completed agents)
 5. **If any validation fails:**
    - **STOP** and present validation report to user
    - User must fix all issues before proceeding
-   - Release status remains `in_progress` until all validations pass
+   - Release status remains `in_progress` until all validations pass (before transitioning to `in_testing`)
    - After fixes, re-run Step 3.6 validation
 
 **Critical:** This validation step catches common deployment blockers early. All checks must pass before Checkpoint 2.
@@ -1038,7 +1047,7 @@ g. **Cleanup worker agents** (terminate completed agents)
 
 ### Step 4: Checkpoint 2 — Pre-Release Sign-Off
 
-**Trigger:** All FUs complete, integration tests pass
+**Trigger:** All FUs complete, integration tests pass, release in `in_testing` status
 
 **Agent Actions:**
 
@@ -1050,12 +1059,19 @@ g. **Cleanup worker agents** (terminate completed agents)
    - Integration test report link
    - **Manual test cases:** "See release_report.md Section 9 (Testing Guidance) for all manual test cases to validate functionality before deployment"
 
-2. **Generate release report with Section 9 (Testing Guidance):**
-   - Extract all test cases from `integration_tests.md`
-   - Format as user-facing manual test instructions
-   - Include step-by-step actions and expected results
-   - Mark all manual test cases as **REQUIRED BEFORE DEPLOYMENT**
-   - See `.cursor/rules/post_build_testing.md` for requirements
+2. **Verify release report exists (REQUIRED):**
+   - **Check if `docs/releases/{RELEASE_ID}/release_report.md` exists**
+   - **If missing:** Generate complete release report immediately
+     - Follow `docs/feature_units/standards/release_report_generation.md` for structure
+     - Include all required sections (Executive Summary, Batch Completion, Feature Units, etc.)
+     - **Section 9 (Testing Guidance) is REQUIRED** - must include all manual test cases
+     - Extract all test cases from `integration_tests.md`
+     - Format as user-facing manual test instructions
+     - Include step-by-step actions and expected results
+     - Mark all manual test cases as **REQUIRED BEFORE DEPLOYMENT**
+     - See `.cursor/rules/post_build_testing.md` for formatting requirements
+   - **If exists:** Verify Section 9 (Testing Guidance) is complete and includes all tests from `integration_tests.md`
+   - **Note:** Report should have been generated in Step 1.4 after all batches completed. If missing, generate it now before proceeding.
 
 3. **REQUIRE Manual Test Execution (BLOCKER):**
    - **STOP and prompt user:**
@@ -1932,14 +1948,15 @@ Load when:
 8. **REQUIRE test coverage thresholds met** - Critical path services must have 100% coverage, general coverage ≥80% before proceeding to architectural validation
 9. **REQUIRE architectural completeness validation** - Step 3.5 validation MUST pass before Step 3.6 (database schema, service persistence, endpoint integration, MCP actions, graph integrity, documentation consistency)
 10. **REQUIRE pre-release validation checklist** - Step 3.6 validation MUST pass before Checkpoint 2 (TypeScript compilation, migrations, schema advisor, MCP startup)
-10. **BLOCK Checkpoint 2 if architectural gaps found** - Do not proceed to Checkpoint 2 until all architectural completeness validations pass
-11. **REQUIRE manual test execution before deployment** - All manual test cases from `release_report.md` Section 9 (Testing Guidance) MUST be executed and all must pass before deployment approval
-12. **BLOCK deployment if manual tests not executed** - Do not proceed to Step 5 (Deployment) until all manual test cases are executed and documented
-13. **BLOCK deployment if any manual test fails** - Fix issues and re-execute tests before deployment approval
-14. **ALWAYS define Release type (marketed/not_marketed) during planning**
-15. **SKIP marketing activities for not_marketed releases** (Step 4.5 and Step 6 marketing sections)
-16. **REQUIRE marketing plan for marketed releases** before proceeding to deployment
-17. **ALL releases deploy to production at neotoma.io** - distinction is marketing, not deployment location
+11. **BLOCK Checkpoint 2 if architectural gaps found** - Do not proceed to Checkpoint 2 until all architectural completeness validations pass
+12. **ALWAYS generate release report after build** - Complete release report MUST be generated immediately after all batches complete (Step 1.4), before transitioning to `in_testing` status. Report must include Section 9 (Testing Guidance) with all manual test cases.
+13. **REQUIRE manual test execution before deployment** - All manual test cases from `release_report.md` Section 9 (Testing Guidance) MUST be executed and all must pass before deployment approval
+14. **BLOCK deployment if manual tests not executed** - Do not proceed to Step 5 (Deployment) until all manual test cases are executed and documented
+15. **BLOCK deployment if any manual test fails** - Fix issues and re-execute tests before deployment approval
+16. **ALWAYS define Release type (marketed/not_marketed) during planning**
+17. **SKIP marketing activities for not_marketed releases** (Step 4.5 and Step 6 marketing sections)
+18. **REQUIRE marketing plan for marketed releases** before proceeding to deployment
+19. **ALL releases deploy to production at neotoma.io** - distinction is marketing, not deployment location
 
 ### Forbidden Patterns
 
@@ -1971,7 +1988,8 @@ Load when:
 7. **Integration testing:** Run full test suite, validate coverage thresholds (Step 3)
 8. **Architectural completeness validation:** Validate database schema, service persistence, endpoint integration, MCP actions, graph integrity, documentation consistency (Step 3.5)
 9. **Pre-release validation:** Run comprehensive validation checklist - TypeScript compilation, migrations, schema advisor, MCP startup (Step 3.6 - see `docs/developer/pre_release_checklist.md`)
-10. **Pre-release sign-off:** Approve deployment at Checkpoint 2
+10. **Generate release report (REQUIRED):** Create complete release report with Section 9 (Testing Guidance) containing all manual test cases (see Step 1.4)
+11. **Pre-release sign-off:** Approve deployment at Checkpoint 2
 10. **Pre-release marketing (marketed only):** Execute pre-launch acquisition and reengagement at Step 4.5
 11. **Deployment:** Follow deployment plan, deploy to production (neotoma.io), setup monitoring
 12. **Post-release marketing (marketed only):** Execute post-launch acquisition and reengagement at Step 6
@@ -1981,19 +1999,20 @@ Load when:
 **Marketed Release:**
 
 ```
-Planning → Discovery → In Progress → Ready for Deployment → Pre-Launch Marketing → Deployed → Post-Launch Marketing → Completed
+Planning → Discovery → In Progress → In Testing → Ready for Deployment → Pre-Launch Marketing → Deployed → Post-Launch Marketing → Completed
 ```
 
 **Not Marketed Release:**
 
 ```
-Planning → Discovery → In Progress → Ready for Deployment → Deployed → Completed
+Planning → Discovery → In Progress → In Testing → Ready for Deployment → Deployed → Completed
 ```
 
 - **Planning:** Release plan being defined (includes marketing plan for marketed releases)
 - **Discovery:** Pre-release discovery validating assumptions (if conducted)
 - **In Progress:** FUs being executed in batches (with continuous discovery)
-- **Ready for Deployment:** All FUs complete, integration tests pass, user approved
+- **In Testing:** All FUs complete, build successful, manual test execution in progress
+- **Ready for Deployment:** All tests passed (automated + manual), user approved for deployment
 - **Pre-Launch Marketing (marketed only):** Execute pre-launch acquisition and reengagement
 - **Deployed:** Release deployed to production at neotoma.io (all releases)
 - **Post-Launch Marketing (marketed only):** Execute post-launch acquisition and reengagement

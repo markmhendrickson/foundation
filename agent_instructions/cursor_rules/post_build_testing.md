@@ -113,7 +113,10 @@ After all batches complete:
 
 1. Run full integration test suite (if test files exist)
 2. Update `status.md` with test results
-3. **Generate release report** (which includes Testing Guidance section with manual test cases)
+3. **ALWAYS generate complete release report (REQUIRED)** - This is a mandatory step per `foundation/development/release_workflow.md` Step 1.4
+   - Report must exist before transitioning to `in_testing` status
+   - Report includes Testing Guidance section with all manual test cases
+   - Follow `docs/feature_units/standards/release_report_generation.md` for structure
 4. Log: "See release_report.md Testing Guidance section for manual test cases"
 
 ### Release Report Generation
