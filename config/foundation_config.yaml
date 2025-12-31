@@ -1,0 +1,475 @@
+# Foundation Configuration Template
+# Configure all foundation processes for your repository
+
+# Repository information
+repository:
+  name: "your-project"
+  type: "application"  # or "library", "service", "monorepo"
+  languages:
+    - "typescript"
+    - "sql"
+    - "yaml"
+    - "shell"
+
+# Development workflow configuration
+development:
+  # Branch strategy
+  branch_strategy:
+    main_branches:
+      - "main"
+      - "dev"
+    feature_prefix: "feature"
+    bugfix_prefix: "bugfix"
+    hotfix_prefix: "hotfix"
+    release_prefix: "release"
+    naming_pattern: "{prefix}/{id}-{description}"  # or "{prefix}/{description}"
+    require_id: true  # whether ID is required in branch names
+  
+  # Workflow preferences
+  workflow:
+    use_worktrees: true
+    worktree_base_path: "../{repo}-{branch}"
+    env_copy_script: "scripts/copy-env-to-worktree.js"  # optional
+  
+  # Commit format
+  commit_format:
+    require_id: true  # whether ID is required in commit messages
+    require_references: false  # whether "References:" line is required
+    pattern: "{id}: {description}"  # or custom pattern
+  
+  # Commit workflow configuration
+  commit:
+    handle_nested_repos: false  # Enable nested repository handling
+    ui_testing:
+      enabled: false
+      frontend_paths: []  # e.g., ["frontend/src/**"]
+    branch_renaming:
+      enabled: false
+      patterns: []  # e.g., ["chat-*"]
+  
+  # Pull workflow
+  pull:
+    auto_commit: true  # Automatically commit local changes before pull
+    conflict_strategy: "merge"  # "merge" | "rebase" | "abort"
+    run_setup_scripts: true  # Run setup scripts after pull
+    setup_scripts: []  # Custom list of scripts to run (empty = auto-detect)
+  
+  # Bug fix workflow
+  bug_fix:
+    enabled: false  # Enable bug fix workflow
+    error_classification:
+      enabled: false  # Enable if you have error classification system
+      classes:
+        - name: "Class 1"
+          description: "Implementation bug"
+          correction: "Patch code only"
+        - name: "Class 2"
+          description: "Spec bug"
+          correction: "Update spec first, then code"
+        - name: "Class 3"
+          description: "Architectural bug"
+          correction: "Update architecture docs first"
+    require_regression_test: true
+    test_commands: []  # Optional, repo-specific test commands (e.g., ["npm test"])
+  
+  # Pull requests
+  pull_requests:
+    require_id_in_title: true
+    title_pattern: "{id}: {description}"
+    min_approvals: 1
+    high_risk_approvals: 2
+    require_review_from_code_owners: false
+    merge_strategy: "squash"  # or "merge", "rebase"
+    delete_branch_on_merge: true
+    require_linear_history: false
+
+# Code conventions
+conventions:
+  typescript:
+    files: "snake_case"  # or "kebab-case", "camelCase"
+    components: "PascalCase"  # React/Vue components
+    functions: "camelCase"
+    types: "PascalCase"
+    interfaces: "PascalCase"
+    variables: "camelCase"
+    constants: "UPPER_SNAKE_CASE"
+    classes: "PascalCase"
+    string_quotes: "double"  # or "single"
+    prefer_named_exports: true
+    import_order:
+      - "external"  # node_modules
+      - "internal"  # from src/
+      - "relative"  # ./ or ../
+  
+  sql:
+    tables: "snake_case"  # Always plural
+    columns: "snake_case"
+    indexes: "idx_{table}_{columns}"
+    constraints: "{table}_{constraint_type}"
+    policies: "{action} - {table}"  # if using RLS
+    use_rls: false  # Postgres Row Level Security
+    timestamp_columns:
+      created: "created_at"
+      updated: "updated_at"
+      deleted: "deleted_at"
+  
+  yaml:
+    keys: "snake_case"
+    indentation: 2
+    use_quotes: "when_needed"  # or "always", "never"
+    boolean_style: "lowercase"  # true/false
+  
+  shell:
+    constants: "UPPER_SNAKE_CASE"
+    local_variables: "lowercase"
+    functions: "snake_case"  # or "camelCase"
+    scripts: "kebab-case.sh"
+
+# Testing configuration
+testing:
+  framework: "vitest"  # or "jest", "mocha", "pytest", "go test"
+  coverage:
+    domain_logic: 85
+    application_layer: 80
+    ui_components: 75
+    infrastructure: 70
+  test_types:
+    - "unit"
+    - "integration"
+    - "e2e"
+  test_file_suffix: ".test.ts"  # or ".spec.ts", "_test.py"
+
+# Documentation standards
+documentation:
+  required_sections:
+    - "Purpose"
+    - "Scope"
+    # "Agent Instructions"  # Optional, uncomment to enable
+  structure:
+    manifest_path: null  # or "docs/manifest.md"
+    architecture_path: "docs/architecture/"
+    foundation_path: null  # or "docs/foundation/"
+  validation:
+    check_dependencies: false  # whether to validate doc dependencies
+    check_links: true
+    enforce_agent_instructions: false
+  writing_style:
+    avoid_ai_patterns: true
+    require_rfc_2119: true  # MUST/MUST NOT language
+    max_sentence_length: null  # or number for enforcement
+
+# Validation systems
+validation:
+  spec_compliance:
+    enabled: false  # whether to validate code against specs
+    spec_paths:
+      - "docs/specs/**/*.md"
+      - "docs/features/**/*.md"
+    requirement_patterns:
+      - "MUST"
+      - "MUST NOT"
+      - "SHALL"
+      - "REQUIRED"
+    check_types:
+      - "code_existence"
+      - "database_schema"
+      - "validation_logic"
+      - "testing"
+  
+  doc_dependencies:
+    enabled: false
+    dependency_map_path: "docs/doc_dependencies.yaml"  # Optional, configure per repository
+    validation_script_path: "scripts/validate-doc-dependencies.js"  # Optional
+    check_on_commit: false
+    auto_suggest_updates: false
+
+# Security configuration
+security:
+  enabled: true
+  pre_commit_audit:
+    enabled: true
+    protected_paths: []  # Configure per repository (e.g., ["docs/private/", "data/"])
+    protected_patterns:
+      - "\.env"
+      - "secrets"
+      - "credentials"
+    check_env_files: true
+    check_data_directory: false  # Configure per repository
+  credential_management:
+    enabled: true
+    require_env_separation: false  # whether to require DEV_*/PROD_* prefixes
+    secrets_manager:
+      enabled: false
+      storage_path: ".secrets/secrets.enc"
+      key_path: ".secrets/.key"
+      algorithm: "aes-256-gcm"
+      master_key_env: "SECRETS_MASTER_KEY"
+
+# Tooling configuration
+tooling:
+  secrets:
+    enabled: false
+    storage_path: ".secrets/secrets.enc"
+    key_path: ".secrets/.key"
+    algorithm: "aes-256-gcm"
+    master_key_env: "SECRETS_MASTER_KEY"
+  
+  env_management:
+    enabled: true
+    env_file_priority:
+      - ".env.dev"
+      - ".env"
+      - ".env.development"
+    worktree_detection:
+      cursor_worktrees: true
+      custom_patterns: []
+    environment_separation:
+      enabled: false
+      dev_prefix: "DEV_"
+      prod_prefix: "PROD_"
+      require_explicit_env: false  # whether to prevent generic variables
+  
+  agent_setup:
+    enabled: false
+    database:
+      type: null  # "supabase", "postgres", "mysql", etc.
+      migration_command: null  # "supabase db push" or custom
+      fallback_script: null  # "scripts/apply_migrations.js"
+    tools: []
+      # - name: "playwright"
+      #   install_command: "npx playwright install --with-deps chromium"
+      # - name: "database_cli"
+      #   verify_command: "npx supabase --version"
+  
+  readme_generation:
+    enabled: false
+    source_documents: []
+      # - "docs/foundation/core_identity.md"
+      # - "docs/specs/overview.md"
+    structure_template: null  # "templates/readme-structure.md"
+    regenerate_triggers: []
+      # - "docs/foundation/**/*.md"
+      # - "docs/specs/**/*.md"
+
+# Agent instructions configuration
+agent_instructions:
+  enabled: false
+  location: "docs/foundation/agent_instructions.md"  # or ".cursor/rules/"
+  cursor_rules:
+    enabled: false
+    location: ".cursor/rules/"
+    generic_rules:
+      - security
+      - worktree_env
+      - readme_maintenance
+      - downstream_doc_updates
+      - instruction_documentation
+      - feature_unit_detection
+      - release_detection
+      - checkpoint_management
+      - post_build_testing
+      - bug_fix_detection
+    custom_rules: []  # Repo-specific rules
+  cursor_commands:
+    enabled: false
+    location: ".cursor/commands/"
+    generic_commands:
+      - commit
+      - pull
+      - create_release
+      - create_feature_unit
+      - run_feature_workflow
+      - create_prototype
+      - final_review
+      - fix_feature_bug
+      - analyze
+      - setup_symlinks
+    custom_commands: []  # Repo-specific commands
+  constraints: []
+    # Project-specific constraints
+    # - "Never commit secrets"
+    # - "Always update documentation when code changes"
+  validation_checklist:
+    enabled: false
+    custom_checks: []  # Repo-specific checks
+
+# Strategy evaluation (optional)
+strategy:
+  discovery:
+    enabled: false
+    framework: "cagan"  # or "lean", "jobs-to-be-done"
+    risks:
+      value:
+        enabled: false
+        method: "interviews"  # or "surveys", "prototypes"
+        success_threshold: 70  # % validating problem
+        min_participants: 5
+      usability:
+        enabled: false
+        method: "prototype_testing"
+        success_threshold: 80  # % completing workflows
+        min_participants: 5
+      feasibility:
+        enabled: false
+        method: "poc"  # or "architectural_review"
+        success_criteria: "meets_requirements"
+      business_viability:
+        enabled: false
+        method: "pricing_interviews"
+        success_threshold: 50  # % willing to pay
+        min_participants: 5
+    mom_test:
+      enabled: false
+      require_live_interviews: false
+      commitment_signals:
+        - "time_spent"
+        - "money_spent"
+        - "reputation_risk"
+        - "emotional_intensity"
+    continuous_discovery:
+      enabled: false
+      frequency: "weekly"  # or "bi-weekly", "monthly"
+      min_participants_per_cycle: 2
+  
+  # Competitive and partnership analysis
+  competitive_analysis:
+    enabled: false
+    output_directory: "docs/private/competitive/"  # Where to save competitive analyses
+  partnership_analysis:
+    enabled: false
+    output_directory: "docs/private/partnerships/"  # Where to save partnership analyses
+  relevance_analysis:
+    enabled: false
+    output_directory: "docs/private/insights/"  # Where to save relevance analyses (for content/thought leadership)
+
+# Private documentation repository (optional)
+private_docs:
+  enabled: false  # Enable to automatically add private docs as submodule during installation
+  repo_url: null  # Private docs repository URL (e.g., "https://github.com/user/private-docs.git")
+                  # If null, uses PRIVATE_DOCS_REPO_URL environment variable
+  path: "docs/private"  # Submodule path in consuming repository
+
+# Release orchestration (optional)
+orchestration:
+  release:
+    enabled: false
+    directory: "docs/releases/"  # Base directory for releases
+    in_progress_subdir: "in_progress"
+    completed_subdir: "completed"
+    execution_strategy: "sequential"  # or "multi_agent", "parallel"
+    max_parallel_items: 3
+    
+    # Release files
+    integration_tests_file: "integration_tests.md"  # Integration tests filename
+    release_report_file: "release_report.md"  # Release report filename
+    status_file: "status.md"  # Status tracking filename
+    manifest_file: "manifest.yaml"  # Release manifest filename
+    testing_section_name: "Testing Guidance"  # Section name in release report
+    
+    # Agent spawning (for multi-agent execution)
+    agent_spawning:
+      enabled: false  # Requires Cursor Cloud API
+      api_url: "${CURSOR_CLOUD_API_URL}"
+      api_key: "${CURSOR_CLOUD_API_KEY}"
+
+# Feature Unit development workflow (optional)
+feature_units:
+  enabled: false
+  
+  # Directory structure
+  directory: "docs/feature_units/"  # Base directory for feature units
+  completed_subdir: "completed"     # Subdirectory for completed FUs
+  in_progress_subdir: "in_progress" # Subdirectory for in-progress FUs
+  
+  # ID format
+  id_pattern: "FU-YYYY-MM-NNN"  # Feature Unit ID format (e.g., FU-2025-01-001)
+  id_regex: "^FU-\\d{4}-\\d{2}-\\d{3}$"  # Validation regex
+  
+  # Manifest configuration
+  manifest_complexity: "simple"  # simple | extended
+  # simple: Core fields only (status, priority, dependencies, testing, observability)
+  # extended: Includes architecture fields (subsystems, schema_changes, api_changes, ui, state_machines)
+  
+  # Required spec sections (always required)
+  required_sections:
+    - "Overview"
+    - "Requirements"
+    - "Testing Strategy"
+    - "Observability"
+  
+  # Optional spec sections (configurable per repo)
+  optional_sections: []
+    # - "UX Requirements"  # Enable for UI-heavy projects
+    # - "Architecture Details"  # Enable for complex architectures
+    # - "Migration Plan"  # Enable for database-heavy projects
+  
+  # Product strategy tracking (optional but recommended)
+  product_strategy:
+    enabled: false  # Enable to track competitive positioning
+    track_defensible_differentiation: false
+    differentiation_types: []  # Define your differentiation types
+      # Examples:
+      # - "privacy-first"
+      # - "deterministic"
+      # - "cross-platform"
+      # - "open-source"
+      # - "offline-first"
+    track_user_value: true  # Always track user value (why users care)
+    track_competitive_positioning: false  # Track vs competitor comparison
+  
+  # Architecture tracking (extended manifest only)
+  architecture:
+    track_subsystems: false  # Track which architecture modules are affected
+    subsystems: []  # Define your architecture modules
+      # Examples:
+      # - "ingestion"
+      # - "schema"
+      # - "search"
+      # - "auth"
+    track_schema_changes: false  # Track database schema changes
+    track_api_changes: false  # Track API/endpoint changes
+    track_ui_changes: false  # Track UI component changes
+    track_state_machines: false  # Track state machine definitions
+  
+  # Dependency validation
+  dependencies:
+    validate_on_create: true  # Validate dependencies exist before creating FU
+    allow_partial_dependencies: true  # Allow depending on partial (in-progress) FUs
+    reject_missing_dependencies: true  # Reject if dependency doesn't exist
+  
+  # Testing requirements
+  testing:
+    require_unit_tests: true
+    require_integration_tests: true
+    require_e2e_tests: false  # Optional for non-UI features
+    require_observability: true  # At least one metric/log required
+    coverage_targets:
+      lines: 80
+      branches: 80
+      critical_paths: 100  # Critical code paths require 100% coverage
+  
+  # Checkpoint workflow
+  checkpoints:
+    checkpoint_0_spec_creation: true  # Always required
+    checkpoint_1_prototype_review: true  # Required for UI features
+    checkpoint_2_final_review: true  # Always required
+  
+  # Git workflow integration
+  git_workflow:
+    use_worktrees: false  # Whether to use git worktrees for isolation
+    worktree_path_pattern: "../{repo}-{feature_id}"
+    branch_prefix: "feature"  # Branch naming: feature/FU-XXX-description
+    require_pr: true  # Require PR for final review
+  
+  # Kill switch (defer criteria)
+  kill_switch:
+    enabled: true  # Track conditions for deferring/pausing FUs
+    check_on_execution: true  # Check conditions during execution
+
+# Project-specific extensions
+# Add custom configuration sections here
+custom:
+  # Your project-specific config
+  example_setting: "value"
+
+

@@ -936,7 +936,103 @@ g. **Cleanup worker agents** (terminate completed agents)
    - Release status remains `in_progress` until all validations pass
    - After fixes, re-run Step 3.5 validation
 
-**Critical:** This validation step prevents deployment of releases with architectural gaps (like v0.1.0 had). All checks must pass before proceeding to Checkpoint 2.
+**Critical:** This validation step prevents deployment of releases with architectural gaps (like v0.1.0 had). All checks must pass before proceeding to Step 3.6.
+
+---
+
+### Step 3.6: Pre-Release Validation Checklist (REQUIRED)
+
+**Trigger:** Step 3.5 (Architectural Completeness Validation) passes
+
+**Purpose:** Run comprehensive pre-release validation to catch common issues before deployment. This checklist is based on issues discovered in past releases and prevents:
+- TypeScript compilation errors
+- Missing migrations
+- MCP protocol errors
+- RLS security issues
+- Service startup failures
+
+**Agent Actions:**
+
+1. **Run Pre-Release Checklist:**
+   - Execute all checks from `docs/developer/pre_release_checklist.md`
+   - Document results in release status or validation report
+
+2. **Required Validation Steps:**
+   - **TypeScript Compilation:**
+     ```bash
+     npm run type-check
+     ```
+     - MUST pass with 0 errors
+     - Past issues: `resolveEntity` return type mismatch, interface mismatches
+   
+   - **Linting:**
+     ```bash
+     npm run lint
+     ```
+     - MUST pass (warnings acceptable but reviewed)
+   
+   - **Migration Completeness:**
+     ```bash
+     # Verify all schema.sql tables have migrations
+     grep "^CREATE TABLE" supabase/schema.sql
+     grep "^CREATE TABLE" supabase/migrations/*.sql
+     # Compare - every table should appear in both
+     ```
+     - Past issues: `record_relationships`, `records`, Plaid/external tables missing migrations
+   
+   - **Migration Execution:**
+     ```bash
+     npm run migrate
+     ```
+     - MUST succeed without errors
+     - Test in clean environment if possible
+   
+   - **Schema Advisor:**
+     ```bash
+     npm run check:advisors
+     ```
+     - MUST pass with 0 critical issues
+     - Past issues: Tables with policies but RLS not enabled
+   
+   - **Build Verification:**
+     ```bash
+     rm -rf dist/ && npm run build
+     ```
+     - MUST succeed, dist/ directory created
+   
+   - **MCP Server Startup:**
+     ```bash
+     npm run dev
+     ```
+     - MUST start without errors
+     - MUST NOT output to stdout (breaks JSON-RPC protocol)
+     - Past issues: Console logging breaking MCP protocol
+   
+   - **MCP Watch Mode:**
+     ```bash
+     npm run dev:mcp
+     ```
+     - MUST compile without errors
+     - Verify watch mode detects changes
+
+3. **Generate Pre-Release Validation Report:**
+   - Save to `docs/releases/vX.Y.Z/pre_release_validation_report.md`
+   - Include pass/fail for each check
+   - Include any warnings or notes
+
+4. **If all validations pass:**
+   - Mark pre-release validation as `completed` in `status.md`
+   - Proceed to Step 4 (Checkpoint 2)
+
+5. **If any validation fails:**
+   - **STOP** and present validation report to user
+   - User must fix all issues before proceeding
+   - Release status remains `in_progress` until all validations pass
+   - After fixes, re-run Step 3.6 validation
+
+**Critical:** This validation step catches common deployment blockers early. All checks must pass before Checkpoint 2.
+
+**Reference:** See `docs/developer/pre_release_checklist.md` for complete checklist and common failure modes.
 
 ---
 
@@ -1834,7 +1930,8 @@ Load when:
 6. **ALWAYS run cross-FU integration tests after each batch**
 7. **NEVER deploy without passing integration tests**
 8. **REQUIRE test coverage thresholds met** - Critical path services must have 100% coverage, general coverage ≥80% before proceeding to architectural validation
-9. **REQUIRE architectural completeness validation** - Step 3.5 validation MUST pass before Checkpoint 2 (database schema, service persistence, endpoint integration, MCP actions, graph integrity, documentation consistency)
+9. **REQUIRE architectural completeness validation** - Step 3.5 validation MUST pass before Step 3.6 (database schema, service persistence, endpoint integration, MCP actions, graph integrity, documentation consistency)
+10. **REQUIRE pre-release validation checklist** - Step 3.6 validation MUST pass before Checkpoint 2 (TypeScript compilation, migrations, schema advisor, MCP startup)
 10. **BLOCK Checkpoint 2 if architectural gaps found** - Do not proceed to Checkpoint 2 until all architectural completeness validations pass
 11. **REQUIRE manual test execution before deployment** - All manual test cases from `release_report.md` Section 9 (Testing Guidance) MUST be executed and all must pass before deployment approval
 12. **BLOCK deployment if manual tests not executed** - Do not proceed to Step 5 (Deployment) until all manual test cases are executed and documented
@@ -1851,8 +1948,10 @@ Load when:
 - Proceeding past checkpoints without user approval
 - Deploying with failing acceptance criteria
 - **Skipping test coverage validation** - Coverage thresholds must be validated in Step 3 before architectural validation
-- **Skipping architectural completeness validation** - Step 3.5 validation must pass before Checkpoint 2
+- **Skipping architectural completeness validation** - Step 3.5 validation must pass before Step 3.6
+- **Skipping pre-release validation checklist** - Step 3.6 validation must pass before Checkpoint 2
 - **Proceeding to Checkpoint 2 with architectural gaps** - Database schema, service persistence, endpoint integration, MCP actions, graph integrity, and documentation consistency must all be validated
+- **Proceeding to Checkpoint 2 with validation failures** - TypeScript compilation, migrations, schema advisor, and MCP startup must all pass
 - **Deploying without executing manual test cases** - All manual test cases from `release_report.md` Section 9 (Testing Guidance) must be executed before deployment
 - **Deploying with failed manual test cases** - All manual test cases must pass before deployment approval
 - **Skipping manual test validation** - Manual test execution and results documentation is required at Checkpoint 2
@@ -1871,7 +1970,8 @@ Load when:
 6. **Mid-release review (optional):** Checkpoint 1 after critical-path FUs
 7. **Integration testing:** Run full test suite, validate coverage thresholds (Step 3)
 8. **Architectural completeness validation:** Validate database schema, service persistence, endpoint integration, MCP actions, graph integrity, documentation consistency (Step 3.5)
-9. **Pre-release sign-off:** Approve deployment at Checkpoint 2
+9. **Pre-release validation:** Run comprehensive validation checklist - TypeScript compilation, migrations, schema advisor, MCP startup (Step 3.6 - see `docs/developer/pre_release_checklist.md`)
+10. **Pre-release sign-off:** Approve deployment at Checkpoint 2
 10. **Pre-release marketing (marketed only):** Execute pre-launch acquisition and reengagement at Step 4.5
 11. **Deployment:** Follow deployment plan, deploy to production (neotoma.io), setup monitoring
 12. **Post-release marketing (marketed only):** Execute post-launch acquisition and reengagement at Step 6

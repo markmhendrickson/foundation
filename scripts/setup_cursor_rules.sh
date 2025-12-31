@@ -35,8 +35,8 @@ else
 fi
 
 # Check if foundation has cursor rules
-RULES_DIR="$FOUNDATION_DIR/agent-instructions/cursor-rules"
-COMMANDS_DIR="$FOUNDATION_DIR/agent-instructions/cursor-commands"
+RULES_DIR="$FOUNDATION_DIR/agent_instructions/cursor_rules"
+COMMANDS_DIR="$FOUNDATION_DIR/agent_instructions/cursor_commands"
 
 if [ ! -d "$RULES_DIR" ]; then
     print_error "Cursor rules directory not found: $RULES_DIR"
@@ -56,9 +56,9 @@ print_info "Setting up cursor rules and commands..."
 print_info "Foundation directory: $FOUNDATION_DIR"
 
 # Calculate relative path from .cursor/rules to foundation
-# .cursor/rules -> .. -> .. -> foundation/agent-instructions/cursor-rules
-RULES_RELATIVE_PATH="../../$FOUNDATION_DIR/agent-instructions/cursor-rules"
-COMMANDS_RELATIVE_PATH="../../$FOUNDATION_DIR/agent-instructions/cursor-commands"
+# .cursor/rules -> .. -> .. -> foundation/agent_instructions/cursor_rules
+RULES_RELATIVE_PATH="../../$FOUNDATION_DIR/agent_instructions/cursor_rules"
+COMMANDS_RELATIVE_PATH="../../$FOUNDATION_DIR/agent_instructions/cursor_commands"
 
 # Prefix for symlink names to avoid conflicts with other repos
 SYMLINK_PREFIX="foundation-"
@@ -245,8 +245,8 @@ if [ $RULES_LINKED -gt 0 ] || [ $COMMANDS_LINKED -gt 0 ] || [ $RULES_REMOVED -gt
     print_info ""
     print_info "Next steps:"
     print_info "  1. Review rules in .cursor/rules/ (they link to foundation and docs/)"
-    print_info "  2. Configure foundation-config.yaml to enable cursor rules"
-    print_info "  3. See foundation/agent-instructions/README.md for documentation"
+    print_info "  2. Configure foundation_config.yaml to enable cursor rules"
+    print_info "  3. See foundation/agent_instructions/README.md for documentation"
     print_info ""
     print_info "Note: To customize a rule, remove the symlink and create your own file"
 else

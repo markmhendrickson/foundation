@@ -135,12 +135,12 @@ case $INSTALL_METHOD in
 esac
 
 # Generate default config if it doesn't exist
-if [ ! -f "foundation-config.yaml" ]; then
-    print_info "Generating foundation-config.yaml..."
-    if [ -f "$FOUNDATION_PATH/config/foundation-config.yaml" ]; then
-        cp "$FOUNDATION_PATH/config/foundation-config.yaml" ./foundation-config.yaml
-        print_info "✅ Config file created: foundation-config.yaml"
-        print_warn "Please customize foundation-config.yaml for your repository"
+if [ ! -f "foundation_config.yaml" ]; then
+    print_info "Generating foundation_config.yaml..."
+    if [ -f "$FOUNDATION_PATH/config/foundation_config.yaml" ]; then
+        cp "$FOUNDATION_PATH/config/foundation_config.yaml" ./foundation_config.yaml
+        print_info "✅ Config file created: foundation_config.yaml"
+        print_warn "Please customize foundation_config.yaml for your repository"
     else
         print_warn "Foundation config template not found"
     fi
@@ -148,10 +148,10 @@ fi
 
 # Create .gitignore entries if needed
 if [ -f ".gitignore" ]; then
-    if ! grep -q "^foundation-config.local.yaml$" .gitignore 2>/dev/null; then
+    if ! grep -q "^foundation_config.local.yaml$" .gitignore 2>/dev/null; then
         echo "" >> .gitignore
         echo "# Foundation local overrides" >> .gitignore
-        echo "foundation-config.local.yaml" >> .gitignore
+        echo "foundation_config.local.yaml" >> .gitignore
         print_info "✅ Added foundation config to .gitignore"
     fi
 fi
@@ -163,14 +163,14 @@ PRIVATE_DOCS_URL=""
 if [ -n "$PRIVATE_DOCS_REPO_URL" ]; then
     PRIVATE_DOCS_URL="$PRIVATE_DOCS_REPO_URL"
     print_info "Found PRIVATE_DOCS_REPO_URL environment variable"
-# Check foundation-config.yaml if it exists
-elif [ -f "foundation-config.yaml" ]; then
+# Check foundation_config.yaml if it exists
+elif [ -f "foundation_config.yaml" ]; then
     # Try to extract private_docs.repo_url from config (requires yq or manual parsing)
     if command -v yq &> /dev/null; then
-        CONFIG_URL=$(yq eval '.private_docs.repo_url' foundation-config.yaml 2>/dev/null)
+        CONFIG_URL=$(yq eval '.private_docs.repo_url' foundation_config.yaml 2>/dev/null)
         if [ "$CONFIG_URL" != "null" ] && [ -n "$CONFIG_URL" ]; then
             PRIVATE_DOCS_URL="$CONFIG_URL"
-            print_info "Found private docs URL in foundation-config.yaml"
+            print_info "Found private docs URL in foundation_config.yaml"
         fi
     fi
 fi
@@ -206,7 +206,7 @@ else
     print_info "ℹ️  Private docs submodule not configured"
     print_info "To set up later, either:"
     print_info "  1. Set PRIVATE_DOCS_REPO_URL environment variable, or"
-    print_info "  2. Add to foundation-config.yaml:"
+    print_info "  2. Add to foundation_config.yaml:"
     print_info "     private_docs:"
     print_info "       enabled: true"
     print_info "       repo_url: \"https://github.com/user/private-docs.git\""
@@ -214,17 +214,17 @@ else
 fi
 
 # Setup cursor rules (optional)
-if [ -f "$FOUNDATION_PATH/scripts/setup-cursor-rules.sh" ]; then
+if [ -f "$FOUNDATION_PATH/scripts/setup_cursor_rules.sh" ]; then
     print_info ""
     print_info "Setting up cursor rules..."
-    "$FOUNDATION_PATH/scripts/setup-cursor-rules.sh"
+    "$FOUNDATION_PATH/scripts/setup_cursor_rules.sh"
 fi
 
 print_info ""
 print_info "✅ Foundation installation complete!"
 print_info ""
 print_info "Next steps:"
-print_info "  1. Customize foundation-config.yaml for your repository"
+print_info "  1. Customize foundation_config.yaml for your repository"
 print_info "  2. Run ./foundation/scripts/validate-setup.sh to verify installation"
 print_info "  3. See foundation/README.md for usage documentation"
 print_info "  4. See foundation/agent-instructions/README.md for cursor rules documentation"

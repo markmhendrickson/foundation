@@ -19,7 +19,7 @@ Foundation is a collection of generalized, composable development processes that
 
 ## Key Features
 
-✅ **Configurable** - Adapt to your project's needs via `foundation-config.yaml`  
+✅ **Configurable** - Adapt to your project's needs via `foundation_config.yaml`  
 ✅ **Composable** - Pick and choose what you need  
 ✅ **Shareable** - Use across multiple repositories via git submodules  
 ✅ **Agent-Friendly** - Designed for AI coding assistants  
@@ -33,17 +33,17 @@ Foundation is a collection of generalized, composable development processes that
 
 ```bash
 # From your repository root
-./path/to/foundation/scripts/install-foundation.sh ../foundation
+./path/to/foundation/scripts/install_foundation.sh ../foundation
 
 # Or from a remote repository
-./path/to/foundation/scripts/install-foundation.sh https://github.com/user/foundation.git
+./path/to/foundation/scripts/install_foundation.sh https://github.com/user/foundation.git
 ```
 
 2. **Customize configuration:**
 
 ```bash
-# Edit foundation-config.yaml to match your project
-vim foundation-config.yaml
+# Edit foundation_config.yaml to match your project
+vim foundation_config.yaml
 ```
 
 3. **Validate setup:**
@@ -83,23 +83,23 @@ git push
 
 ```bash
 # Run pre-commit security audit
-./foundation/security/pre-commit-audit.sh
+./foundation/security/pre_commit_audit.sh
 ```
 
 **Setup Agent Instructions:**
 
 ```bash
 # Install Cursor rules and commands as symlinks
-./foundation/scripts/setup-cursor-rules.sh
+./foundation/scripts/setup_cursor_rules.sh
 ```
 
 ## Directory Structure
 
 ```
 foundation/
-├── agent-instructions/   # AI agent instructions (Cursor rules & commands)
-│   ├── cursor-rules/     # Generic Cursor rules
-│   ├── cursor-commands/  # Generic Cursor commands
+├── agent_instructions/   # AI agent instructions (Cursor rules & commands)
+│   ├── cursor_rules/     # Generic Cursor rules
+│   ├── cursor_commands/  # Generic Cursor commands
 │   └── README.md
 ├── development/          # Development workflow and branch strategy
 │   ├── workflow.md
@@ -125,21 +125,21 @@ foundation/
 ├── validation/           # Validation systems (optional)
 │   └── README.md
 ├── config/               # Configuration system
-│   ├── foundation-config.yaml
-│   └── repo-adapters/
+│   ├── foundation_config.yaml
+│   └── repo_adapters/
 │       ├── template.yaml
 │       └── personal.yaml
 ├── scripts/              # Integration and utility scripts
-│   ├── install-foundation.sh
-│   ├── sync-foundation.sh
-│   ├── validate-setup.sh
-│   └── setup-cursor-rules.sh
+│   ├── install_foundation.sh
+│   ├── sync_foundation.sh
+│   ├── validate_setup.sh
+│   └── setup_cursor_rules.sh
 └── README.md
 ```
 
 ## Configuration
 
-Foundation is configured via `foundation-config.yaml` in your repository root.
+Foundation is configured via `foundation_config.yaml` in your repository root.
 
 **Example configuration:**
 
@@ -169,7 +169,7 @@ security:
       - ".env*"
 ```
 
-See `foundation/config/foundation-config.yaml` for all available options.
+See `foundation/config/foundation_config.yaml` for all available options.
 
 ## Sharing Across Repositories
 
@@ -222,7 +222,7 @@ When agents make changes to foundation from any consuming repository:
 
 ### Repository-Specific Overrides
 
-Create a repository adapter in `foundation/config/repo-adapters/`:
+Create a repository adapter in `foundation/config/repo_adapters/`:
 
 ```yaml
 # my-repo.yaml
@@ -257,9 +257,9 @@ development:
 - **[Feature Unit Workflow](development/feature_unit_workflow.md)** - Spec-first development with Feature Units
 - **[Release Workflow](development/release_workflow.md)** - Release orchestration and coordination
 - **[Code Conventions](conventions/code-conventions.md)** - Style guides for all languages
-- **[Documentation Standards](conventions/documentation-standards.md)** - Doc structure and style
-- **[Security Rules](security/security-rules.md)** - Security best practices
-- **[Agent Instructions](agent-instructions/README.md)** - Cursor rules and commands for AI assistants
+- **[Documentation Standards](conventions/documentation_standards.md)** - Doc structure and style
+- **[Security Rules](security/security_rules.md)** - Security best practices
+- **[Agent Instructions](agent_instructions/README.md)** - Cursor rules and commands for AI assistants
 - **[Strategy Frameworks](strategy/README.md)** - Product discovery and competitive analysis (optional)
 - **[Tooling](tooling/README.md)** - Development tooling configuration (optional)
 - **[Validation Systems](validation/README.md)** - Spec compliance and doc dependency validation (optional)
@@ -340,19 +340,19 @@ A: Yes, but prefer configuration over modification. If you need to modify, consi
 A: Same as any git submodule conflict. Resolve conflicts, commit, and push.
 
 **Q: Can I use foundation without all components?**  
-A: Yes, enable/disable components in `foundation-config.yaml`. Most components are optional (Feature Units, strategy, validation, tooling).
+A: Yes, enable/disable components in `foundation_config.yaml`. Most components are optional (Feature Units, strategy, validation, tooling).
 
 **Q: What are Feature Units?**  
 A: Feature Units are a spec-first development workflow where changes are fully specified before implementation. See `foundation/development/feature_unit_workflow.md`.
 
 **Q: How do I set up agent instructions?**  
-A: Run `./foundation/scripts/setup-cursor-rules.sh` to create symlinks from `.cursor/` to foundation rules and commands. See `foundation/agent-instructions/README.md`.
+A: Run `./foundation/scripts/setup_cursor_rules.sh` to create symlinks from `.cursor/` to foundation rules and commands. See `foundation/agent_instructions/README.md`.
 
 ## Support
 
 For issues or questions:
 - Check existing documentation
-- Review `foundation-config.yaml` for configuration options
+- Review `foundation_config.yaml` for configuration options
 - Create an issue in the foundation repository
 
 ## License

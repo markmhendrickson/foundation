@@ -42,16 +42,16 @@ else
 fi
 
 # Check 2: Foundation config exists
-if [ -f "foundation-config.yaml" ]; then
+if [ -f "foundation_config.yaml" ]; then
     print_success "Foundation config file exists"
     
     # Check if config is still template
-    if grep -q "your-project" foundation-config.yaml; then
+    if grep -q "your-project" foundation_config.yaml; then
         print_warning "Config appears to be template (contains 'your-project')"
-        print_info "   Please customize foundation-config.yaml for your repository"
+        print_info "   Please customize foundation_config.yaml for your repository"
     fi
 else
-    print_failure "Foundation config file not found (foundation-config.yaml)"
+    print_failure "Foundation config file not found (foundation_config.yaml)"
 fi
 
 # Check 3: Check if foundation is a submodule
@@ -72,7 +72,7 @@ KEY_FILES=(
     "foundation/conventions/code-conventions.md"
     "foundation/conventions/documentation-standards.md"
     "foundation/development/workflow.md"
-    "foundation/config/foundation-config.yaml"
+    "foundation/config/foundation_config.yaml"
 )
 
 MISSING_FILES=0
@@ -97,10 +97,10 @@ fi
 
 # Check 6: .gitignore configuration
 if [ -f ".gitignore" ]; then
-    if grep -q "foundation-config.local.yaml" .gitignore; then
-        print_success ".gitignore includes foundation-config.local.yaml"
+    if grep -q "foundation_config.local.yaml" .gitignore; then
+        print_success ".gitignore includes foundation_config.local.yaml"
     else
-        print_warning ".gitignore should include foundation-config.local.yaml"
+        print_warning ".gitignore should include foundation_config.local.yaml"
     fi
     
     if grep -q "\.env" .gitignore; then
