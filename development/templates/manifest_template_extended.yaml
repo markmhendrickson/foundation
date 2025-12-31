@@ -1,0 +1,303 @@
+# Feature Unit Manifest Template (Extended)
+# Full manifest for complex projects with architecture tracking
+# Use this when foundation-config.yaml has: feature_units.manifest_complexity: "extended"
+
+feature_id: "FU-YYYY-MM-NNN"  # Or your configured ID pattern
+version: "1.0.0"
+status: "draft"  # draft | in_progress | review | completed
+priority: "P1"  # P0 (critical) | P1 (high) | P2 (medium) | P3 (low)
+risk_level: "medium"  # low | medium | high
+
+# Cross-cutting concern tags (used for scheduling and parallelization)
+tags:
+  - "schema"  # Your configured tags
+  - "api"
+  - "ui"
+
+# Metadata
+metadata:
+  title: "Feature Name"
+  description: "Brief description"
+  owner: "owner@example.com"
+  reviewers:
+    - "reviewer1@example.com"
+  created_at: "2025-01-01"
+  target_release: "v1.0.0"
+
+# Cross-cutting concern tags (used for scheduling and parallelization)
+tags:
+  - "schema"  # Your configured tags
+  - "api"
+  - "ui"
+
+# Product strategy (optional, enabled via foundation-config)
+product_strategy:
+  # If track_defensible_differentiation: true
+  defensible_differentiation:
+    validates: []  # List of differentiation types this FU validates
+      # Examples from your configured types:
+      # - "privacy-first"
+      # - "deterministic"
+      # - "cross-platform"
+    mechanism: "How this FU enables the differentiation"
+  
+  # If track_competitive_positioning: true
+  competitive_positioning:
+    advantage: "What advantage this provides vs competitors"
+    comparison: "Specific competitor comparison"
+
+# Affected subsystems (extended manifest only)
+subsystems:
+  - name: "subsystem_name"  # From your configured subsystems
+    changes: "Description of changes"
+  - name: "subsystem_name_2"
+    changes: "Description of changes"
+
+# Schema changes (if architecture.track_schema_changes: true)
+schema_changes:
+  - table: "table_name"
+    operation: "add_column"  # add_column | add_index | modify_column | add_table
+    column_name: "new_column"
+    column_type: "TEXT"
+    nullable: true
+    default_value: null
+  
+  - table: "table_name"
+    operation: "add_index"
+    index_name: "idx_table_column"
+    index_type: "btree"  # btree | gin | hash | etc.
+    columns: ["column_name"]
+
+# JSONB/JSON schema version bumps (if applicable)
+json_schema_bumps:
+  - schema_type: "SchemaTypeName"
+    old_version: "1.0"
+    new_version: "1.1"
+    changes:
+      - "Add field: new_field"
+      - "Deprecate field: old_field"
+
+# API changes (if architecture.track_api_changes: true)
+api_changes:
+  - endpoint: "/api/endpoint"
+    method: "POST"
+    change_type: "new"  # new | modified | deprecated
+    parameters:
+      - name: "param_name"
+        type: "string"
+        required: true
+    returns:
+      type: "ResponseType"
+    errors:
+      - "ERROR_CODE_1"
+      - "ERROR_CODE_2"
+
+# UI changes (if architecture.track_ui_changes: true)
+ui:
+  components:
+    - name: "ComponentName"
+      change_type: "new"  # new | modified | deprecated
+      path: "src/components/ComponentName.tsx"
+      changes: "Description of changes"
+  
+  # Accessibility requirements
+  accessibility:
+    keyboard_navigation: true
+    aria_labels:
+      - element: "element-id"
+        label: "Accessible label"
+    focus_management: "Description of focus handling"
+  
+  # Internationalization requirements
+  i18n:
+    translatable_strings:
+      - key: "feature.string_key"
+        en: "English text"
+        # Add other locales as needed
+    locale_formatting:
+      - type: "date"
+        fields: ["created_at"]
+      - type: "currency"
+        fields: ["amount"]
+
+# State machines (if architecture.track_state_machines: true)
+state_machines:
+  - name: "feature_status"
+    states:
+      - name: "pending"
+        terminal: false
+      - name: "processing"
+        terminal: false
+      - name: "completed"
+        terminal: true
+      - name: "failed"
+        terminal: true
+    transitions:
+      - from: "pending"
+        to: "processing"
+        event: "start_processing"
+      - from: "processing"
+        to: "completed"
+        event: "success"
+      - from: "processing"
+        to: "failed"
+        event: "error"
+
+# Dependencies
+dependencies:
+  requires:
+    - feature_id: "FU-YYYY-MM-NNN"
+      reason: "Why this dependency is needed"
+  
+  blocks:
+    - feature_id: "FU-YYYY-MM-NNN"
+      reason: "Why this blocks other work"
+
+# Kill switch / defer criteria (optional, enabled via foundation-config)
+kill_switch:
+  conditions:
+    - condition: "Dependency takes >2x estimated time"
+      action: "Defer to next release"
+    - condition: "Critical bug discovered"
+      action: "Pause until bug fixed"
+
+# Observability (REQUIRED: At least one metric or log)
+observability:
+  # Metrics (at least one required)
+  metrics:
+    - name: "feature_operation_total"
+      type: "counter"  # counter | gauge | histogram
+      labels:
+        - "status"  # success | failed
+      description: "Total operations"
+    
+    - name: "feature_operation_duration_ms"
+      type: "histogram"
+      buckets: [100, 500, 1000, 5000]
+      description: "Operation duration"
+  
+  # Logs
+  logs:
+    - level: "info"
+      event: "operation_completed"
+      fields:
+        - "feature_id"
+        - "duration_ms"
+    
+    - level: "error"
+      event: "operation_failed"
+      fields:
+        - "error_code"
+        - "feature_id"
+  
+  # Events (optional)
+  events:
+    - event_type: "feature.operation_completed"
+      payload:
+        - "feature_id"
+        - "result"
+      emitted_when: "Operation successfully completes"
+  
+  # Tracing (optional)
+  traces:
+    - span_name: "feature_operation"
+      attributes:
+        - "feature_id"
+        - "operation_type"
+
+# Testing requirements
+testing:
+  unit_tests:
+    - file: "tests/unit/features/{feature_id}/test.test.ts"
+      tests:
+        - "test case 1"
+        - "test case 2"
+  
+  integration_tests:
+    - file: "tests/integration/features/{feature_id}/test.test.ts"
+      tests:
+        - "integration test 1"
+  
+  e2e_tests:  # Optional
+    - file: "tests/e2e/features/{feature_id}/test.spec.ts"
+      tests:
+        - "e2e flow 1"
+  
+  # Test fixtures
+  fixtures:
+    - name: "fixture_name"
+      location: "tests/fixtures/fixture_file"
+      description: "Description"
+  
+  # Coverage targets (from foundation-config)
+  coverage:
+    lines: 80
+    branches: 80
+    critical_paths: 100
+
+# Feature flags (optional)
+feature_flags:
+  enabled: false
+  flags:
+    - name: "enable_new_feature"
+      default_value: false
+      description: "Enable new feature"
+
+# Rollout plan (optional)
+rollout:
+  strategy: "instant"  # instant | phased | canary
+  
+  phases:  # If phased
+    - name: "internal"
+      percentage: 10
+      duration_days: 2
+    - name: "beta"
+      percentage: 50
+      duration_days: 7
+    - name: "general"
+      percentage: 100
+  
+  # Rollback plan
+  rollback:
+    steps:
+      - "Rollback step 1"
+      - "Rollback step 2"
+    triggers:
+      - condition: "error_rate > 5%"
+        action: "Automatic rollback"
+  
+  # Monitoring
+  monitoring:
+    key_metrics:
+      - metric: "feature_operation_total"
+        threshold: "success_rate > 95%"
+      - metric: "feature_operation_duration_ms"
+        threshold: "p95 < 1000"
+
+# Documentation updates
+documentation:
+  files_updated:
+    - path: "docs/path/to/doc.md"
+      changes: "What changed"
+  
+  files_created:
+    - path: "docs/path/to/new_doc.md"
+      purpose: "Purpose of new doc"
+
+# Risk assessment
+risks:
+  - category: "data_loss"  # or performance, security, etc.
+    likelihood: "low"  # low | medium | high
+    impact: "high"  # low | medium | high
+    mitigation: "How risk is mitigated"
+
+# Notes
+notes: |
+  Additional context, design decisions, or links to external resources.
+
+links:
+  - title: "Design Doc"
+    url: "https://example.com/design"
+  - title: "Related Issue"
+    url: "https://github.com/org/repo/issues/123"
+

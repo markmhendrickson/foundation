@@ -6,12 +6,15 @@ Shared development processes and practices for consistent, high-quality software
 
 Foundation is a collection of generalized, composable development processes that can be shared across multiple repositories. It includes:
 
-- **Development Workflow** - Git branch strategy, PR process, code review guidelines
+- **Development Workflow** - Git branch strategy, PR process, code review guidelines, Feature Unit workflow, release orchestration
 - **Code Conventions** - Naming patterns, style guides for TypeScript, SQL, YAML, Shell
 - **Documentation Standards** - Structure, formatting, and writing style
-- **Testing Standards** - Test types, coverage requirements, fixtures
 - **Security Practices** - Pre-commit audits, credential management, security rules
+- **Agent Instructions** - Cursor rules and commands for AI coding assistants
 - **Configuration System** - Flexible YAML-based configuration for repo-specific customization
+- **Strategy Frameworks** - Product discovery, competitive analysis, partnership evaluation (optional)
+- **Validation Systems** - Spec compliance validation, documentation dependency tracking (optional)
+- **Tooling** - Secrets management, environment management, agent setup (optional)
 - **Integration Scripts** - Easy adoption and synchronization
 
 ## Key Features
@@ -68,6 +71,14 @@ git push
 - Follow PR process in `foundation/development/pr-process.md`
 - Use code conventions in `foundation/conventions/code-conventions.md`
 
+**Feature Units (if enabled):**
+
+```bash
+# Create a new Feature Unit
+# (uses interactive spec creation via agent)
+# Follow workflow in foundation/development/feature_unit_workflow.md
+```
+
 **Security:**
 
 ```bash
@@ -75,34 +86,54 @@ git push
 ./foundation/security/pre-commit-audit.sh
 ```
 
+**Setup Agent Instructions:**
+
+```bash
+# Install Cursor rules and commands as symlinks
+./foundation/scripts/setup-cursor-rules.sh
+```
+
 ## Directory Structure
 
 ```
 foundation/
+├── agent-instructions/   # AI agent instructions (Cursor rules & commands)
+│   ├── cursor-rules/     # Generic Cursor rules
+│   ├── cursor-commands/  # Generic Cursor commands
+│   └── README.md
 ├── development/          # Development workflow and branch strategy
 │   ├── workflow.md
 │   ├── branch-strategy.md
 │   ├── pr-process.md
-│   └── worktree-setup.sh
+│   ├── feature_unit_workflow.md
+│   ├── release_workflow.md
+│   ├── worktree-setup.sh
+│   └── templates/        # Feature Unit templates
 ├── conventions/          # Code and documentation conventions
 │   ├── code-conventions.md
 │   ├── documentation-standards.md
 │   └── naming-patterns.yaml
-├── testing/              # Testing standards
-│   └── testing-standard.md
 ├── security/             # Security practices
 │   ├── security-rules.md
 │   ├── pre-commit-audit.sh
 │   └── credential-management.md
+├── strategy/             # Strategy evaluation frameworks (optional)
+│   ├── README.md
+│   └── [analysis templates]
+├── tooling/              # Development tooling (optional)
+│   └── README.md
+├── validation/           # Validation systems (optional)
+│   └── README.md
 ├── config/               # Configuration system
 │   ├── foundation-config.yaml
 │   └── repo-adapters/
 │       ├── template.yaml
-│       └── neotoma.yaml
+│       └── personal.yaml
 ├── scripts/              # Integration and utility scripts
 │   ├── install-foundation.sh
 │   ├── sync-foundation.sh
-│   └── validate-setup.sh
+│   ├── validate-setup.sh
+│   └── setup-cursor-rules.sh
 └── README.md
 ```
 
@@ -223,9 +254,15 @@ development:
 ## Documentation
 
 - **[Development Workflow](development/workflow.md)** - Git workflow, branching, PRs
+- **[Feature Unit Workflow](development/feature_unit_workflow.md)** - Spec-first development with Feature Units
+- **[Release Workflow](development/release_workflow.md)** - Release orchestration and coordination
 - **[Code Conventions](conventions/code-conventions.md)** - Style guides for all languages
 - **[Documentation Standards](conventions/documentation-standards.md)** - Doc structure and style
 - **[Security Rules](security/security-rules.md)** - Security best practices
+- **[Agent Instructions](agent-instructions/README.md)** - Cursor rules and commands for AI assistants
+- **[Strategy Frameworks](strategy/README.md)** - Product discovery and competitive analysis (optional)
+- **[Tooling](tooling/README.md)** - Development tooling configuration (optional)
+- **[Validation Systems](validation/README.md)** - Spec compliance and doc dependency validation (optional)
 - **[Contributing](CONTRIBUTING.md)** - How to contribute to foundation
 
 ## Use Cases
@@ -303,7 +340,13 @@ A: Yes, but prefer configuration over modification. If you need to modify, consi
 A: Same as any git submodule conflict. Resolve conflicts, commit, and push.
 
 **Q: Can I use foundation without all components?**  
-A: Yes, enable/disable components in `foundation-config.yaml`.
+A: Yes, enable/disable components in `foundation-config.yaml`. Most components are optional (Feature Units, strategy, validation, tooling).
+
+**Q: What are Feature Units?**  
+A: Feature Units are a spec-first development workflow where changes are fully specified before implementation. See `foundation/development/feature_unit_workflow.md`.
+
+**Q: How do I set up agent instructions?**  
+A: Run `./foundation/scripts/setup-cursor-rules.sh` to create symlinks from `.cursor/` to foundation rules and commands. See `foundation/agent-instructions/README.md`.
 
 ## Support
 

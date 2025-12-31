@@ -2,11 +2,9 @@
 
 **Reference:** `foundation/conventions/documentation-standards.md` — Documentation standards
 
-## Purpose
-
 Ensures that when upstream documentation is updated, all downstream documentation that depends on it is also updated to maintain consistency across the documentation tree.
 
-**Automated Validation:** This rule can be enforced via:
+Automated validation via:
 
 - Dependency mapping: `docs/doc_dependencies.yaml` (or configured path) — Explicit upstream→downstream relationships
 - Validation script: `scripts/validate-doc-dependencies.js` (or configured path) — Checks downstream docs for outdated references
@@ -84,7 +82,7 @@ README.md
 
 ### Step 1: Identify Upstream Change
 
-**When modifying documentation, agents MUST:**
+When modifying documentation:
 
 1. **Classify the change:**
    - Foundation change (core identity, philosophy, principles)
@@ -99,8 +97,6 @@ README.md
    - Which docs might contradict if not updated?
 
 ### Step 2: Identify Downstream Dependencies
-
-**Agents MUST:**
 
 1. **Use dependency map first (if configured):**
    - Check dependency map file for explicit downstream dependencies
@@ -126,7 +122,7 @@ README.md
 
 ### Step 3: Update Downstream Documentation
 
-**For each downstream document, agents MUST:**
+For each downstream document:
 
 1. **Review content for outdated information:**
    - Check if downstream doc restates upstream information
@@ -146,7 +142,7 @@ README.md
 
 ### Step 4: Validate Consistency
 
-**Before completing, agents MUST:**
+Before completing:
 
 1. **Run validation script (if configured):**
    ```bash
@@ -249,19 +245,12 @@ README.md
 
 ## Constraints
 
-- **MUST** identify downstream dependencies when updating upstream docs
-- **MUST** update all downstream docs that restate or depend on upstream changes
-- **MUST** verify consistency across documentation tree
-- **MUST NOT** leave contradictions between upstream and downstream docs
-- **MUST NOT** skip downstream updates due to scope
-- **MUST** maintain document integrity while updating
-
-## Related Documents
-
-- `foundation/conventions/documentation-standards.md` — Documentation standards
-- `foundation/agent-instructions/cursor-rules/readme_maintenance.md` — README synchronization rules
-- `foundation/agent-instructions/cursor-rules/instruction_documentation.md` — Instruction documentation rule
-- `foundation-config.yaml` — Configuration file
+- Identify downstream dependencies when updating upstream docs
+- Update all downstream docs that restate or depend on upstream changes
+- Verify consistency across documentation tree
+- Do NOT leave contradictions between upstream and downstream docs
+- Do NOT skip downstream updates due to scope
+- Maintain document integrity while updating
 
 
 

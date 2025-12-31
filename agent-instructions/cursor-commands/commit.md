@@ -1,22 +1,223 @@
 # commit
 
-**SUBMODULE COMMIT MODE**: If a submodule name is provided (e.g., `/commit foundation`), commit changes in that submodule only, not the main repository.
+**PARAMETER MODES:**
 
-**If submodule name provided:**
-1. Check if submodule exists: `git submodule status <submodule-name>`
-2. Change to submodule directory: `cd <submodule-name>`
-3. Run commit workflow in submodule context (security audit, staging, commit)
-4. Exit after submodule commit (do NOT commit main repository)
-
-**If no submodule name provided**, proceed with main repository commit workflow below.
+1. **No parameter** (default): Commit ALL submodules first, then the main repository
+2. **"repo" parameter** (e.g., `/commit repo`): Commit ONLY the main repository, skip all submodules
+3. **Submodule name parameter** (e.g., `/commit foundation`): Commit ONLY that specific submodule, skip main repository
 
 ---
+
+## Parameter Detection and Routing
+
+**STEP 1: Detect parameter and route to appropriate workflow:**
+
+```bash
+# Check if parameter provided
+if [ -n "$1" ]; then
+  PARAM="$1"
+  
+  # Case 1: "repo" parameter - commit main repository only
+  if [ "$PARAM" = "repo" ]; then
+    echo "📦 REPO-ONLY MODE: Committing main repository only (skipping submodules)"
+    # Proceed to main repository commit workflow (skip to line after submodule processing)
+  
+  # Case 2: Submodule name parameter - commit that submodule only
+  else
+    echo "📦 SUBMODULE MODE: Checking for submodule '$PARAM'"
+    # Verify submodule exists
+    if ! git submodule status "$PARAM" >/dev/null 2>&1; then
+      echo "❌ Submodule not found: $PARAM"
+      exit 1
+    fi
+    # Proceed to single submodule commit workflow (see "Single Submodule Commit" section)
+  fi
+else
+  # Case 3: No parameter - commit all submodules then main repository
+  echo "📦 ALL MODE: Committing all submodules and main repository"
+  # Proceed to all submodules commit workflow (see "All Submodules Commit" section)
+fi
+```
+
+---
+
+## Single Submodule Commit Workflow
+
+**When a specific submodule name is provided** (e.g., `/commit foundation`):
+
+1. **Change to submodule directory:**
+   ```bash
+   cd "$PARAM" || {
+     echo "❌ Failed to change to submodule directory: $PARAM"
+     exit 1
+   }
+   ```
+
+2. **Run security audit in submodule:**
+   ```bash
+   echo "🔒 Running security audit in submodule..."
+   if [ -f "foundation/security/pre-commit-audit.sh" ]; then
+     ./foundation/security/pre-commit-audit.sh
+   elif [ -f "../foundation/security/pre-commit-audit.sh" ]; then
+     ../foundation/security/pre-commit-audit.sh
+   fi
+   ```
+
+3. **Check if there are changes:**
+   ```bash
+   if ! git status --porcelain | grep -q .; then
+     echo "✓ No changes in submodule $PARAM"
+     exit 0
+   fi
+   ```
+
+4. **Stage all changes in submodule:**
+   ```bash
+   echo "📝 Staging changes in submodule..."
+   git add -A
+   ```
+
+5. **Generate commit message** (analyze changes in submodule context - follow same comprehensive analysis as main repo)
+
+6. **Commit and push submodule:**
+   ```bash
+   echo "💾 Committing submodule..."
+   git commit -m "$COMMIT_MSG"
+   
+   if git remote | grep -q .; then
+     echo "📤 Pushing submodule to remote..."
+     git push origin HEAD
+   fi
+   ```
+
+7. **Display commit message:**
+   ```bash
+   git log -1 --pretty=format:"%B"
+   ```
+
+8. **EXIT** - Do NOT proceed with main repository commit
+
+---
+
+## All Submodules Commit Workflow
+
+**When no parameter is provided** - commit all submodules first, then main repository:
+
+1. **Initialize and update submodules:**
+   ```bash
+   echo "📦 Initializing submodules..."
+   git submodule update --init --recursive
+   ```
+
+2. **Get list of all submodules:**
+   ```bash
+   SUBMODULES=$(git config --file .gitmodules --get-regexp path | awk '{ print $2 }')
+   
+   if [ -z "$SUBMODULES" ]; then
+     echo "ℹ️  No submodules found"
+   else
+     echo "📦 Found submodules:"
+     echo "$SUBMODULES" | while IFS= read -r submodule; do
+       echo "  - $submodule"
+     done
+   fi
+   ```
+
+3. **For each submodule, commit changes:**
+   ```bash
+   echo "$SUBMODULES" | while IFS= read -r submodule; do
+     if [ -n "$submodule" ] && [ -d "$submodule/.git" ]; then
+       echo ""
+       echo "🔄 Processing submodule: $submodule"
+       
+       # Save current directory
+       ORIGINAL_DIR=$(pwd)
+       
+       # Change to submodule directory
+       cd "$submodule" || {
+         echo "  ❌ Failed to change to directory: $submodule"
+         exit 1
+       }
+       
+       # Check if there are changes
+       if git status --porcelain | grep -q .; then
+         echo "  📝 Found changes, committing..."
+         
+         # Run security audit
+         echo "  🔒 Running security audit..."
+         if [ -f "foundation/security/pre-commit-audit.sh" ]; then
+           ./foundation/security/pre-commit-audit.sh
+         elif [ -f "../foundation/security/pre-commit-audit.sh" ]; then
+           ../foundation/security/pre-commit-audit.sh
+         fi
+         
+         # Stage all changes
+         echo "  📝 Staging changes..."
+         git add -A
+         
+         # Generate commit message (analyze changes in submodule context)
+         echo "  📝 Generating commit message..."
+         # (Follow comprehensive change analysis workflow)
+         
+         # Commit submodule
+         echo "  💾 Committing changes..."
+         git commit -m "$COMMIT_MSG" || {
+           echo "  ❌ Failed to commit submodule: $submodule"
+           cd "$ORIGINAL_DIR"
+           exit 1
+         }
+         
+         # Push submodule (if remote exists)
+         if git remote | grep -q .; then
+           echo "  📤 Pushing to remote..."
+           git push origin HEAD || {
+             echo "  ⚠️  Warning: Failed to push submodule: $submodule"
+           }
+         fi
+         
+         echo "  ✓ Successfully committed submodule: $submodule"
+       else
+         echo "  ✓ No changes in $submodule"
+       fi
+       
+       # Return to original directory
+       cd "$ORIGINAL_DIR" || exit 1
+     fi
+   done
+   ```
+
+4. **Update submodule references in main repository:**
+   ```bash
+   echo ""
+   echo "📝 Updating submodule references in main repository..."
+   git add .gitmodules
+   echo "$SUBMODULES" | while IFS= read -r submodule; do
+     if [ -n "$submodule" ]; then
+       git add "$submodule" 2>/dev/null || true
+     fi
+   done
+   ```
+
+5. **After all submodules committed, proceed to main repository commit workflow below**
+
+---
+
+## Main Repository Commit Workflow
+
+**Run when:**
+- No parameter provided (after committing all submodules)
+- "repo" parameter provided (skip submodules)
+
+**Ensure in root directory:**
+```bash
+cd "$(git rev-parse --show-toplevel)"
+```
 
 Run entire test suite and resolve any errors as necessary. Proceed to analyze all uncommitted files for security vulnerabilities and patch as necessary.
 
 **CRITICAL: PRE-COMMIT SECURITY AUDIT** - MUST RUN BEFORE STAGING:
 
-Before staging ANY files, execute the security audit from `foundation/agent-instructions/cursor-rules/security.md` (or `.cursor/rules/security.md` if installed):
+Execute security audit from `foundation/agent-instructions/cursor-rules/security.md` (or `.cursor/rules/security.md` if installed) before staging ANY files:
 
 1. **Run security audit script:**
    ```bash
@@ -31,7 +232,7 @@ Before staging ANY files, execute the security audit from `foundation/agent-inst
 
 2. **If any check fails, ABORT immediately and alert the user. DO NOT proceed with staging or commit.**
 
-**ONLY AFTER security audit passes**, proceed with:
+After security audit passes, proceed with:
 
 **NESTED GIT REPOSITORY DETECTION AND COMMIT** (Optional, configurable):
 
@@ -44,7 +245,7 @@ development:
 
 **If enabled**, before committing the main repository, detect and commit any nested git repositories:
 
-**CRITICAL**: Nested repositories must be committed BEFORE the main repository to maintain consistency.
+Nested repositories must be committed BEFORE the main repository to maintain consistency.
 
 1. **Detect nested git repositories:**
    ```bash
@@ -152,7 +353,7 @@ development:
 
 **If enabled**, if any frontend files were modified, automatically verify user-facing changes work correctly in the browser before committing. After completing the browser run, rerun the security audit in case new assets or logs were created.
 
-**IMPORTANT**: Before committing, ensure all changes are staged:
+Before committing, ensure all changes are staged:
 
 **CRITICAL: Exclude nested repositories from main repo staging** (if nested repo handling enabled):
 
@@ -289,7 +490,7 @@ fi
 # (Same check as above if nested repos are configured)
 ```
 
-**ONLY IF final security check passes**, proceed to git commit with the comprehensive commit message and push to origin.
+If final security check passes, proceed to git commit with the comprehensive commit message and push to origin.
 
 **WORKTREE DETECTION:** Follow the Worktree Rule (`.cursor/rules/worktree_env.md` or `foundation/agent-instructions/cursor-rules/worktree_env.md`) to restrict all commit activity to the current worktree.
 
@@ -300,6 +501,8 @@ fi
 After committing the main repository, verify no unstaged changes remain with `git status`. If any files were missed, amend the commit with `git add <file> && git commit --amend --no-edit`.
 
 **NESTED REPOSITORY SUMMARY** (if nested repo handling enabled): After committing the main repository, display a summary of nested repository commits.
+
+**SUBMODULE SUMMARY** (if submodules were committed in all-mode): After committing the main repository, display a summary of submodule commits made during this commit session.
 
 **POST-COMMIT VALIDATION**: After displaying the commit message, verify it comprehensively covers all changes by:
 
@@ -326,49 +529,12 @@ development:
     pattern: "{description}"  # or "{id}: {description}"
 ```
 
-## Submodule Commit Mode
+## Summary of Commit Modes
 
-When a submodule name is provided as an argument (e.g., `/commit foundation`):
+1. **`/commit`** - Default: Commits all submodules first, then main repository
+2. **`/commit repo`** - Commits only main repository, skips all submodules
+3. **`/commit <submodule-name>`** - Commits only the specified submodule, skips main repository
 
-1. **Verify submodule exists:**
-   ```bash
-   if ! git submodule status <submodule-name> >/dev/null 2>&1; then
-     echo "❌ Submodule not found: <submodule-name>"
-     exit 1
-   fi
-   ```
+All modes follow the same security audit, change analysis, and commit message generation workflows appropriate to their scope.
 
-2. **Change to submodule directory:**
-   ```bash
-   cd <submodule-name> || exit 1
-   ```
-
-3. **Run security audit in submodule:**
-   ```bash
-   # Use foundation security audit if available
-   if [ -f "foundation/security/pre-commit-audit.sh" ]; then
-     ./foundation/security/pre-commit-audit.sh
-   elif [ -f "../foundation/security/pre-commit-audit.sh" ]; then
-     ../foundation/security/pre-commit-audit.sh
-   fi
-   ```
-
-4. **Stage and commit in submodule:**
-   ```bash
-   git add -A
-   # Generate commit message (analyze changes in submodule context)
-   git commit -m "<commit-message>"
-   git push origin HEAD  # if remote exists
-   ```
-
-5. **Exit after submodule commit** (do NOT proceed with main repository commit)
-
-**Note:** The commit message generation and change analysis should be done in the submodule context, analyzing only files within that submodule.
-
-## Related Documents
-
-- `foundation/agent-instructions/cursor-rules/security.md` — Security audit rules
-- `foundation/agent-instructions/cursor-rules/worktree_env.md` — Worktree environment rules
-- `foundation/security/pre-commit-audit.sh` — Pre-commit audit script
-- `foundation-config.yaml` — Configuration file
 

@@ -2,8 +2,6 @@
 
 **Reference:** `README.md` — Project overview and entry point
 
-## Purpose
-
 Ensures that `README.md` remains synchronized with documentation changes, providing accurate and comprehensive representation of the repository at all times.
 
 ## Configuration
@@ -21,7 +19,7 @@ tooling:
 
 ## Trigger Patterns
 
-When any of the following occur, agents MUST update `README.md`:
+When any of the following occur, update `README.md`:
 
 - Documentation files are created, modified, or deleted:
   - New documentation sections added (e.g., new subsystem docs, new integration guides)
@@ -45,11 +43,11 @@ When any of the following occur, agents MUST update `README.md`:
 
 ## Agent Actions
 
-**CRITICAL:** README updates are **mandatory** and **automatic** — whenever documentation is updated in materially affecting ways, README MUST be **regenerated** (not patched) in the same workflow, not as a separate step.
+README updates are mandatory and automatic - whenever documentation is updated in materially affecting ways, README must be regenerated (not patched) in the same workflow, not as a separate step.
 
 ### Step 1: Detect Material Documentation Changes
 
-**When modifying ANY documentation, agents MUST:**
+When modifying ANY documentation:
 
 1. **Determine if change is material:**
 
@@ -65,11 +63,7 @@ When any of the following occur, agents MUST update `README.md`:
    - Integrations (providers added/removed)
    - Target users or personas
 
-2. **If material change detected:**
-   - **Regenerate entire README** using configured regeneration framework or template
-   - Do NOT patch individual sections
-   - Use primary sources to regenerate from scratch
-   - **Regenerate in same tool call batch as documentation changes**
+2. **If material change detected:** Regenerate entire README using configured regeneration framework or template. Do NOT patch individual sections. Use primary sources to regenerate from scratch. Regenerate in same tool call batch as documentation changes.
 
 3. **If non-material change (typos, formatting, minor clarifications):**
    - May patch specific sections if needed
@@ -77,7 +71,7 @@ When any of the following occur, agents MUST update `README.md`:
 
 ### Step 2: Regenerate README
 
-**For material changes, agents MUST:**
+For material changes:
 
 1. **Follow regeneration process:**
    - Read primary source documents (per configuration)
@@ -100,7 +94,7 @@ When any of the following occur, agents MUST update `README.md`:
 
 ### Step 3: Validate Changes
 
-**Before completing, agents MUST:**
+Before completing:
 
 1. **Check for broken links:**
    - Verify all documentation links resolve correctly
@@ -133,23 +127,17 @@ Common README sections and their update triggers (customize per repository):
 
 ## Constraints
 
-- **MUST** regenerate README (not patch) whenever documentation changes in materially affecting ways
-- **MUST** regenerate README automatically in same tool call batch as material documentation changes
-- **MUST** use configured regeneration framework or template for regeneration process
-- **MUST** regenerate from primary sources, not from existing README
-- **MUST** maintain README accuracy and completeness against source docs
-- **MUST** verify all links before completing regeneration
-- **MUST NOT** patch individual sections for material changes (always regenerate)
-- **MUST NOT** add information to README that contradicts documentation
-- **MUST** preserve README's role as entry point and overview document
-- **MUST** follow required section structure exactly as defined in template or framework
-- **MUST** ensure confident, positive tone throughout (not defensive)
-
-## Related Documents
-
-- `README.md` — Project README file
-- `foundation/conventions/documentation-standards.md` — Documentation standards
-- `foundation-config.yaml` — Configuration file
+- Regenerate README (not patch) whenever documentation changes in materially affecting ways
+- Regenerate README automatically in same tool call batch as material documentation changes
+- Use configured regeneration framework or template for regeneration process
+- Regenerate from primary sources, not from existing README
+- Maintain README accuracy and completeness against source docs
+- Verify all links before completing regeneration
+- Do NOT patch individual sections for material changes (always regenerate)
+- Do NOT add information to README that contradicts documentation
+- Preserve README's role as entry point and overview document
+- Follow required section structure exactly as defined in template or framework
+- Ensure confident, positive tone throughout (not defensive)
 
 
 

@@ -1,6 +1,6 @@
 # Configuration Management Rule
 
-**Purpose:** Ensures configuration files are placed in the correct location based on their scope and purpose.
+Ensures configuration files are placed in the correct location based on their scope and purpose.
 
 ## Configuration Locations
 
@@ -70,26 +70,26 @@ documentation:
 
 ### MUST
 
-1. **Repository-specific config → repository's `foundation-config.yaml`**
-   - All configuration unique to a single repository MUST go in the repository's own `foundation-config.yaml`
-   - This includes: conventions, security paths, documentation structure, custom settings
+1. Repository-specific config → repository's `foundation-config.yaml`
+   - All configuration unique to a single repository goes in the repository's own `foundation-config.yaml`
+   - Includes: conventions, security paths, documentation structure, custom settings
 
-2. **Shared config → foundation repo adapters**
+2. Shared config → foundation repo adapters
    - Only use `foundation/config/repo-adapters/` for configurations shared across multiple repositories
    - Examples: organization standards, project templates, multi-repo conventions
 
-3. **Never commit single-repo configs to foundation submodule**
+3. Never commit single-repo configs to foundation submodule
    - If a configuration file is only relevant to one repository, it belongs in that repository's `foundation-config.yaml`, NOT in the foundation submodule
 
 ### MUST NOT
 
-1. **DO NOT** add repository-specific configuration to `foundation/config/repo-adapters/`
+1. Do NOT add repository-specific configuration to `foundation/config/repo-adapters/`
    - Single-repo configs belong in the repository's own `foundation-config.yaml`
 
-2. **DO NOT** duplicate configuration between repo adapters and `foundation-config.yaml`
+2. Do NOT duplicate configuration between repo adapters and `foundation-config.yaml`
    - If it's in `foundation-config.yaml`, it shouldn't also be in a repo adapter
 
-3. **DO NOT** modify foundation submodule files for repository-specific needs
+3. Do NOT modify foundation submodule files for repository-specific needs
    - Foundation submodule is shared code - repository-specific changes belong in the repository itself
 
 ## Decision Tree
@@ -151,11 +151,6 @@ documentation:
     - "Agent Instructions"  # Standard for ALL neotoma repos
 ```
 
-## Related Documents
-
-- `foundation/config/foundation-config.yaml` - Full configuration reference
-- `foundation/config/repo-adapters/template.yaml` - Template for shared configs
-- `foundation/README.md` - Foundation documentation
 
 
 

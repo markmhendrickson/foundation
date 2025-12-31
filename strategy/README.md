@@ -161,12 +161,19 @@ Make evidence-based decisions after discovery.
 
 ## Templates
 
-Foundation provides templates for discovery:
+Foundation provides templates for discovery and competitive analysis:
 
+**Product Discovery:**
 - `discovery-templates/value-discovery-template.md`
 - `discovery-templates/usability-discovery-template.md`
 - `discovery-templates/business-viability-template.md`
 - `discovery-templates/discovery-report-template.md`
+
+**Competitive and Partnership Analysis:**
+- `competitive_analysis_template.md` - Systematic competitive positioning assessment (for products/projects)
+- `partnership_analysis_template.md` - Partnership potential evaluation (for products/projects)
+- `relevance_analysis_template.md` - Holistic relevance analysis (for content/thought leadership)
+- `project_assessment_framework.md` - Combined assessment methodology
 
 ## Usage
 
@@ -208,6 +215,52 @@ Ongoing user research throughout development.
 - "Inspired" by Marty Cagan
 - "The Mom Test" by Rob Fitzpatrick
 - "Continuous Discovery Habits" by Teresa Torres
+
+## Competitive and Partnership Analysis
+
+Foundation includes tools for analyzing projects from competitive and partnership perspectives.
+
+### Analyze Command
+
+**Command:** `analyze <url_or_term>`
+
+**Purpose:** Systematically analyze any project (URL or term) from both competitive and partnership perspectives relative to your current repository.
+
+**Examples:**
+- `analyze memorae.ai`
+- `analyze https://memorae.ai`
+- `analyze "memory layer productivity"`
+
+**Process:**
+
+1. Dynamically discovers your repo's identity from foundational documents
+2. Researches target project via browser tools
+3. Generates competitive analysis using standardized template
+4. Generates partnership analysis using standardized template
+5. Saves both to `docs/private/competitive/` and `docs/private/partnerships/`
+
+**Output:**
+- `docs/private/competitive/[target_name]_competitive_analysis.md`
+- `docs/private/partnerships/[target_name]_partnership_analysis.md`
+
+**See:** `foundation/agent-instructions/cursor-commands/analyze.md` for complete documentation.
+
+### Framework and Templates
+
+**Project Assessment Framework:**
+- `project_assessment_framework.md` - Complete methodology for analyzing projects
+
+**Templates:**
+- `competitive_analysis_template.md` - Competitive positioning assessment
+- `partnership_analysis_template.md` - Partnership potential evaluation
+
+**All analysis is:**
+- Relative to your current repository
+- Dynamically discovers repo context from foundational docs
+- Generic and works for any repo using foundation as submodule
+- Stored in private docs submodule for confidentiality
+
+---
 
 ## Implementation
 

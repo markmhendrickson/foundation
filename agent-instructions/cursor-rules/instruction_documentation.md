@@ -2,13 +2,7 @@
 
 **Reference:** `docs/foundation/agent_instructions.md` (or configured location) — Repository-wide agent instructions
 
-## Purpose
-
-Ensures that important instructions, constraints, and guidelines are:
-
-1. Documented in appropriate documentation files
-2. Available to all Cursor agents automatically as repo rules
-3. Maintained and kept up-to-date
+Ensures that important instructions, constraints, and guidelines are documented in appropriate documentation files, available to all Cursor agents automatically as repo rules, and maintained and kept up-to-date.
 
 ## Configuration
 
@@ -25,13 +19,13 @@ agent_instructions:
 
 ## Trigger Patterns
 
-**CRITICAL:** When any of the following occur, agents MUST **IMMEDIATELY** document the instruction in the appropriate repository documentation file. Documentation MUST happen during the same conversation, before proceeding with other work.
+When any of the following occur, immediately document the instruction in the appropriate repository documentation file. Documentation must happen during the same conversation, before proceeding with other work.
 
 ### High-Priority Triggers (Immediate Documentation Required)
 
-- User says **"always do X"** or **"never do Y"** — These are permanent instructions that MUST be documented immediately
-- User says **"remember to"** or **"make sure to"** — Persistent behavioral instructions
-- User says **"all agents should"** or **"everyone must"** — Repository-wide requirements
+- User says "always do X" or "never do Y" - These are permanent instructions that must be documented immediately
+- User says "remember to" or "make sure to" - Persistent behavioral instructions
+- User says "all agents should" or "everyone must" - Repository-wide requirements
 
 ### Standard Triggers
 
@@ -57,6 +51,60 @@ agent_instructions:
   - Code generation patterns
 
 ## Agent Actions
+
+### Step 0: Meta-Rule: Remember to Create Rules
+
+**When user says "always X" or "never Y":**
+
+1. **Recognize this as a rule creation request** - The user is requesting a permanent rule, not a one-time instruction
+2. **Determine rule scope:**
+   - **Foundation rule** (generic, applies to all repos using foundation):
+     - Generic agent behavior patterns
+     - Universal development practices
+     - Cross-repository conventions
+     - **Location:** `foundation/agent-instructions/cursor-rules/{topic}.md`
+   - **Repository-specific rule** (applies only to this repo):
+     - Project-specific constraints
+     - Domain-specific patterns
+     - Repository-unique workflows
+     - **Location:** `.cursor/rules/{topic}.md` or `docs/` subdirectory
+3. **Decision criteria:**
+   - If instruction would benefit ALL repositories using foundation → Foundation rule
+   - If instruction is specific to this repository's domain/architecture → Repo-specific rule
+   - If instruction is about generic agent behavior → Foundation rule
+   - If instruction is about project-specific features/constraints → Repo-specific rule
+4. **Create rule immediately** - Do not ask for confirmation, create the rule file in the appropriate location
+5. **Update references** - Add rule to appropriate index/README (foundation README for foundation rules, repo docs for repo rules)
+
+**This meta-rule ensures:** When user requests "always X", agents automatically create appropriate rule files without asking where to place them.
+
+**Decision Tree for Rule Placement:**
+
+```
+User says "always X" or "never Y"?
+    │
+    ├─ Would this benefit ALL repos using foundation?
+    │   │
+    │   ├─ YES → Foundation rule
+    │   │   Location: foundation/agent-instructions/cursor-rules/{topic}.md
+    │   │   Examples: dependency installation, security patterns, generic workflows
+    │   │
+    │   └─ NO → Continue to next question
+    │
+    ├─ Is this specific to this repository's domain/architecture?
+    │   │
+    │   ├─ YES → Repository-specific rule
+    │   │   Location: .cursor/rules/{topic}.md or docs/ subdirectory
+    │   │   Examples: project-specific constraints, domain patterns, unique workflows
+    │   │
+    │   └─ NO → Continue to next question
+    │
+    └─ Is this about generic agent behavior?
+        │
+        ├─ YES → Foundation rule
+        │
+        └─ NO → Repository-specific rule (default)
+```
 
 ### Step 1: Detect Instruction Type
 
@@ -103,7 +151,7 @@ agent_instructions:
 3. **If instruction is Cursor-specific:**
    - Create or update rule file in `.cursor/rules/` (or configured location)
    - Follow existing rule file format (see other rule files)
-   - Add reference to `repo_doctrine.md` or central reference if needed
+   - Add reference to agent instructions file or central reference if needed
 
 ### Step 3: Make Available as Repo Rule
 
@@ -130,10 +178,17 @@ agent_instructions:
    - `docs/architecture/` for architectural rules
    - `docs/feature_units/standards/` for workflow standards
 
-2. **MUST NOT store documentation in repo root:**
-   - All documentation files MUST be placed in appropriate subdirectories under `docs/`
-   - Summary files, review files, implementation notes, and similar documentation MUST be placed in relevant `docs/` subdirectories
+2. Do NOT store documentation in repo root:
+   - All documentation files must be placed in appropriate subdirectories under `docs/`
+   - Summary files, review files, implementation notes, and similar documentation must be placed in relevant `docs/` subdirectories
    - Only configuration files and essential project files belong in repo root
+
+3. **Temporary agent assessment/analysis files:**
+   - MUST be stored in `tmp/` directory (create if it doesn't exist)
+   - Examples: assessment files, analysis documents, temporary comparisons, agent-generated summaries
+   - These files are temporary and may be deleted after use
+   - Do NOT store temporary assessment files in `docs/` or repo root
+   - Pattern: `tmp/assessment_{topic}.md`, `tmp/analysis_{topic}.md`, etc.
 
 3. **Reference in central reference (if exists):**
    - Add to "Required Reading" section if critical
@@ -211,7 +266,7 @@ When [conditions], agents MUST [action].
 **Cursor agents automatically have access to:**
 
 1. **All files in `.cursor/rules/`** — Automatically loaded as repo rules
-2. **Central reference** (e.g., `repo_doctrine.md`) — Central reference that links to all rules
+2. **Central reference** (e.g., agent instructions file) — Central reference that links to all rules
 3. **Files referenced in central reference** — Should be loaded when relevant
 
 **To ensure instructions are available:**
@@ -234,7 +289,7 @@ When [conditions], agents MUST [action].
 
 **When user provides instructions (especially "always" or "never" statements):**
 
-**CRITICAL:** Agents MUST follow this workflow IMMEDIATELY, before proceeding with any other work.
+Follow this workflow immediately, before proceeding with any other work.
 
 1. **Detect instruction trigger:**
    - Identify if instruction matches trigger patterns (especially "always"/"never")
@@ -244,9 +299,10 @@ When [conditions], agents MUST [action].
    - "I'll document this instruction permanently in [location]"
    - Do NOT proceed with other work until documentation is complete
 
-3. **Classify instruction type:**
+3. **Classify instruction type and determine rule scope:**
+   - Apply Step 0: Meta-Rule to determine foundation vs repository-specific placement
    - Determine appropriate documentation location (see Step 1: Detect Instruction Type)
-   - Determine if Cursor repo rule is needed
+   - Determine if Cursor repo rule is needed (usually YES for "always"/"never" statements)
    - Determine if both documentation and rule file are needed
 
 4. **Document IMMEDIATELY (same conversation):**
@@ -267,7 +323,7 @@ When [conditions], agents MUST [action].
    - "Downstream docs updated: [list]" (if applicable)
    - "Available to all agents via [reference]"
 
-**MUST NOT:**
+Do NOT:
 - Skip documentation and proceed with other work
 - Promise to document "later" or in a future conversation
 - Document only in conversation memory without updating repo files
@@ -288,26 +344,18 @@ When [conditions], agents MUST [action].
 
 ## Constraints
 
-- **NEVER** skip documenting important instructions
-- **MUST document "always" and "never" instructions IMMEDIATELY** during the same conversation
-- **MUST NOT** defer documentation to a future conversation or session
-- **MUST NOT** document only in conversation memory — all permanent instructions MUST be in repo files
-- **ALWAYS** classify instruction type before documenting
-- **ALWAYS** update central reference when adding new rules
-- **ALWAYS** update downstream documentation when upstream docs change
-- **ALWAYS** use clear, directive language (MUST/SHOULD/MUST NOT/ALWAYS/NEVER)
-- **NEVER** duplicate instructions across multiple files without cross-references
-- **ALWAYS** ensure instructions are discoverable via central reference or `.cursor/rules/`
-- **MUST NOT** store documentation files in repo root — all documentation MUST be placed in appropriate `docs/` subdirectories
-
-## Related Documents
-
-- `docs/foundation/agent_instructions.md` (or configured location) — Repository-wide agent instructions
-- `.cursor/rules/repo_doctrine.md` (or central reference) — Central reference for all repo rules
-- `foundation/agent-instructions/cursor-rules/downstream_doc_updates.md` — Downstream documentation update rules
-- `foundation/agent-instructions/cursor-rules/readme_maintenance.md` — README synchronization rules
-- `foundation/conventions/documentation-standards.md` — Documentation standards
-- `foundation-config.yaml` — Configuration file
+- Do NOT skip documenting important instructions
+- Document "always" and "never" instructions immediately during the same conversation
+- Do NOT defer documentation to a future conversation or session
+- Do NOT document only in conversation memory - all permanent instructions must be in repo files
+- Always classify instruction type before documenting
+- Always update central reference when adding new rules
+- Always update downstream documentation when upstream docs change
+- Always use clear, directive language (MUST/SHOULD/MUST NOT/ALWAYS/NEVER)
+- Do NOT duplicate instructions across multiple files without cross-references
+- Always ensure instructions are discoverable via central reference or `.cursor/rules/`
+- Do NOT store documentation files in repo root - all documentation must be placed in appropriate `docs/` subdirectories
+- Do NOT store temporary assessment/analysis files in `docs/` - use `tmp/` directory instead
 
 
 

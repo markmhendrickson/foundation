@@ -1,10 +1,8 @@
 # Security Rule
 
-## Purpose
+Prevents accidental commits of private, sensitive, or confidential documentation and data.
 
-Prevent accidental commits of private, sensitive, or confidential documentation and data.
-
-**Configuration:** This rule uses protected paths configured in `foundation-config.yaml` under `security.pre_commit_audit.protected_paths`.
+Configuration: This rule uses protected paths configured in `foundation-config.yaml` under `security.pre_commit_audit.protected_paths`.
 
 ## Pre-Commit Security Audit
 
@@ -12,7 +10,7 @@ Before staging or committing ANY changes, perform the following checks:
 
 ### 1. Protected Paths Check
 
-**CRITICAL**: Check for any files in protected paths (configured in `foundation-config.yaml`):
+Check for any files in protected paths (configured in `foundation-config.yaml`):
 
 ```bash
 # Load protected paths from config (example paths shown)
@@ -37,7 +35,7 @@ for path in "${PROTECTED_PATHS[@]}"; do
 done
 ```
 
-**Action**: If any files match protected paths, **ABORT** the commit immediately and alert the user.
+If any files match protected paths, ABORT the commit immediately and alert the user.
 
 ### 2. Environment Files Check
 
@@ -57,9 +55,9 @@ if git diff --cached --name-only 2>/dev/null | grep -qE "\.env"; then
 fi
 ```
 
-**Action**: If any `.env*` files are detected, **ABORT** the commit.
+If any `.env*` files are detected, ABORT the commit.
 
-**Configuration**: Enable/disable via `security.pre_commit_audit.check_env_files` in `foundation-config.yaml`.
+Configuration: Enable/disable via `security.pre_commit_audit.check_env_files` in `foundation-config.yaml`.
 
 ### 3. Sensitive File Pattern Check
 
@@ -101,11 +99,11 @@ Scan staged and unstaged files for common credential patterns:
 git diff --cached --name-only | xargs -I {} sh -c 'file {} | grep -q "text" && grep -lE "(api[_-]?key|password|secret|token)\s*[:=]\s*['\''\"][^'\''\"]{10,}" {}' && echo "WARNING: Potential hardcoded credentials detected" && exit 1
 ```
 
-**Action**: If potential credentials are found, review manually before proceeding.
+If potential credentials are found, review manually before proceeding.
 
 ## Security Audit Execution
 
-The security audit MUST be executed **BEFORE** running `git add -A` or staging any files.
+The security audit must be executed BEFORE running `git add -A` or staging any files.
 
 ### Audit Script
 
@@ -173,18 +171,16 @@ echo "✅ Security audit passed"
 
 ## Enforcement
 
-This security audit MUST be run:
-
-1. **Before** any `git add` command
-2. **Before** any `git commit` command
+This security audit must be run:
+1. Before any `git add` command
+2. Before any `git commit` command
 3. As part of the commit command workflow
 
 ## Failure Behavior
 
 If the security audit fails:
-
-1. **STOP** all git operations immediately
-2. **DO NOT** stage or commit any files
+1. STOP all git operations immediately
+2. Do NOT stage or commit any files
 3. Display clear error message to user
 4. List the specific files that triggered the violation
 5. Wait for user to resolve the issue before proceeding
@@ -206,12 +202,6 @@ security:
 ## Exceptions
 
 No exceptions. Private documentation must never be committed to public repositories.
-
-## Related Documents
-
-- `foundation/security/security-rules.md` — Security best practices
-- `foundation/security/pre-commit-audit.sh` — Pre-commit audit script
-- `foundation-config.yaml` — Configuration file
 
 
 
