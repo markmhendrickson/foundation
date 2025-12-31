@@ -412,6 +412,33 @@ development:
 
 **COMPREHENSIVE CHANGE ANALYSIS**: Before generating the commit message, perform comprehensive analysis of all staged changes:
 
+**CRITICAL: Release-Aware Analysis (Perform First):**
+
+1. **Check for Release Status Changes:**
+   ```bash
+   # Check if any release status files were modified
+   git diff --cached --name-only | grep -E "docs/releases/.*/status\.md"
+   ```
+   - If release status files changed, read them to understand what release is being executed
+   - Check for status transitions (e.g., `planning` → `ready_for_deployment`, `in_progress` → `deployed`)
+   - **Release execution is ALWAYS the primary work** - documentation is secondary
+
+2. **Analyze Release Context:**
+   - Read the release status file to understand:
+     - What feature units were completed
+     - What migrations were added
+     - What services/tools were implemented
+     - Test results and acceptance criteria
+   - **If a release is being executed, the commit message MUST lead with the release execution**
+   - Example: "Execute v0.2.0: [Release Name]" not "Add documentation and update code"
+
+3. **Understand Implementation vs Documentation:**
+   - Database migrations + source code changes + release status update = **Release execution**
+   - Documentation-only changes = **Documentation work**
+   - If both exist, **implementation is primary, documentation is supporting context**
+
+**Standard Change Analysis (After Release Context):**
+
 1. **Categorize Changes by Type:**
    - Run `git diff --cached --name-status` to get all changed files with their status (A/M/D)
    - Group files by status: Added (A), Modified (M), Deleted (D)
@@ -425,16 +452,22 @@ development:
      - Configuration (`*.json`, `*.yaml`, `*.toml`, `*.config.*`)
      - Tests (`**/*.test.*`, `**/*.spec.*`, or configured test paths)
      - Build/deployment (`Dockerfile`, `*.sh`, or configured paths)
+     - **Database migrations** (`supabase/migrations/**`, `**/migrations/*.sql`) - these indicate release execution
    - Identify major functional areas affected
 
 3. **Analyze Change Magnitude:**
    - Run `git diff --cached --stat` to get line counts (insertions/deletions)
    - Identify files with significant changes (>100 lines added/removed, configurable)
    - Note files that are new vs. heavily modified vs. deleted
+   - **Pay attention to migration files** - they indicate schema changes and release work
 
 4. **Extract Key Themes:**
    - Review file names and paths to identify common themes
    - Look for patterns: new features, refactoring, documentation updates, bug fixes, configuration changes
+   - **Look for release execution patterns:**
+     - Migrations + services + MCP tools + status update = Release execution
+     - Multiple migrations = Major schema change (likely release work)
+     - New services + updated actions = Feature implementation
    - Identify if changes span multiple areas (cross-cutting concerns)
 
 5. **Generate Structured Commit Message:**
@@ -447,15 +480,34 @@ development:
    ```
 
    **Default structure** (if no custom format configured):
-   - **Summary line** (50-72 chars): High-level description of the primary change
-   - **Detailed sections** organized by functional area:
-     - Documentation Changes (if docs modified)
-     - New Features/Components (if new files added)
-     - Architecture/Design Changes (if architecture docs modified)
-     - Code Changes (if source code modified)
-     - Configuration Changes (if config files modified)
-     - Bug Fixes (if bug fixes detected)
-     - Other Changes (miscellaneous)
+   - **Summary line** (50-72 chars): High-level description of the PRIMARY change
+     - **If release execution detected**: "Execute v{version}: {Release Name}"
+     - **If release status changed to ready_for_deployment**: Lead with release execution
+     - **Otherwise**: Describe the most impactful change (implementation > documentation)
+   - **Detailed sections** organized by priority:
+     - **Release Execution** (if release status changed or release work detected):
+       - Release version and name
+       - Feature units completed
+       - Migrations added
+       - Services/tools implemented
+       - Test results
+       - Status: ready_for_deployment, deployed, etc.
+     - **Database Schema Changes** (if migrations present):
+       - Migration files added
+       - Schema changes (tables, columns, RLS policies)
+       - Impact on existing data
+     - **Implementation Changes** (if source code modified):
+       - Services created/modified
+       - MCP tools added
+       - API changes
+       - Core functionality changes
+     - **Documentation Changes** (secondary):
+       - Release documentation added
+       - Guides updated
+       - API documentation
+     - **Configuration Changes** (if config files modified)
+     - **Bug Fixes** (if bug fixes detected)
+     - **Other Changes** (miscellaneous)
    - **For each section**, list:
      - Files added/modified/deleted
      - Key changes or new capabilities
@@ -468,12 +520,31 @@ development:
 
 **COMMIT MESSAGE GENERATION PROCESS:**
 
-1. Run `git diff --cached --name-status` to get all changes
-2. Run `git diff --cached --stat` to get change statistics
-3. Analyze patterns and group changes logically
-4. Generate comprehensive commit message following configured format
-5. Verify all files are represented in the message
-6. Proceed with commit
+1. **Check for release status changes FIRST:**
+   ```bash
+   git diff --cached --name-only | grep -E "docs/releases/.*/status\.md"
+   ```
+   - If found, read the status file(s) to understand what release is being executed
+   - This determines the PRIMARY focus of the commit
+
+2. **Analyze migrations and schema changes:**
+   ```bash
+   git diff --cached --name-only | grep -E "migrations|schema\.sql"
+   ```
+   - Migrations indicate release execution or major schema work
+   - Read migration files to understand what's being built
+
+3. Run `git diff --cached --name-status` to get all changes
+4. Run `git diff --cached --stat` to get change statistics
+5. **Determine primary vs secondary work:**
+   - Primary: Release execution, major features, schema changes, core services
+   - Secondary: Documentation, configuration updates, minor fixes
+6. **Generate commit message with proper prioritization:**
+   - Lead with the most impactful work (release execution > implementation > documentation)
+   - Group related changes together
+   - Ensure release work is prominently featured if present
+7. Verify all files are represented in the message
+8. Proceed with commit
 
 **FINAL PRE-COMMIT SECURITY CHECK**: Immediately before executing `git commit`, run one final security audit:
 
