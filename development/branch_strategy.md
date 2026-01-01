@@ -151,6 +151,51 @@ git merge main
 git branch -d hotfix/critical-fix
 ```
 
+### Publishing to Production (Dev to Main)
+
+**Use the `/publish` command to merge dev into main and deploy to production:**
+
+```bash
+# From dev branch, publish to production
+/publish
+```
+
+**What `/publish` does:**
+1. Validates prerequisites (on dev, no uncommitted changes, tests pass)
+2. Merges dev into main
+3. Detects if a planned release is included in commits
+4. Creates version and release document (planned or incremental)
+5. Bumps package.json version
+6. Tags release
+7. Deploys to production
+
+**Release Types:**
+- **Planned Release** (vX.Y.0): Detected if release document exists in commits
+- **Incremental Release** (vX.Y.Z): Auto-generated if no planned release detected
+
+**Publishing Submodules:**
+```bash
+# Publish specific submodule
+/publish foundation
+```
+
+**Manual Alternative (Not Recommended):**
+If you need to merge dev to main manually without deployment:
+```bash
+git checkout main
+git pull origin main
+git merge --no-ff dev -m "Merge dev into main"
+git push origin main
+```
+
+**Best Practice:** Use `/publish` command for all dev-to-main merges to ensure:
+- Proper version bumping
+- Release documentation
+- Automated deployment
+- Consistent release process
+
+See `foundation/agent-instructions/cursor-commands/publish.md` for complete documentation.
+
 ## Configuration
 
 Configure branch strategy in `foundation-config.yaml`:
