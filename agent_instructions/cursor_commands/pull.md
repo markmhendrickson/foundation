@@ -35,10 +35,10 @@ If submodule name provided:
    fi
    ```
 
-2. Change to submodule directory:
+2. Save parent directory and change to submodule directory:
    ```bash
+   ORIGINAL_DIR=$(pwd)  # Save parent directory before cd
    cd <submodule-name> || exit 1
-   ORIGINAL_DIR=$(pwd)  # Save for later
    ```
 
 3. Update scope context (all subsequent operations in submodule)
@@ -177,15 +177,28 @@ echo "✅ Successfully pulled latest changes"
 
 After successful pull, detect and run setup scripts as needed:
 
+**IMPORTANT**: If in submodule mode, return to parent repository directory BEFORE running setup scripts, as parent-level setup scripts (like `foundation/scripts/setup_cursor_rules.sh`) must be run from the parent repository context.
+
 ```bash
 echo "🔧 Checking for setup scripts..."
+
+# If in submodule mode, return to parent directory for setup scripts
+if [ -n "$ORIGINAL_DIR" ]; then
+  echo "📁 Returning to parent repository for setup scripts..."
+  cd "$ORIGINAL_DIR" || exit 1
+fi
 
 # Common setup script patterns
 SETUP_SCRIPTS=()
 
+# Check for foundation setup script (must run from parent repo)
+if [ -f "foundation/scripts/setup_cursor_rules.sh" ]; then
+  SETUP_SCRIPTS+=("foundation/scripts/setup_cursor_rules.sh")
+fi
+
 # Check for foundation validation script
-if [ -f "foundation/scripts/validate-setup.sh" ]; then
-  SETUP_SCRIPTS+=("foundation/scripts/validate-setup.sh")
+if [ -f "foundation/scripts/validate_setup.sh" ]; then
+  SETUP_SCRIPTS+=("foundation/scripts/validate_setup.sh")
 fi
 
 # Check for repository-specific setup scripts
@@ -256,11 +269,15 @@ echo "  - Setup scripts run: ${#SETUP_SCRIPTS[@]}"
 
 ### Step 8: Return to Original Directory (if in submodule mode)
 
-If submodule name was provided:
+**Note**: If in submodule mode, we already returned to the parent directory in Step 6 to run setup scripts. This step is now a no-op, but kept for clarity.
+
+If submodule name was provided and we're not already in the parent directory:
 
 ```bash
-cd "$ORIGINAL_DIR" || exit 1
-echo "✅ Returned to main repository directory"
+if [ -n "$ORIGINAL_DIR" ] && [ "$(pwd)" != "$ORIGINAL_DIR" ]; then
+  cd "$ORIGINAL_DIR" || exit 1
+  echo "✅ Returned to main repository directory"
+fi
 ```
 
 ## Configuration
