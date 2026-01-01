@@ -71,6 +71,86 @@ Marketing activities (pre-launch and post-launch) are **skipped for not_marketed
 
 ---
 
+## Planned vs Incremental Releases
+
+Neotoma distinguishes between **Planned Releases** and **Incremental Releases**:
+
+### Planned Releases (Milestones)
+
+**Characteristics:**
+- Use semantic versioning: `vX.Y.0` (major.minor.0, patch always 0)
+- Examples: `v1.0.0`, `v1.1.0`, `v2.0.0`
+- Created via `/create_release` command
+- Follow full release workflow with checkpoints, FUs, acceptance criteria
+- Control major and minor version numbers
+- Located in `docs/releases/{version}/` with complete release structure
+
+**When to Create:**
+- Major feature milestones (new major functionality)
+- Breaking changes (major version increment)
+- Significant product enhancements (minor version increment)
+- Marketing-worthy releases
+- Multi-FU coordinated launches
+
+### Incremental Releases (Continuous Deployments)
+
+**Characteristics:**
+- Use semantic versioning as patches: `vX.Y.Z` where Z increments
+- Examples: If last planned release is `v1.1.0`, incremental releases are `v1.1.1`, `v1.1.2`, `v1.1.3`
+- Created via `/publish` command (auto-generated from dev commits)
+- Only patch version increments (never major or minor)
+- Minimal release documentation (auto-generated)
+- Independent purpose: continuous deployments between planned milestones
+
+**When to Create:**
+- Bug fixes
+- Small improvements
+- Documentation updates
+- Refactoring
+- Incremental feature additions
+- Regular dev-to-main merges
+
+### Versioning Strategy
+
+**Version Numbering:**
+- **Planned releases** control major and minor: `vX.Y.0`
+- **Incremental releases** increment patch only: `vX.Y.Z` (Z increments)
+- Both update `package.json`
+- Example sequence: `v1.0.0` (planned) → `v1.0.1`, `v1.0.2` (incremental) → `v1.1.0` (planned) → `v1.1.1`, `v1.1.2` (incremental)
+
+**Version Determination:**
+- Incremental releases find last planned release (vX.Y.0 pattern)
+- Incremental releases increment patch from last planned release
+- If no planned release exists, start at v0.1.0
+
+**Relationship:**
+- Independent purposes: Planned = milestones, Incremental = continuous deployment
+- Incremental releases happen between planned releases
+- Each planned release resets patch counter to 0
+- Incremental releases preserve major/minor from last planned release
+
+### Deployment
+
+**Both release types deploy to production at neotoma.io:**
+- Planned releases: Follow full deployment workflow with staging validation
+- Incremental releases: Faster deployment, minimal validation
+
+### Commands
+
+**Creating Releases:**
+- `/create_release` - Creates planned release with full workflow
+- `/publish` - Merges dev to main, creates incremental release (or detects planned release in commits)
+
+**Publish Command Detection:**
+The `/publish` command automatically detects if a planned release is included in commits:
+- Checks for release status.md changes
+- Checks for new release directories with manifest.yaml
+- Checks commit messages for release references
+- If detected: Uses planned release version, updates existing release document
+- If not detected: Creates incremental release with patch increment
+
+---
+
 ## Prerequisites
 
 Before creating a Release, verify:

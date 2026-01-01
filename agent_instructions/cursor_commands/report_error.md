@@ -9,14 +9,17 @@ Supports **cross-repo reporting**: Report errors to sibling repositories (repos 
 ## Command Usage
 
 ```bash
-/report_error [target-repo-name]
+/report_error [target-repo-name] [--wait] [--timeout SECONDS] [--poll-interval SECONDS]
 ```
 
 **Parameters:**
 - `target-repo-name` (optional): Name of sibling repository to report error to
   - Must be a sibling repository (shares same parent directory)
   - Example: If current repo is `/Users/user/Projects/personal`, target `neotoma` resolves to `/Users/user/Projects/neotoma`
-- If omitted: Reports error to current repository (local reporting)
+  - If omitted: Reports error to current repository (local reporting)
+- `--wait` (optional): Enable wait-for-resolution mode (monitor error status until resolved)
+- `--timeout SECONDS` (optional): Maximum time to wait for resolution (default: 300 seconds / 5 minutes)
+- `--poll-interval SECONDS` (optional): How often to check error status (default: 5 seconds)
 
 **Examples:**
 ```bash
@@ -26,6 +29,18 @@ Supports **cross-repo reporting**: Report errors to sibling repositories (repos 
 # Cross-repo reporting to sibling repo
 /report_error neotoma
 /report_error personal-project
+
+# Report error and wait for resolution
+/report_error --wait
+
+# Report error with custom timeout (10 minutes)
+/report_error --wait --timeout 600
+
+# Report error with custom poll interval (check every 2 seconds)
+/report_error --wait --poll-interval 2
+
+# Cross-repo reporting with wait mode
+/report_error neotoma --wait --timeout 600
 ```
 
 ## When to Use
@@ -668,9 +683,129 @@ Expected: Error message: "Target path is not a git repository: /Users/user/Proje
 (Where neotoma repo exists but `.cursor/error_reports/` doesn't exist yet)
 Expected: Directories created automatically, error report written successfully
 
+## Wait-for-Resolution Mode
+
+When using the `--wait` flag, the agent will monitor the error report status and wait for resolution before continuing.
+
+### Workflow with --wait
+
+1. **Report Error:**
+   - Agent executes `/report_error --wait`
+   - Error report created with `resolution_status: "pending"`
+   - Error ID returned to agent
+
+2. **Monitor Resolution:**
+   - Agent polls error report file for status changes
+   - Checks `resolution_status` field in JSON report
+   - Status values: `pending` → `in_progress` → `resolved` | `failed`
+
+3. **Resolution Detection:**
+   - **Resolved:** Status changes to `"resolved"`
+     - Agent can resume/retry the operation that failed
+     - Check `resolution_notes` for details about the fix
+   - **Failed:** Status changes to `"failed"`
+     - Agent should handle failure case (log, skip, or escalate)
+     - Check `resolution_notes` for failure reason
+
+4. **Timeout Handling:**
+   - If timeout reached while status is still `pending` or `in_progress`:
+     - Agent logs warning and continues (assumes resolution in progress)
+     - Agent can check status later or proceed without waiting
+
+5. **Resume/Retry Logic:**
+   - After resolution, agent can:
+     - **Resume:** Continue from where error occurred
+     - **Retry:** Re-execute the operation that failed
+     - **Skip:** If error indicates operation should be skipped
+
+### Configuration
+
+Wait mode settings are read from `foundation-config.yaml`:
+- `error_reporting.wait_mode.default_timeout` - Default timeout (overridden by `--timeout`)
+- `error_reporting.wait_mode.default_poll_interval` - Default poll interval (overridden by `--poll-interval`)
+- `error_reporting.wait_mode.max_timeout` - Maximum allowed timeout
+- `error_reporting.wait_mode.min_poll_interval` - Minimum allowed poll interval
+
+### Implementation Example
+
+```javascript
+// Agent workflow with --wait
+try {
+  await performOperation();
+} catch (error) {
+  // Report error and wait for resolution
+  const result = await reportError('--wait', '--timeout', '600');
+  
+  if (result.resolved) {
+    // Retry operation after resolution
+    console.log(`Retrying operation after error resolution: ${result.errorId}`);
+    await performOperation(); // Retry
+  } else if (result.failed) {
+    // Handle failure case
+    console.log(`Error resolution failed: ${result.resolutionNotes}`);
+    throw new Error(`Operation failed and could not be resolved: ${result.errorId}`);
+  } else if (result.timeout) {
+    // Timeout - proceed or skip
+    console.log(`Timeout waiting for resolution, skipping operation`);
+    // Agent decides whether to skip or continue
+  }
+}
+```
+
+### Status Monitoring
+
+The agent polls the error report JSON file for status changes:
+
+```javascript
+async function waitForErrorResolution(errorId, errorReportPath, options = {}) {
+  const {
+    timeout = 300, // 5 minutes default
+    pollInterval = 5, // 5 seconds default
+  } = options;
+
+  const startTime = Date.now();
+  const timeoutMs = timeout * 1000;
+
+  while (true) {
+    // Check timeout
+    if (Date.now() - startTime > timeoutMs) {
+      throw new Error(`Timeout waiting for error resolution: ${errorId}`);
+    }
+
+    // Read error report
+    const report = JSON.parse(fs.readFileSync(errorReportPath, 'utf8'));
+    const status = report.resolution_status;
+
+    // Check if resolved or failed
+    if (status === 'resolved') {
+      return {
+        status: 'resolved',
+        errorId,
+        resolutionNotes: report.resolution_notes || '',
+        report
+      };
+    }
+
+    if (status === 'failed') {
+      return {
+        status: 'failed',
+        errorId,
+        resolutionNotes: report.resolution_notes || '',
+        report
+      };
+    }
+
+    // Still pending or in_progress, wait and check again
+    console.log(`[WAIT] Error ${errorId} status: ${status}, waiting...`);
+    await new Promise(resolve => setTimeout(resolve, pollInterval * 1000));
+  }
+}
+```
+
 ## Related Documentation
 
 - `.cursor/commands/fix_feature_bug.md` - Bug fix workflow
 - `.cursor/commands/analyze.md` - Analysis command
-- `foundation-config.yaml` - Configuration file
+- `.cursor/commands/debug_pending_errors.md` - Debug pending errors workflow
+- `foundation-config.yaml` - Configuration file (in repository root)
 
