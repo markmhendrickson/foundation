@@ -63,6 +63,9 @@ COMMANDS_RELATIVE_PATH="../../$FOUNDATION_DIR/agent_instructions/cursor_commands
 # Prefix for symlink names to avoid conflicts with other repos
 SYMLINK_PREFIX="foundation_"
 
+# Prefix for repository rules (can be set via REPO_RULES_PREFIX env var, defaults to empty)
+REPO_RULES_PREFIX="${REPO_RULES_PREFIX:-}"
+
 # Remove all existing symlinks with the prefix (both - and _ variants)
 print_info "Removing existing symlinks with prefix '$SYMLINK_PREFIX' (including underscore variant)..."
 RULES_REMOVED=0
@@ -189,35 +192,68 @@ REPO_RULES_LINKED=0
 # Check if docs/ directory exists
 if [ -d "docs" ]; then
     # Remove existing repo rule symlinks (ending in _rules.md, excluding foundation-* and foundation_*)
-    if [ -d ".cursor/rules" ]; then
-        for existing_link in .cursor/rules/*_rules.md; do
-            if [ -L "$existing_link" ] && [ -e "$existing_link" ]; then
-                basename_file=$(basename "$existing_link")
-                # Skip if it starts with foundation- or foundation_
-                if [[ ! "$basename_file" =~ ^foundation[-_] ]]; then
-                    rm "$existing_link"
-                    print_info "  ✓ Removed repo rule: $basename_file"
-                    REPO_RULES_REMOVED=$((REPO_RULES_REMOVED + 1))
-                fi
+        if [ -d ".cursor/rules" ]; then
+            if [ -n "$REPO_RULES_PREFIX" ]; then
+                # Remove symlinks with the repo prefix (both .md and .mdc)
+                for existing_link in .cursor/rules/${REPO_RULES_PREFIX}*_rules.{md,mdc}; do
+                    if [ -e "$existing_link" ]; then
+                        basename_file=$(basename "$existing_link")
+                        rm "$existing_link"
+                        print_info "  ✓ Removed repo rule: $basename_file"
+                        REPO_RULES_REMOVED=$((REPO_RULES_REMOVED + 1))
+                    fi
+                done
+            else
+                # Remove symlinks ending in _rules.md or _rules.mdc that don't start with foundation- or foundation_
+                for existing_link in .cursor/rules/*_rules.{md,mdc}; do
+                    if [ -L "$existing_link" ] && [ -e "$existing_link" ]; then
+                        basename_file=$(basename "$existing_link")
+                        # Skip if it starts with foundation- or foundation_
+                        if [[ ! "$basename_file" =~ ^foundation[-_] ]]; then
+                            rm "$existing_link"
+                            print_info "  ✓ Removed repo rule: $basename_file"
+                            REPO_RULES_REMOVED=$((REPO_RULES_REMOVED + 1))
+                        fi
+                    fi
+                done
             fi
-        done
-    fi
+        fi
     
-    # Find all *_rules.md files in docs/ directory (recursively)
+    # Find all *_rules.mdc and *_rules.md files in docs/ directory (recursively)
+    # Prefer .mdc over .md if both exist
     while IFS= read -r -d '' rule_file; do
         # Get relative path from docs/ directory
         rel_path="${rule_file#docs/}"
         # Get directory path and filename
         dir_path=$(dirname "$rel_path")
-        file_name=$(basename "$rel_path" .md)
+        # Remove .mdc or .md extension
+        if [[ "$rel_path" == *.mdc ]]; then
+            file_name=$(basename "$rel_path" .mdc)
+        else
+            file_name=$(basename "$rel_path" .md)
+        fi
+        
+        # Determine file extension based on source file
+        if [[ "$rule_file" == *.mdc ]]; then
+            file_ext=".mdc"
+        else
+            file_ext=".md"
+        fi
         
         # Create symlink name by replacing / with _
         if [ "$dir_path" = "." ]; then
-            symlink_name="${file_name}.md"
+            base_symlink_name="${file_name}${file_ext}"
         else
             # Replace / with _ in path
             path_prefix=$(echo "$dir_path" | tr '/' '_')
-            symlink_name="${path_prefix}_${file_name}.md"
+            base_symlink_name="${path_prefix}_${file_name}${file_ext}"
+        fi
+        
+        # Apply repo rules prefix if set
+        if [ -n "$REPO_RULES_PREFIX" ]; then
+            symlink_name="${REPO_RULES_PREFIX}${base_symlink_name}"
+        else
+            symlink_name="$base_symlink_name"
         fi
         
         target_file=".cursor/rules/$symlink_name"
@@ -225,15 +261,29 @@ if [ -d "docs" ]; then
         # Calculate relative path from .cursor/rules/ to the file
         rel_to_cursor="../../$rule_file"
         
-        if [ -e "$target_file" ] && [ ! -L "$target_file" ]; then
-            # File exists but is not a symlink (preserve customizations)
-            print_warn "File already exists (not a symlink): $symlink_name (skipping to preserve existing file)"
-        else
-            ln -s "$rel_to_cursor" "$target_file"
-            print_info "  ✓ Linked $rule_file -> $symlink_name"
-            REPO_RULES_LINKED=$((REPO_RULES_LINKED + 1))
+        if [ -e "$target_file" ]; then
+            if [ -L "$target_file" ]; then
+                # Symlink already exists, remove it first
+                rm "$target_file"
+            else
+                # File exists but is not a symlink (preserve customizations)
+                print_warn "File already exists (not a symlink): $symlink_name (skipping to preserve existing file)"
+                continue
+            fi
         fi
-    done < <(find docs -name "*_rules.md" -type f -print0)
+        ln -sf "$rel_to_cursor" "$target_file"
+        print_info "  ✓ Linked $rule_file -> $symlink_name"
+        REPO_RULES_LINKED=$((REPO_RULES_LINKED + 1))
+    done < <(find docs -type f \( -name "*_rules.mdc" -o -name "*_rules.md" \) -print0 | while IFS= read -r -d '' file; do
+        # If both .mdc and .md exist, prefer .mdc
+        base="${file%.mdc}"
+        base="${base%.md}"
+        if [ -f "${base}.mdc" ] && [ -f "${base}.md" ] && [[ "$file" == *.md ]]; then
+            continue  # Skip .md if .mdc exists
+        fi
+        echo -n "$file"
+        echo -ne '\0'
+    done)
     
     if [ $REPO_RULES_LINKED -eq 0 ] && [ $REPO_RULES_REMOVED -eq 0 ]; then
         print_info "  No repo rules found in docs/ directory"
@@ -264,7 +314,16 @@ if [ $RULES_LINKED -gt 0 ] || [ $COMMANDS_LINKED -gt 0 ] || [ $RULES_REMOVED -gt
     print_info "Updates to foundation will automatically apply to these rules/commands"
     print_info "Foundation symlinks are prefixed with 'foundation_' to avoid conflicts"
     if [ $REPO_RULES_LINKED -gt 0 ]; then
+        if [ -n "$REPO_RULES_PREFIX" ]; then
+        # Determine example extension based on what was linked
+        if ls .cursor/rules/${REPO_RULES_PREFIX}*_rules.mdc 1>/dev/null 2>&1; then
+            print_info "Repo rules prefixed with '$REPO_RULES_PREFIX' (e.g., ${REPO_RULES_PREFIX}communication_rules.mdc)"
+        else
+            print_info "Repo rules prefixed with '$REPO_RULES_PREFIX' (e.g., ${REPO_RULES_PREFIX}communication_rules.md)"
+        fi
+    else
         print_info "Repo rules use path-based naming (e.g., foundation_agent_instructions_rules.md)"
+    fi
     fi
     print_info ""
     print_info "Next steps:"

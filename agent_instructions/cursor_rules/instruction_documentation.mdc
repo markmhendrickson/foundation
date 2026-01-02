@@ -73,7 +73,7 @@ When user says "always X" or "never Y", agents MUST:
 
 1. Recognize as rule creation request (all rules are Cursor rules)
 2. Determine scope:
-   - **Global rule** (benefits all repos using foundation): `foundation/agent_instructions/cursor_rules/{topic}.md`
+   - **Global rule** (benefits all repos using foundation): `foundation/agent_instructions/cursor_rules/{topic}.mdc` (MUST use `.mdc` extension)
    - **Repository rule** (this repo only): Place in appropriate `docs/` subdirectory based on topic. MUST NOT use `.cursor/rules/`
      - Examples (choose subdirectory that best matches rule's topic):
        - Code/documentation conventions → `docs/conventions/{topic}_rules.md`
@@ -116,7 +116,7 @@ Rules are classified by scope and topic:
 
 **For Cursor rules (all rules are Cursor rules):**
 1. Determine scope:
-   - **Global rule** (all repos) → `foundation/agent_instructions/cursor_rules/{topic}.md`
+   - **Global rule** (all repos) → `foundation/agent_instructions/cursor_rules/{topic}.mdc` (MUST use `.mdc` extension)
    - **Repository rule** (this repo) → `docs/{appropriate_subdirectory}/{topic}_rules.md` based on topic
      - Examples (choose subdirectory that best matches rule's topic):
        - Code/documentation conventions → `docs/conventions/`
@@ -124,7 +124,9 @@ Rules are classified by scope and topic:
        - Feature unit workflows → `docs/feature_units/standards/`
        - Development workflows → `docs/developer/`
 2. MUST NOT use `.cursor/rules/` directly
-3. Use filename: `{topic}_rule.md` or `{topic}_management.md`
+3. Use filename: 
+   - Foundation rules: `{topic}.mdc` or `{topic}_management.mdc` (MUST use `.mdc`)
+   - Repository rules: `{topic}_rules.md` or `{topic}_management.md`
 4. Follow existing rule format (Purpose, Trigger Patterns, Agent Actions, Constraints)
 5. Update references if applicable
 

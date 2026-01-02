@@ -74,7 +74,7 @@ create-rule [submodule_name]
    - Use RFC 2119 language (MUST, SHOULD, MUST NOT)
 
 **Submodule mode prompts:**
-1. **Rule file name** (without `_rules.md` suffix for submodules that use this convention, or without `.md` for submodules that use plain names)
+1. **Rule file name** (without `_rules.mdc` suffix for foundation submodule, or without `.mdc` for foundation submodule - MUST use `.mdc` extension for foundation rules)
 
 2. **Rule purpose and scope**
 
@@ -215,8 +215,8 @@ For foundation submodule, create file following foundation cursor-rules pattern 
    ```
    ✅ Rule created in submodule successfully!
    
-   File: {submodule}/{rule_path}/{name}{suffix}.md
-   Symlink: .cursor/rules/{prefix}{name}.md (if applicable)
+   File: {submodule}/{rule_path}/{name}{suffix}.mdc (for foundation submodule, use .mdc extension)
+   Symlink: .cursor/rules/{prefix}{name}.mdc (if applicable)
    
    The rule is now available to all repositories using this submodule.
    ```
@@ -270,8 +270,8 @@ Prompts:
 - Key constraints: "MUST include unit tests, SHOULD use fixtures"
 
 Creates:
-- `foundation/agent_instructions/cursor_rules/testing_patterns_rules.md`
-- `.cursor/rules/foundation-testing_patterns_rules.md` (symlink)
+- `foundation/agent_instructions/cursor_rules/testing_patterns.mdc`
+- `.cursor/rules/foundation_testing_patterns.mdc` (symlink)
 
 ## Required Documents
 
