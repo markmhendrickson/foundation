@@ -291,3 +291,6 @@ This template provides a framework for analyzing any resource (article, thought 
   - `docs/foundation/problem_statement.md`
   - `docs/foundation/philosophy.md`
 
+
+
+
