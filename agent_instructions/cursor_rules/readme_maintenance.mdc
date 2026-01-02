@@ -1,3 +1,7 @@
+---
+description: "Ensures that README.md remains synchronized with documentation changes, providing accurate and comprehensive representation of the repository"
+alwaysApply: true
+---
 # README Maintenance Rule
 
 **Reference:** `README.md` — Project overview and entry point

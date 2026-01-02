@@ -4,7 +4,7 @@ Fix a bug in a feature or module.
 
 Configuration is read from `foundation-config.yaml`.
 
-This workflow can also be triggered automatically via `.cursor/rules/bug_fix_detection.md` (or `foundation/agent-instructions/cursor-rules/bug_fix_detection.md`) when you mention bug/error-related patterns in natural language (e.g., "bug", "error", "fix", "broken"). Both paths execute the same workflow.
+This workflow can also be triggered automatically via `.cursor/rules/bug_fix_detection.md` (or `foundation/agent_instructions/cursor_rules/bug_fix_detection.md`) when you mention bug/error-related patterns in natural language (e.g., "bug", "error", "fix", "broken"). Both paths execute the same workflow.
 
 ## Workflow
 

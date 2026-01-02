@@ -159,7 +159,7 @@ development:
 
 ## Related Commands
 
-- `/report_error` - Report an error (triggers debugging if automation enabled)
+- `/report` - Report an error (triggers debugging if automation enabled)
 - `/debug` - Manually debug pending errors (deprecated: use `/debug` instead)
 
 ## Error Handling

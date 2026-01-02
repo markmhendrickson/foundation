@@ -1,3 +1,7 @@
+---
+description: "Automatically detects release intent from user patterns and triggers the release creation workflow"
+alwaysApply: true
+---
 # Release Detection Rule
 
 **Reference:** `foundation/development/release_workflow.md` — "Release Detection" section

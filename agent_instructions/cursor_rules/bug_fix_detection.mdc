@@ -1,3 +1,7 @@
+---
+description: "Automatically detects bug fix intent from user patterns and triggers the bug fix workflow"
+alwaysApply: true
+---
 # Bug Fix Detection Rule
 
 **Reference:** `foundation/agent_instructions/cursor_commands/fix_feature_bug.md` — Bug fix workflow (or `.cursor/commands/foundation_fix_feature_bug.md` if symlinked)
@@ -136,4 +140,3 @@ development:
       - "npm test"
       - "npm run test:integration"
 ```
-

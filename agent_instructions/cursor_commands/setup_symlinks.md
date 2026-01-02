@@ -18,8 +18,8 @@ setup symlinks
 
 This command runs the foundation symlinks script (`foundation/scripts/setup-cursor-rules.sh`) which:
 
-1. Creates symlinks from `foundation/agent-instructions/cursor-rules/` to `.cursor/rules/`
-2. Creates symlinks from `foundation/agent-instructions/cursor-commands/` to `.cursor/commands/`
+1. Creates symlinks from `foundation/agent_instructions/cursor_rules/` to `.cursor/rules/`
+2. Creates symlinks from `foundation/agent_instructions/cursor_commands/` to `.cursor/commands/`
 3. Prefixes all symlink names with `foundation-` to avoid conflicts
 4. Removes existing foundation symlinks before creating new ones
 5. Preserves any non-symlink files (custom rules/commands)
@@ -85,14 +85,14 @@ This command runs the foundation symlinks script (`foundation/scripts/setup-curs
 ## What Gets Created
 
 **Symlinks in `.cursor/rules/`:**
-- `foundation_security.md` → `foundation/agent-instructions/cursor-rules/security.md`
-- `foundation_worktree_env.md` → `foundation/agent-instructions/cursor-rules/worktree_env.md`
-- `foundation_readme_maintenance.md` → `foundation/agent-instructions/cursor-rules/readme_maintenance.md`
+- `foundation_security.md` → `foundation/agent_instructions/cursor_rules/security.md`
+- `foundation_worktree_env.md` → `foundation/agent_instructions/cursor_rules/worktree_env.md`
+- `foundation_readme_maintenance.md` → `foundation/agent_instructions/cursor_rules/readme_maintenance.md`
 - ... (all rules from foundation)
 
 **Symlinks in `.cursor/commands/`:**
-- `foundation_commit.md` → `foundation/agent-instructions/cursor-commands/commit.md`
-- `foundation_analyze.md` → `foundation/agent-instructions/cursor-commands/analyze.md`
+- `foundation_commit.md` → `foundation/agent_instructions/cursor_commands/commit.md`
+- `foundation_analyze.md` → `foundation/agent_instructions/cursor_commands/analyze.md`
 - ... (all commands from foundation)
 
 ## Behavior
@@ -129,7 +129,7 @@ This command runs the foundation symlinks script (`foundation/scripts/setup-curs
 
 **Error:**
 ```
-[ERROR] Cursor rules directory not found: foundation/agent-instructions/cursor-rules
+[ERROR] Cursor rules directory not found: foundation/agent_instructions/cursor_rules
 ```
 
 **Solution:**
@@ -140,7 +140,7 @@ This command runs the foundation symlinks script (`foundation/scripts/setup-curs
 
 **Error:**
 ```
-[ERROR] Cursor commands directory not found: foundation/agent-instructions/cursor-commands
+[ERROR] Cursor commands directory not found: foundation/agent_instructions/cursor_commands
 ```
 
 **Solution:**
@@ -150,7 +150,7 @@ This command runs the foundation symlinks script (`foundation/scripts/setup-curs
 ## Related Documents
 
 - `foundation/scripts/setup-cursor-rules.sh` - The script that performs the setup
-- `foundation/agent-instructions/README.md` - Cursor rules and commands documentation
+- `foundation/agent_instructions/README.md` - Cursor rules and commands documentation
 - `foundation/README.md` - Foundation overview and installation
 
 ## Notes

@@ -1,3 +1,7 @@
+---
+description: "Defines how agents MUST document important instructions, constraints, and guidelines in appropriate files"
+alwaysApply: true
+---
 # Instruction Documentation Rule
 
 _(Cursor Rule: Agent Behavior)_

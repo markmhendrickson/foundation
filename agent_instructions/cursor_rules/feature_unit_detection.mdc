@@ -1,3 +1,7 @@
+---
+description: "Automatically detects feature unit creation intent from user patterns and triggers the feature unit creation workflow"
+alwaysApply: true
+---
 # Feature Unit Creation Detection Rule
 
 **Reference:** `foundation/development/feature_unit_workflow.md` — Complete workflow

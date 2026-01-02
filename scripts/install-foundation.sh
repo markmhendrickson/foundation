@@ -227,6 +227,6 @@ print_info "Next steps:"
 print_info "  1. Customize foundation-config.yaml for your repository"
 print_info "  2. Run ./foundation/scripts/validate-setup.sh to verify installation"
 print_info "  3. See foundation/README.md for usage documentation"
-print_info "  4. See foundation/agent-instructions/README.md for cursor rules documentation"
+print_info "  4. See foundation/agent_instructions/README.md for cursor rules documentation"
 
 

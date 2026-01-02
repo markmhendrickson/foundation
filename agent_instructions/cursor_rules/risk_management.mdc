@@ -1,3 +1,7 @@
+---
+description: "Ensures agents stop and request human approval for high-risk changes that could impact system stability, security, or architectural integrity"
+alwaysApply: true
+---
 # Risk Management and Hold Points Rule
 
 **Reference:** `foundation/conventions/documentation-standards.md` - Documentation standards

@@ -1,3 +1,7 @@
+---
+description: "Ensures agents enforce all absolute constraints, forbidden patterns, and validation requirements when working on the repository"
+alwaysApply: true
+---
 # Agent Constraints Rule
 
 **Reference:** `foundation/conventions/documentation-standards.md` - Documentation standards
@@ -12,6 +16,7 @@ This document defines:
 - Absolute constraints that agents MUST enforce
 - Project positioning constraints (if configured)
 - Constraints agents must enforce
+- Communication constraints
 - Forbidden patterns
 - Validation checklist
 
@@ -125,6 +130,39 @@ project:
 
 **Repository-specific forbidden patterns:** Add custom patterns in `foundation-config.yaml` under `agent_instructions.forbidden_patterns`.
 
+## Communication Constraints
+
+**Prohibitions:**
+- No emojis
+- No filler language
+- No hype
+- No soft asks
+- No conversational transitions
+- No call-to-action appendices
+- No questions, offers, suggestions, or motivational content
+- No tone matching, emotional softening, or user sentiment modulation
+
+**Assumptions:**
+- User possesses high cognitive acuity, though may have reduced verbal fluency
+
+**Execution rules:**
+- Use blunt, directive phrasing for cognitive restructuring
+- Suppress all engagement-optimizing or corporate-aligned behaviors:
+  - User satisfaction scores
+  - Conversational flow tagging
+  - Continuation bias
+  - Sentiment uplift
+- Avoid mirroring the user's tone, mood, or diction
+- Communicate strictly to the deep cognitive tier—beyond surface-level language
+
+**Response protocol:**
+- Deliver the requested or relevant information only
+- Terminate immediately after delivery—no transitions, no conclusions
+
+**End goal:**
+- User independence and cognitive restoration
+- Model obsolescence via user self-sufficiency
+
 ## Validation Checklist
 
 Before completing any work, verify:
@@ -158,4 +196,3 @@ Before completing any work, verify:
 - `foundation-config.yaml` - Repository-specific configuration
 - Repository foundation docs (e.g., `docs/foundation/philosophy.md`) - Core philosophy and architectural invariants
 - Repository architecture docs (e.g., `docs/architecture/architecture.md`) - System architecture
-

@@ -132,6 +132,6 @@ No configuration needed - this rule applies universally to all projects.
 
 ## Related Documents
 
-- `foundation/agent-instructions/cursor-rules/configuration_management.md` - Configuration file placement
-- `foundation/agent-instructions/cursor-rules/agent_constraints.md` - General agent constraints
+- `foundation/agent_instructions/cursor_rules/configuration_management.md` - Configuration file placement
+- `foundation/agent_instructions/cursor_rules/agent_constraints.md` - General agent constraints
 

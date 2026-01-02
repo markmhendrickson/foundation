@@ -9,7 +9,7 @@ Supports **cross-repo reporting**: Report errors to sibling repositories (repos 
 ## Command Usage
 
 ```bash
-/report_error [target-repo-name] [--wait] [--timeout SECONDS] [--poll-interval SECONDS]
+/report [target-repo-name] [--wait] [--timeout SECONDS] [--poll-interval SECONDS]
 ```
 
 **Parameters:**
@@ -24,23 +24,23 @@ Supports **cross-repo reporting**: Report errors to sibling repositories (repos 
 **Examples:**
 ```bash
 # Local reporting (current repo)
-/report_error
+/report
 
 # Cross-repo reporting to sibling repo
-/report_error neotoma
-/report_error personal-project
+/report neotoma
+/report personal-project
 
 # Report error and wait for resolution
-/report_error --wait
+/report --wait
 
 # Report error with custom timeout (10 minutes)
-/report_error --wait --timeout 600
+/report --wait --timeout 600
 
 # Report error with custom poll interval (check every 2 seconds)
-/report_error --wait --poll-interval 2
+/report --wait --poll-interval 2
 
 # Cross-repo reporting with wait mode
-/report_error neotoma --wait --timeout 600
+/report neotoma --wait --timeout 600
 ```
 
 ## When to Use
@@ -322,7 +322,7 @@ Error: Cannot find module '../db'
   at Object.<anonymous> (/Users/user/Projects/neotoma/src/services/raw_storage.ts:1:1)
   ...
 
-Command: /report_error
+Command: /report
 ```
 
 Agent will:
@@ -341,7 +341,7 @@ Agent: Working in personal-project repo, encountered error that should be tracke
 
 Error: MCP error -32603: Failed to upload to storage: Bucket not found
 
-Command: /report_error neotoma
+Command: /report neotoma
 ```
 
 Agent will:
@@ -356,7 +356,7 @@ Agent will:
 ### Scenario 3: Invalid Target Repo
 
 ```
-Command: /report_error ../secret-repo
+Command: /report ../secret-repo
 ```
 
 Agent will:
@@ -648,37 +648,37 @@ Awaiting resolution by Cursor Cloud Agent.
 
 ### Test 1: Local Reporting (No Target)
 ```bash
-/report_error
+/report
 ```
 Expected: Error report written to current repo's `.cursor/error_reports/`
 
 ### Test 2: Valid Sibling Repo
 ```bash
-/report_error neotoma
+/report neotoma
 ```
 Expected: Error report written to `../neotoma/.cursor/error_reports/`
 
 ### Test 3: Non-Existent Sibling Repo
 ```bash
-/report_error non-existent-repo
+/report non-existent-repo
 ```
 Expected: Error message: "Target repository not found: /Users/user/Projects/non-existent-repo"
 
 ### Test 4: Invalid Repo Name (Path Traversal)
 ```bash
-/report_error ../other-dir
+/report ../other-dir
 ```
 Expected: Error message: "Invalid repo name: ../other-dir. Only alphanumeric, hyphens, underscores, and dots allowed."
 
 ### Test 5: Valid Name but Not Git Repo
 ```bash
-/report_error some-directory
+/report some-directory
 ```
 Expected: Error message: "Target path is not a git repository: /Users/user/Projects/some-directory"
 
 ### Test 6: Cross-Repo with Directory Creation
 ```bash
-/report_error neotoma
+/report neotoma
 ```
 (Where neotoma repo exists but `.cursor/error_reports/` doesn't exist yet)
 Expected: Directories created automatically, error report written successfully
@@ -690,7 +690,7 @@ When using the `--wait` flag, the agent will monitor the error report status and
 ### Workflow with --wait
 
 1. **Report Error:**
-   - Agent executes `/report_error --wait`
+   - Agent executes `/report --wait`
    - Error report created with `resolution_status: "pending"`
    - Error ID returned to agent
 
@@ -804,8 +804,8 @@ async function waitForErrorResolution(errorId, errorReportPath, options = {}) {
 
 ## Related Documentation
 
-- `.cursor/commands/fix_feature_bug.md` - Bug fix workflow
-- `.cursor/commands/analyze.md` - Analysis command
-- `.cursor/commands/debug.md` - Debug workflow
+- `.cursor/commands/foundation_fix_feature_bug.md` - Bug fix workflow
+- `.cursor/commands/foundation_analyze.md` - Analysis command
+- `.cursor/commands/foundation_debug.md` - Debug workflow
 - `foundation-config.yaml` - Configuration file (in repository root)
 

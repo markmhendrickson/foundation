@@ -1,3 +1,7 @@
+---
+description: "All filenames and folder names must use underscores (snake_case), not kebab-case (dashes)."
+alwaysApply: true
+---
 # File and Folder Naming Convention
 
 All filenames and folder names must use underscores (snake_case), not kebab-case (dashes).

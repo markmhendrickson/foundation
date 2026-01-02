@@ -1,3 +1,7 @@
+---
+description: "Ensures checkpoints are automatically updated in status.md when their trigger batches complete"
+alwaysApply: true
+---
 # Checkpoint Management Rule
 
 **Reference:** `foundation/development/release_workflow.md` — Checkpoint sections
@@ -185,4 +189,3 @@ orchestration:
     status_file: "status.md"
     manifest_file: "manifest.yaml"
 ```
-

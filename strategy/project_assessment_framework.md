@@ -373,7 +373,7 @@ Use this framework to:
 ## Related Documents
 
 - `foundation/strategy/README.md` - Strategy evaluation framework overview
-- `foundation/agent-instructions/cursor-commands/analyze.md` - Analyze command definition
+- `foundation/agent_instructions/cursor_commands/analyze.md` - Analyze command definition
 - Current repo foundational docs (dynamically discovered):
   - `docs/foundation/core_identity.md`
   - `docs/foundation/product_positioning.md`

@@ -1,3 +1,7 @@
+---
+description: "Rules for managing environment files when working in git worktrees, especially Cursor worktrees"
+alwaysApply: true
+---
 # Worktree Environment Rules
 
 When working in a git worktree (especially Cursor worktrees):

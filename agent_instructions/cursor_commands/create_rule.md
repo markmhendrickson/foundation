@@ -46,7 +46,7 @@ create-rule [submodule_name]
    ```
 
 2. Determine submodule rule location:
-   - For `foundation` submodule: `foundation/agent-instructions/cursor-rules/`
+   - For `foundation` submodule: `foundation/agent_instructions/cursor_rules/`
    - For other submodules: Check for standard rule directories or prompt user
 
 3. Set context for submodule rule creation
@@ -270,7 +270,7 @@ Prompts:
 - Key constraints: "MUST include unit tests, SHOULD use fixtures"
 
 Creates:
-- `foundation/agent-instructions/cursor-rules/testing_patterns_rules.md`
+- `foundation/agent_instructions/cursor_rules/testing_patterns_rules.md`
 - `.cursor/rules/foundation-testing_patterns_rules.md` (symlink)
 
 ## Required Documents

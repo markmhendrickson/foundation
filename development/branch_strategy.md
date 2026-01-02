@@ -194,7 +194,7 @@ git push origin main
 - Automated deployment
 - Consistent release process
 
-See `foundation/agent-instructions/cursor-commands/publish.md` for complete documentation.
+See `foundation/agent_instructions/cursor_commands/publish.md` for complete documentation.
 
 ## Configuration
 

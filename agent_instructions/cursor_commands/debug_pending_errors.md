@@ -1,13 +1,13 @@
-# Debug Command
+# Debug Pending Errors Command
 
 ## Purpose
 
-Check for pending error reports and debug/resolve them. Supports cross-repo error queue checking for sibling repositories. Also manages the error debugging automation watcher.
+Check for pending error reports and debug/resolve them. Supports cross-repo error queue checking for sibling repositories.
 
 ## Command Usage
 
 ```bash
-/debug [action|target-repo-name]
+/debug_pending_errors [action|target-repo-name]
 ```
 
 **Modes of Operation:**
@@ -19,11 +19,11 @@ The command operates in two modes based on the first argument:
 If the first argument is a watcher management action (`start`, `stop`, `status`, `logs`, `restart`), manage the error debugging automation watcher:
 
 ```bash
-/debug start      # Start the error debugging watcher
-/debug stop       # Stop the running watcher
-/debug status     # Check watcher status
-/debug logs       # Show watcher logs
-/debug restart    # Restart the watcher
+/debug_pending_errors start      # Start the error debugging watcher
+/debug_pending_errors stop       # Stop the running watcher
+/debug_pending_errors status     # Check watcher status
+/debug_pending_errors logs       # Show watcher logs
+/debug_pending_errors restart    # Restart the watcher
 ```
 
 ### 2. Error Debugging Mode (Default)
@@ -31,17 +31,17 @@ If the first argument is a watcher management action (`start`, `stop`, `status`,
 If the first argument is not a watcher action (or no arguments provided), check and debug pending errors:
 
 ```bash
-/debug                    # Check current repo's pending errors (default)
-/debug neotoma            # Check sibling repo's pending errors
-/debug personal-project   # Check another sibling repo
+/debug_pending_errors                    # Check current repo's pending errors (default)
+/debug_pending_errors neotoma            # Check sibling repo's pending errors
+/debug_pending_errors personal-project   # Check another sibling repo
 ```
 
-**Note:** To check watcher status, use `/debug status`. The default behavior (no arguments) checks for pending errors in the current repository.
+**Note:** To check watcher status, use `/debug_pending_errors status`. The default behavior (no arguments) checks for pending errors in the current repository.
 
 **Parameters:**
 - `action` (optional): Watcher management action (`start`, `stop`, `status`, `logs`, `restart`)
   - If provided, manages the error debugging automation watcher
-  - If omitted: Defaults to error debugging mode (check pending errors)
+  - If omitted and no target-repo-name: Shows watcher status (default)
 - `target-repo-name` (optional): Name of sibling repository to check for pending errors
   - Must be a sibling repository (shares same parent directory)
   - Only used if first argument is not a watcher action
@@ -49,16 +49,16 @@ If the first argument is not a watcher action (or no arguments provided), check 
 **Examples:**
 ```bash
 # Watcher management
-/debug start      # Start watcher
-/debug status     # Check watcher status
-/debug logs        # View watcher logs
-/debug stop        # Stop watcher
+/debug_pending_errors start      # Start watcher
+/debug_pending_errors status     # Check watcher status
+/debug_pending_errors logs        # View watcher logs
+/debug_pending_errors stop        # Stop watcher
 
 # Error debugging
-/debug                    # Check current repo's pending errors
-/debug neotoma            # Check sibling repo's pending errors
-/debug --list-only       # List errors without debugging
-/debug --all --auto      # Process all errors automatically
+/debug_pending_errors                    # Check current repo's pending errors
+/debug_pending_errors neotoma            # Check sibling repo's pending errors
+/debug_pending_errors --list-only       # List errors without debugging
+/debug_pending_errors --all --auto      # Process all errors automatically
 ```
 
 ## Workflow
@@ -138,7 +138,7 @@ If the first argument is not a watcher action (or no arguments provided), check 
 4. **Also show pending errors count:**
    - Read `.cursor/error_reports/pending.json`
    - Display count of pending errors
-   - If errors exist, suggest running `/debug` to debug
+   - If errors exist, suggest running `/debug_pending_errors` to debug
 
 #### Action: `logs`
 
@@ -446,20 +446,20 @@ Remaining pending errors: 1
 
 ```bash
 # Check watcher status (default)
-/debug
-/debug status
+/debug_pending_errors
+/debug_pending_errors status
 
 # Start watcher
-/debug start
+/debug_pending_errors start
 
 # View logs
-/debug logs
+/debug_pending_errors logs
 
 # Stop watcher
-/debug stop
+/debug_pending_errors stop
 
 # Restart watcher
-/debug restart
+/debug_pending_errors restart
 ```
 
 **Output (status):**
@@ -475,7 +475,7 @@ Configuration: Enabled
 Pending Errors: 2
 Last Activity: 2025-01-31T15:30:00Z
 
-Use /debug to debug pending errors.
+Use /debug_pending_errors to debug pending errors.
 ```
 
 **On Failed Resolution:**
@@ -504,8 +504,8 @@ Remaining pending errors: 2
 Display pending errors without debugging:
 
 ```bash
-/debug --list-only
-/debug neotoma --list-only
+/debug_pending_errors --list-only
+/debug_pending_errors neotoma --list-only
 ```
 
 **Behavior:**
@@ -518,8 +518,8 @@ Display pending errors without debugging:
 Process all pending errors in priority order:
 
 ```bash
-/debug --all
-/debug neotoma --all
+/debug_pending_errors --all
+/debug_pending_errors neotoma --all
 ```
 
 **Behavior:**
@@ -532,8 +532,8 @@ Process all pending errors in priority order:
 Skip confirmation prompts:
 
 ```bash
-/debug --auto
-/debug neotoma --auto
+/debug_pending_errors --auto
+/debug_pending_errors neotoma --auto
 ```
 
 **Behavior:**
@@ -543,7 +543,7 @@ Skip confirmation prompts:
 ### Combined Flags
 
 ```bash
-/debug neotoma --all --auto
+/debug_pending_errors neotoma --all --auto
 ```
 Process all pending errors in neotoma repo without prompts
 
@@ -606,8 +606,8 @@ development:
 
 **Watcher Management:**
 - When `watch_mode: true`, the watcher automatically monitors for new errors
-- Use `/debug start` to start the watcher
-- Use `/debug status` to check watcher and pending errors
+- Use `/debug_pending_errors start` to start the watcher
+- Use `/debug_pending_errors status` to check watcher and pending errors
 - Watcher logs are written to `.cursor/error_reports/watcher.log`
 
 ## Integration Points
@@ -638,7 +638,7 @@ development:
 ### Scenario 1: Check & Debug Current Repo
 
 ```bash
-/debug
+/debug_pending_errors
 ```
 
 **Output:**
@@ -674,7 +674,7 @@ Proceed with debugging? (yes/no/choose-different/list-only)
 ### Scenario 2: Check Sibling Repo
 
 ```bash
-/debug neotoma
+/debug_pending_errors neotoma
 ```
 
 **Output:**
@@ -697,7 +697,7 @@ Debugging error...
 ### Scenario 3: List Only Mode
 
 ```bash
-/debug --list-only
+/debug_pending_errors --list-only
 ```
 
 **Output:**
@@ -714,13 +714,13 @@ Found 2 pending error(s) in neotoma:
    - Message: MCP error -32603: UNKNOWN_CAPABILITY
    - Affected: src/server.ts
 
-Use /debug to debug highest priority error.
+Use /debug_pending_errors to debug highest priority error.
 ```
 
 ### Scenario 4: No Pending Errors
 
 ```bash
-/debug
+/debug_pending_errors
 ```
 
 **Output (if no watcher action specified, shows status):**
@@ -747,7 +747,7 @@ All clear!
 ### Scenario 5: Debug All Errors
 
 ```bash
-/debug --all
+/debug_pending_errors --all
 ```
 
 **Output:**
@@ -901,8 +901,8 @@ function getRepositoryMetadata(repoPath) {
 
 ### Check Watcher Status
 ```bash
-/debug
-/debug status
+/debug_pending_errors
+/debug_pending_errors status
 ```
 
 **Output:**
@@ -918,12 +918,12 @@ Configuration: Enabled
 Pending Errors: 2
 Last Activity: 2025-01-31T15:30:00Z
 
-Use /debug to debug pending errors.
+Use /debug_pending_errors to debug pending errors.
 ```
 
 ### Start Watcher
 ```bash
-/debug start
+/debug_pending_errors start
 ```
 
 **Output:**
@@ -936,8 +936,8 @@ debug them when found.
 
 ### View Watcher Logs
 ```bash
-/debug logs
-/debug logs --follow  # Tail logs
+/debug_pending_errors logs
+/debug_pending_errors logs --follow  # Tail logs
 ```
 
 **Output:**
@@ -960,12 +960,12 @@ Error Debugging Watcher Logs (last 50 lines)
 
 ## Deprecated Commands
 
-- `/manage_error_debugging` - **Deprecated**: Use `/debug [action]` instead
-  - `/manage_error_debugging start` → `/debug start`
-  - `/manage_error_debugging stop` → `/debug stop`
-  - `/manage_error_debugging status` → `/debug status`
-  - `/manage_error_debugging logs` → `/debug logs`
-  - `/manage_error_debugging restart` → `/debug restart`
+- `/manage_error_debugging` - **Deprecated**: Use `/debug_pending_errors [action]` instead
+  - `/manage_error_debugging start` → `/debug_pending_errors start`
+  - `/manage_error_debugging stop` → `/debug_pending_errors stop`
+  - `/manage_error_debugging status` → `/debug_pending_errors status`
+  - `/manage_error_debugging logs` → `/debug_pending_errors logs`
+  - `/manage_error_debugging restart` → `/debug_pending_errors restart`
 
 
 

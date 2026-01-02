@@ -217,7 +217,7 @@ Run entire test suite and resolve any errors as necessary. Proceed to analyze al
 
 **CRITICAL: PRE-COMMIT SECURITY AUDIT** - MUST RUN BEFORE STAGING:
 
-Execute security audit from `foundation/agent-instructions/cursor-rules/security.md` (or `.cursor/rules/foundation_security.md` if installed) before staging ANY files:
+Execute security audit from `foundation/agent_instructions/cursor_rules/security.md` (or `.cursor/rules/foundation_security.md` if installed) before staging ANY files:
 
 1. **Run security audit script:**
    ```bash
@@ -563,7 +563,7 @@ fi
 
 If final security check passes, proceed to git commit with the comprehensive commit message and push to origin.
 
-**WORKTREE DETECTION:** Follow the Worktree Rule (`.cursor/rules/foundation_worktree_env.md` or `foundation/agent-instructions/cursor-rules/worktree_env.md`) to restrict all commit activity to the current worktree.
+**WORKTREE DETECTION:** Follow the Worktree Rule (`.cursor/rules/foundation_worktree_env.md` or `foundation/agent_instructions/cursor_rules/worktree_env.md`) to restrict all commit activity to the current worktree.
 
 **COMMIT MESSAGE DISPLAY**: After successfully committing and pushing, always display the full commit message to the user by running `git log -1 --pretty=format:"%B"` and showing the output. This allows the user to review what was committed.
 

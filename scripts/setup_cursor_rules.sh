@@ -119,9 +119,33 @@ fi
 # Create symlinks for generic rules
 print_info "Creating symlinks for generic cursor rules..."
 RULES_LINKED=0
+# Process both .md and .mdc files (prefer .mdc if both exist)
+# First, collect all .mdc files
+for rule_file in "$RULES_DIR"/*.mdc; do
+    if [ -f "$rule_file" ]; then
+        rule_name=$(basename "$rule_file")
+        symlink_name="${SYMLINK_PREFIX}${rule_name}"
+        target_file=".cursor/rules/$symlink_name"
+        
+        if [ -e "$target_file" ]; then
+            # File exists but is not a symlink (preserve customizations)
+            print_warn "File already exists (not a symlink): $symlink_name (skipping to preserve existing file)"
+        else
+            ln -s "$RULES_RELATIVE_PATH/$rule_name" "$target_file"
+            print_info "  ✓ Linked $rule_name -> $symlink_name"
+            RULES_LINKED=$((RULES_LINKED + 1))
+        fi
+    fi
+done
+# Then, process .md files that don't have corresponding .mdc files
 for rule_file in "$RULES_DIR"/*.md; do
     if [ -f "$rule_file" ]; then
         rule_name=$(basename "$rule_file")
+        base_name="${rule_name%.md}"
+        # Skip if .mdc version exists
+        if [ -f "$RULES_DIR/${base_name}.mdc" ]; then
+            continue
+        fi
         symlink_name="${SYMLINK_PREFIX}${rule_name}"
         target_file=".cursor/rules/$symlink_name"
         

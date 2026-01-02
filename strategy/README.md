@@ -243,7 +243,7 @@ Foundation includes tools for analyzing projects from competitive and partnershi
 - `docs/private/competitive/[target_name]_competitive_analysis.md`
 - `docs/private/partnerships/[target_name]_partnership_analysis.md`
 
-**See:** `foundation/agent-instructions/cursor-commands/analyze.md` for complete documentation.
+**See:** `foundation/agent_instructions/cursor_commands/analyze.md` for complete documentation.
 
 ### Framework and Templates
 

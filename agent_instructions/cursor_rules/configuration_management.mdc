@@ -1,3 +1,7 @@
+---
+description: "Ensures configuration files are placed in the correct location based on their scope and purpose"
+alwaysApply: true
+---
 # Configuration Management Rule
 
 Ensures configuration files are placed in the correct location based on their scope and purpose.
@@ -150,12 +154,3 @@ documentation:
     - "Scope"
     - "Agent Instructions"  # Standard for ALL neotoma repos
 ```
-
-
-
-
-
-
-
-
-

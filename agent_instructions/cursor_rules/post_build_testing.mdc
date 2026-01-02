@@ -1,3 +1,7 @@
+---
+description: "Ensures agents always describe manual test cases after completing a release build"
+alwaysApply: true
+---
 # Post-Build Testing Rule
 
 Configuration is read from `foundation-config.yaml`.

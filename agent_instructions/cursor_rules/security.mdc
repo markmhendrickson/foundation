@@ -1,3 +1,7 @@
+---
+description: "Prevents accidental commits of private, sensitive, or confidential documentation and data."
+alwaysApply: true
+---
 # Security Rule
 
 Prevents accidental commits of private, sensitive, or confidential documentation and data.
