@@ -306,3 +306,6 @@ Additional context, design decisions, or links to external resources.
 - `foundation/development/templates/manifest_template_simple.yaml` or `manifest_template_extended.yaml` — Manifest template
 - Repository-specific architecture/module documentation
 
+
+
+

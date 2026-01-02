@@ -265,3 +265,6 @@ This template provides a systematic framework for analyzing competitive position
 - Defensible differentiation framework (if available):
   - `docs/private/competitive/defensible_differentiation_framework.md`
 
+
+
+

@@ -806,6 +806,6 @@ async function waitForErrorResolution(errorId, errorReportPath, options = {}) {
 
 - `.cursor/commands/fix_feature_bug.md` - Bug fix workflow
 - `.cursor/commands/analyze.md` - Analysis command
-- `.cursor/commands/debug_pending_errors.md` - Debug pending errors workflow
+- `.cursor/commands/debug.md` - Debug workflow
 - `foundation-config.yaml` - Configuration file (in repository root)
 
