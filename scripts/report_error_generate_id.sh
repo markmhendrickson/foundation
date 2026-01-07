@@ -7,3 +7,4 @@ ERROR_ID="01JQ$(echo $TIMESTAMP | tr -d 'T' | cut -c1-20)"
 echo "${ERROR_ID}|${TIMESTAMP}"
 
 
+
