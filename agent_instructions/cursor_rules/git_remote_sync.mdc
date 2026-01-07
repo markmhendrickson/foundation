@@ -234,3 +234,4 @@ $ git push origin HEAD
 - `foundation/agent_instructions/cursor_commands/commit.md` - Commit command workflow
 - `foundation/development/workflow.md` - Git workflow documentation
 
+
