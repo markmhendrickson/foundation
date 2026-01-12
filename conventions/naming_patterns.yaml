@@ -64,6 +64,48 @@ shell:
   # File naming
   scripts: "kebab-case.sh"  # Options: "kebab-case.sh", "snake_case.sh"
 
+environment_variables:
+  # Environment variable naming standard
+  # All environment variables MUST use UPPER_SNAKE_CASE
+  # This standard applies to all repositories using Foundation
+  
+  case: "UPPER_SNAKE_CASE"  # REQUIRED: All env vars must be uppercase
+  separator: "_"  # Use underscore to separate words
+  
+  # Naming patterns (preferred formats)
+  patterns:
+    # Service-based naming (preferred)
+    service_purpose_type: "{SERVICE}_{PURPOSE}_{TYPE}"  # e.g., COINBASE_API_KEY
+    service_type: "{SERVICE}_{TYPE}"  # e.g., MINTED_EMAIL, BTC_PRIVATE_KEY
+  
+  # Examples
+  examples:
+    valid:
+      - "COINBASE_API_KEY"  # service_purpose_type
+      - "TWILIO_AUTH_TOKEN"  # service_purpose_type
+      - "ASANA_SOURCE_PAT"  # service_purpose_type
+      - "MINTED_EMAIL"  # service_type
+      - "BTC_PRIVATE_KEY"  # service_type
+      - "OPENAI_API_KEY"  # service_purpose_type
+      - "WISE_API_TOKEN"  # service_purpose_type
+    
+    invalid:
+      - "minted_email"  # lowercase not allowed
+      - "coinbase-api-key"  # hyphens not allowed
+      - "CoinbaseApiKey"  # camelCase not allowed
+      - "COINBASE_Api_Key"  # mixed case not allowed
+  
+  # Validation
+  validation:
+    pattern: "^[A-Z][A-Z0-9_]*$"  # Regex for UPPER_SNAKE_CASE
+    enforce: true  # Whether to validate env var names
+    description: |
+      Environment variables must:
+      - Start with uppercase letter
+      - Use only uppercase letters, numbers, and underscores
+      - Follow SERVICE_PURPOSE_TYPE or SERVICE_TYPE pattern
+      - Never use lowercase, hyphens, or camelCase
+
 # Project-specific prefixes/suffixes
 prefixes:
   entity_id: "ent_"

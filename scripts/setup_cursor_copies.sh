@@ -1,7 +1,8 @@
 #!/bin/bash
-# Setup Cursor Rules Script
-# Creates symlinks to generic cursor rules and commands from foundation to .cursor/ directory
-# Prefixes all symlink names with "foundation_" to avoid conflicts with other repos
+# Setup Cursor Rules Script (Copy Version)
+# Copies generic cursor rules and commands from foundation to .cursor/ directory
+# Uses original filenames (no prefix)
+# This creates independent copies rather than symlinks
 
 set -e
 
@@ -52,91 +53,101 @@ fi
 mkdir -p .cursor/rules
 mkdir -p .cursor/commands
 
-print_info "Setting up cursor rules and commands..."
+print_info "Setting up cursor rules and commands (copy mode)..."
 print_info "Foundation directory: $FOUNDATION_DIR"
 
-# Calculate relative path from .cursor/rules to foundation
-# .cursor/rules -> .. -> .. -> foundation/agent_instructions/cursor_rules
-RULES_RELATIVE_PATH="../../$FOUNDATION_DIR/agent_instructions/cursor_rules"
-COMMANDS_RELATIVE_PATH="../../$FOUNDATION_DIR/agent_instructions/cursor_commands"
+# Get absolute paths for copying
+RULES_ABS_PATH=$(cd "$RULES_DIR" && pwd -P)
+COMMANDS_ABS_PATH=$(cd "$COMMANDS_DIR" && pwd -P)
 
-# Prefix for symlink names to avoid conflicts with other repos
-SYMLINK_PREFIX="foundation_"
+# No prefix - use original filenames
 
 # Prefix for repository rules (can be set via REPO_RULES_PREFIX env var, defaults to empty)
 REPO_RULES_PREFIX="${REPO_RULES_PREFIX:-}"
 
-# Remove all existing symlinks with the prefix (both - and _ variants)
-print_info "Removing existing symlinks with prefix '$SYMLINK_PREFIX' (including underscore variant)..."
+# Remove all existing foundation files with the prefix (both symlinks and regular files)
+print_info "Removing existing foundation files..."
 RULES_REMOVED=0
 COMMANDS_REMOVED=0
 
 if [ -d ".cursor/rules" ]; then
-    # Remove foundation- prefixed symlinks
-    for existing_link in .cursor/rules/${SYMLINK_PREFIX}*.md; do
-        if [ -L "$existing_link" ]; then
-            rm "$existing_link"
-            print_info "  ✓ Removed $(basename "$existing_link")"
+    # Remove old foundation- and foundation_ prefixed files
+    while IFS= read -r -d '' existing_file; do
+        basename_file=$(basename "$existing_file")
+        if [[ "$basename_file" =~ ^foundation[-_] ]]; then
+            rm "$existing_file"
+            print_info "  ✓ Removed $basename_file"
             RULES_REMOVED=$((RULES_REMOVED + 1))
         fi
-    done
-    # Remove foundation_ prefixed symlinks
-    for existing_link in .cursor/rules/foundation_*.md; do
-        if [ -L "$existing_link" ]; then
-            rm "$existing_link"
-            print_info "  ✓ Removed $(basename "$existing_link")"
-            RULES_REMOVED=$((RULES_REMOVED + 1))
+    done < <(find .cursor/rules -maxdepth 1 \( -name "foundation_*.md" -o -name "foundation_*.mdc" -o -name "foundation-*.md" -o -name "foundation-*.mdc" \) -print0 2>/dev/null)
+    
+    # Remove unprefixed foundation files (will be recreated)
+    for rule_file in "$RULES_DIR"/*.mdc "$RULES_DIR"/*.md; do
+        if [ -f "$rule_file" ]; then
+            rule_name=$(basename "$rule_file")
+            target_file=".cursor/rules/$rule_name"
+            if [ -e "$target_file" ]; then
+                rm "$target_file"
+                print_info "  ✓ Removed $rule_name"
+                RULES_REMOVED=$((RULES_REMOVED + 1))
+            fi
         fi
     done
 fi
 
 if [ -d ".cursor/commands" ]; then
-    # Remove foundation- prefixed symlinks
-    for existing_link in .cursor/commands/${SYMLINK_PREFIX}*.md; do
-        if [ -L "$existing_link" ]; then
-            rm "$existing_link"
-            print_info "  ✓ Removed $(basename "$existing_link")"
+    # Remove old foundation- and foundation_ prefixed files
+    while IFS= read -r -d '' existing_file; do
+        basename_file=$(basename "$existing_file")
+        if [[ "$basename_file" =~ ^foundation[-_] ]]; then
+            rm "$existing_file"
+            print_info "  ✓ Removed $basename_file"
             COMMANDS_REMOVED=$((COMMANDS_REMOVED + 1))
         fi
-    done
-    # Remove foundation_ prefixed symlinks
-    for existing_link in .cursor/commands/foundation_*.md; do
-        if [ -L "$existing_link" ]; then
-            rm "$existing_link"
-            print_info "  ✓ Removed $(basename "$existing_link")"
-            COMMANDS_REMOVED=$((COMMANDS_REMOVED + 1))
+    done < <(find .cursor/commands -maxdepth 1 \( -name "foundation_*.md" -o -name "foundation-*.md" \) -print0 2>/dev/null)
+    
+    # Remove unprefixed foundation files (will be recreated)
+    for cmd_file in "$COMMANDS_DIR"/*.md; do
+        if [ -f "$cmd_file" ]; then
+            cmd_name=$(basename "$cmd_file")
+            target_file=".cursor/commands/$cmd_name"
+            if [ -e "$target_file" ]; then
+                rm "$target_file"
+                print_info "  ✓ Removed $cmd_name"
+                COMMANDS_REMOVED=$((COMMANDS_REMOVED + 1))
+            fi
         fi
     done
 fi
 
 if [ $RULES_REMOVED -gt 0 ] || [ $COMMANDS_REMOVED -gt 0 ]; then
     if [ $RULES_REMOVED -gt 0 ]; then
-        print_info "Removed $RULES_REMOVED existing rule symlink(s)"
+        print_info "Removed $RULES_REMOVED existing rule file(s)"
     fi
     if [ $COMMANDS_REMOVED -gt 0 ]; then
-        print_info "Removed $COMMANDS_REMOVED existing command symlink(s)"
+        print_info "Removed $COMMANDS_REMOVED existing command file(s)"
     fi
     print_info ""
 fi
 
-# Create symlinks for generic rules
-print_info "Creating symlinks for generic cursor rules..."
-RULES_LINKED=0
+# Copy files for generic rules
+print_info "Copying generic cursor rules..."
+RULES_COPIED=0
 # Process both .md and .mdc files (prefer .mdc if both exist)
 # First, collect all .mdc files
 for rule_file in "$RULES_DIR"/*.mdc; do
     if [ -f "$rule_file" ]; then
         rule_name=$(basename "$rule_file")
-        symlink_name="${SYMLINK_PREFIX}${rule_name}"
-        target_file=".cursor/rules/$symlink_name"
+        # copy_name removed - using rule_name directly
+        target_file=".cursor/rules/$rule_name"
         
-        if [ -e "$target_file" ]; then
-            # File exists but is not a symlink (preserve customizations)
-            print_warn "File already exists (not a symlink): $symlink_name (skipping to preserve existing file)"
+        if [ -e "$target_file" ] && [ ! -L "$target_file" ]; then
+            # File exists and is not a symlink (preserve customizations)
+            print_warn "File already exists (not a symlink): $rule_name (skipping to preserve existing file)"
         else
-            ln -s "$RULES_RELATIVE_PATH/$rule_name" "$target_file"
-            print_info "  ✓ Linked $rule_name -> $symlink_name"
-            RULES_LINKED=$((RULES_LINKED + 1))
+            cp "$rule_file" "$target_file"
+            print_info "  ✓ Copied $rule_name"
+            RULES_COPIED=$((RULES_COPIED + 1))
         fi
     fi
 done
@@ -149,41 +160,41 @@ for rule_file in "$RULES_DIR"/*.md; do
         if [ -f "$RULES_DIR/${base_name}.mdc" ]; then
             continue
         fi
-        symlink_name="${SYMLINK_PREFIX}${rule_name}"
-        target_file=".cursor/rules/$symlink_name"
+        # copy_name removed - using rule_name directly
+        target_file=".cursor/rules/$rule_name"
         
-        if [ -e "$target_file" ]; then
-            # File exists but is not a symlink (preserve customizations)
-            print_warn "File already exists (not a symlink): $symlink_name (skipping to preserve existing file)"
+        if [ -e "$target_file" ] && [ ! -L "$target_file" ]; then
+            # File exists and is not a symlink (preserve customizations)
+            print_warn "File already exists (not a symlink): $rule_name (skipping to preserve existing file)"
         else
-            ln -s "$RULES_RELATIVE_PATH/$rule_name" "$target_file"
-            print_info "  ✓ Linked $rule_name -> $symlink_name"
-            RULES_LINKED=$((RULES_LINKED + 1))
+            cp "$rule_file" "$target_file"
+            print_info "  ✓ Copied $rule_name"
+            RULES_COPIED=$((RULES_COPIED + 1))
         fi
     fi
 done
 
-# Create symlinks for generic commands
-print_info "Creating symlinks for generic cursor commands..."
-COMMANDS_LINKED=0
+# Copy files for generic commands
+print_info "Copying generic cursor commands..."
+COMMANDS_COPIED=0
 for cmd_file in "$COMMANDS_DIR"/*.md; do
     if [ -f "$cmd_file" ]; then
         cmd_name=$(basename "$cmd_file")
-        symlink_name="${SYMLINK_PREFIX}${cmd_name}"
-        target_file=".cursor/commands/$symlink_name"
+        # copy_name removed - using cmd_name directly
+        target_file=".cursor/commands/$cmd_name"
         
-        if [ -e "$target_file" ]; then
-            # File exists but is not a symlink (preserve customizations)
-            print_warn "File already exists (not a symlink): $symlink_name (skipping to preserve existing file)"
+        if [ -e "$target_file" ] && [ ! -L "$target_file" ]; then
+            # File exists and is not a symlink (preserve customizations)
+            print_warn "File already exists (not a symlink): $rule_name (skipping to preserve existing file)"
         else
-            ln -s "$COMMANDS_RELATIVE_PATH/$cmd_name" "$target_file"
-            print_info "  ✓ Linked $cmd_name -> $symlink_name"
-            COMMANDS_LINKED=$((COMMANDS_LINKED + 1))
+            cp "$cmd_file" "$target_file"
+            print_info "  ✓ Copied $cmd_name"
+            COMMANDS_COPIED=$((COMMANDS_COPIED + 1))
         fi
     fi
 done
 
-# Process repo rules from docs/ directory
+# Process repo rules from docs/ directory (still use symlinks for repo rules)
 print_info ""
 print_info "Processing repository rules from docs/ directory..."
 REPO_RULES_REMOVED=0
@@ -221,6 +232,7 @@ if [ -d "docs" ]; then
     
     # Find all *_rules.mdc and *_rules.md files in docs/ directory (recursively)
     # Prefer .mdc over .md if both exist
+    # For repo rules, we still use symlinks (they're repository-specific)
     while IFS= read -r -d '' rule_file; do
         # Get relative path from docs/ directory
         rel_path="${rule_file#docs/}"
@@ -293,7 +305,7 @@ else
 fi
 
 print_info ""
-if [ $RULES_LINKED -gt 0 ] || [ $COMMANDS_LINKED -gt 0 ] || [ $RULES_REMOVED -gt 0 ] || [ $COMMANDS_REMOVED -gt 0 ] || [ $REPO_RULES_LINKED -gt 0 ] || [ $REPO_RULES_REMOVED -gt 0 ]; then
+if [ $RULES_COPIED -gt 0 ] || [ $COMMANDS_COPIED -gt 0 ] || [ $RULES_REMOVED -gt 0 ] || [ $COMMANDS_REMOVED -gt 0 ] || [ $REPO_RULES_LINKED -gt 0 ] || [ $REPO_RULES_REMOVED -gt 0 ]; then
     print_info "✅ Cursor rules setup complete!"
     if [ $RULES_REMOVED -gt 0 ]; then
         print_info "  Foundation rules removed: $RULES_REMOVED"
@@ -304,15 +316,16 @@ if [ $RULES_LINKED -gt 0 ] || [ $COMMANDS_LINKED -gt 0 ] || [ $RULES_REMOVED -gt
     if [ $REPO_RULES_REMOVED -gt 0 ]; then
         print_info "  Repo rules removed: $REPO_RULES_REMOVED"
     fi
-    print_info "  Foundation rules linked: $RULES_LINKED"
-    print_info "  Foundation commands linked: $COMMANDS_LINKED"
+    print_info "  Foundation rules copied: $RULES_COPIED"
+    print_info "  Foundation commands copied: $COMMANDS_COPIED"
     if [ $REPO_RULES_LINKED -gt 0 ]; then
         print_info "  Repo rules linked: $REPO_RULES_LINKED"
     fi
     print_info ""
-    print_info "Symlinks created to foundation (single source of truth)"
-    print_info "Updates to foundation will automatically apply to these rules/commands"
-    print_info "Foundation symlinks are prefixed with 'foundation_' to avoid conflicts"
+    print_info "Files copied from foundation (independent copies)"
+    print_info "These files are now independent - updates to foundation will NOT automatically apply"
+    print_info "Files use original filenames (no prefix)"
+    
     if [ $REPO_RULES_LINKED -gt 0 ]; then
         if [ -n "$REPO_RULES_PREFIX" ]; then
         # Determine example extension based on what was linked
@@ -327,14 +340,14 @@ if [ $RULES_LINKED -gt 0 ] || [ $COMMANDS_LINKED -gt 0 ] || [ $RULES_REMOVED -gt
     fi
     print_info ""
     print_info "Next steps:"
-    print_info "  1. Review rules in .cursor/rules/ (they link to foundation and docs/)"
+    print_info "  1. Review rules in .cursor/rules/ (foundation files are copies, repo rules are symlinks)"
     print_info "  2. Configure foundation_config.yaml to enable cursor rules"
     print_info "  3. See foundation/agent_instructions/README.md for documentation"
     print_info ""
-    print_info "Note: To customize a rule, remove the symlink and create your own file"
+    print_info "Note: Foundation files are independent copies. To update them, run this script again."
 else
-    print_warn "No new rules or commands linked (all already exist)"
-    print_info "  Existing files/symlinks preserved"
+    print_warn "No new rules or commands copied (all already exist)"
+    print_info "  Existing files preserved"
     print_info "  To replace with foundation versions, remove existing files first"
 fi
 
@@ -360,10 +373,10 @@ if [ -d "agent_instructions/cursor_commands" ]; then
                 PEER_COUNT=$((PEER_COUNT + 1))
                 PEER_NAME=$(basename "$peer_repo")
                 print_info "Found peer repo with foundation symlink: $PEER_NAME"
-                print_info "Running setup script in $PEER_NAME..."
+                print_info "Running copy setup script in $PEER_NAME..."
                 
-                # Run setup script in peer repo
-                if (cd "$peer_repo" && "$CURRENT_REPO/scripts/setup_cursor_rules.sh" 2>&1); then
+                # Run copy setup script in peer repo
+                if (cd "$peer_repo" && "$CURRENT_REPO/scripts/setup_cursor_copies.sh" 2>&1); then
                     print_info "✓ Successfully updated $PEER_NAME"
                 else
                     print_warn "Failed to run setup in $PEER_NAME (continuing with other repos)"
