@@ -167,7 +167,7 @@ This command runs the foundation copy script (`foundation/scripts/setup_cursor_c
 - `analyze.md` (independent copy)
 - ... (all commands from foundation, as independent copies, using original filenames)
 
-**Note:** Repository rules from `docs/` directory are still symlinked (not copied), as they are repository-specific.
+**Note:** Repository rules from `docs/` directory are copied (not symlinked) since Cursor doesn't recognize symlinks. Source files in `docs/` remain the source of truth.
 
 ## Behavior
 
@@ -241,7 +241,8 @@ This command runs the foundation copy script (`foundation/scripts/setup_cursor_c
 - **Customization allowed**: You can modify copied files for your repository
 - **Version control**: Copied files can be committed to your repository
 - **Refresh required**: Re-run this script to get foundation updates
-- **Repository rules**: Rules from `docs/` directory are still symlinked (repository-specific)
+- **Repository rules**: Rules from `docs/` directory are copied (not symlinked, since Cursor doesn't recognize symlinks)
+- **Repository rule updates**: Existing copies are updated if source files in `docs/` are newer
 - **When run from foundation repo**: Automatically propagates to peer repos that symlink to this foundation
 - **Peer repo detection**: Only processes repos in `../*` that have `foundation/` symlink pointing to this repo
 

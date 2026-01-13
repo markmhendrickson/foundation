@@ -97,14 +97,32 @@ This command performs systematic analysis following the framework defined in `fo
 
 **Actions:**
 
-1. **Navigate to target:**
+1. **Check if URL is supported by web scraper:**
+   - **ChatGPT URLs:** `https://chatgpt.com/share/...` or `https://chatgpt.com/c/...`
+   - **Twitter/X URLs:** `https://twitter.com/.../status/...` or `https://x.com/.../status/...`
+   - **If supported:** Use web scraper MCP tools (see Step 1a below)
+   - **If not supported:** Use browser tools (see Step 1b below)
+
+1a. **If web scraper supported URL:**
+   - **Use `scrape_content` MCP tool** with the URL
+   - **Parameters:**
+     - `url`: The target URL
+     - `method`: "auto" (default, tries methods in order)
+   - **Extract content from response:**
+     - For ChatGPT: Parse conversation messages from scraped JSON
+     - For Twitter/X: Parse tweet content, author, engagement metrics
+     - Extract title, content, metadata, engagement metrics
+   - **Store scraped content path** for reference
+   - **Proceed to resource type determination** (Step 2 below)
+
+1b. **If not web scraper supported or search term:**
    - **If URL format:** Navigate directly using browser tools
    - **If search term:** Use web search, navigate to top relevant result
    - Take screenshot and capture snapshot (if accessible)
 
 2. **Determine resource type:**
    - **Product/Project:** Has features, pricing, business model, target users (e.g., SaaS app, platform, tool)
-   - **Content/Thought Leadership:** Article, blog post, research paper, video, podcast, tweet thread, analysis
+   - **Content/Thought Leadership:** Article, blog post, research paper, video, podcast, tweet thread, analysis, ChatGPT conversation
    - **Hybrid:** Product with significant thought leadership content (analyze as both)
 
 3. **If Product/Project:** Proceed to Steps 3-4 (Competitive & Partnership Analysis)
@@ -128,7 +146,8 @@ This command performs systematic analysis following the framework defined in `fo
    - Main themes and topics
    - Key arguments or insights
    - Engagement metrics (views, likes, shares)
-   - Format (article, video, podcast, etc.)
+   - Format (article, video, podcast, ChatGPT conversation, Twitter/X post, etc.)
+   - **For scraped content:** Include message count (ChatGPT) or tweet details (Twitter/X)
 
 3. **Analyze technology stack:**
    - Check network requests for stack indicators:
@@ -455,5 +474,6 @@ If configuration doesn't exist, use defaults:
 - **Resource Type Detection:** Command automatically detects if resource is a product/project (competitive/partnership analysis) or content/thought leadership (relevance analysis)
 - Templates ensure consistent, thorough analysis across all assessments
 - For content/thought leadership, analysis focuses on extracting insights applicable to current repo rather than competitive positioning
-- **X/Twitter URLs:** Handled via browser tools or MCP integration (set up separately as MCP if needed)
+- **Web Scraper Integration:** ChatGPT and Twitter/X URLs are automatically handled via web scraper MCP server when configured (see MCP configuration)
+- **Browser Tools Fallback:** Non-scraper URLs and search terms use browser tools for research
 
