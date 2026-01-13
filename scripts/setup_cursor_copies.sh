@@ -1,0 +1,576 @@
+#!/bin/bash
+# Setup Cursor Rules Script (Copy Version)
+# Copies generic cursor rules and commands from foundation to .cursor/ directory
+# Uses original filenames (no prefix)
+# This creates independent copies rather than symlinks
+
+set -e
+
+# Colors
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+RED='\033[0;31m'
+NC='\033[0m'
+
+print_info() {
+    echo -e "${GREEN}[INFO]${NC} $1"
+}
+
+print_warn() {
+    echo -e "${YELLOW}[WARN]${NC} $1"
+}
+
+print_error() {
+    echo -e "${RED}[ERROR]${NC} $1"
+}
+
+# Find foundation directory
+FOUNDATION_DIR=""
+if [ -d "foundation" ]; then
+    FOUNDATION_DIR="foundation"
+elif [ -d "../foundation" ]; then
+    FOUNDATION_DIR="../foundation"
+else
+    print_error "Foundation directory not found. Please run from repository root or ensure foundation is installed."
+    exit 1
+fi
+
+# Check if foundation has cursor rules
+RULES_DIR="$FOUNDATION_DIR/agent_instructions/cursor_rules"
+COMMANDS_DIR="$FOUNDATION_DIR/agent_instructions/cursor_commands"
+
+if [ ! -d "$RULES_DIR" ]; then
+    print_error "Cursor rules directory not found: $RULES_DIR"
+    exit 1
+fi
+
+if [ ! -d "$COMMANDS_DIR" ]; then
+    print_error "Cursor commands directory not found: $COMMANDS_DIR"
+    exit 1
+fi
+
+# Create .cursor directories if they don't exist
+mkdir -p .cursor/rules
+mkdir -p .cursor/commands
+
+print_info "Setting up cursor rules and commands (copy mode)..."
+print_info "Foundation directory: $FOUNDATION_DIR"
+
+# Get absolute paths for copying
+RULES_ABS_PATH=$(cd "$RULES_DIR" && pwd -P)
+COMMANDS_ABS_PATH=$(cd "$COMMANDS_DIR" && pwd -P)
+
+# No prefix - use original filenames
+
+# Prefix for repository rules (can be set via REPO_RULES_PREFIX env var, defaults to empty)
+REPO_RULES_PREFIX="${REPO_RULES_PREFIX:-}"
+
+# Remove all existing foundation files with the prefix (both symlinks and regular files)
+print_info "Removing existing foundation files..."
+RULES_REMOVED=0
+COMMANDS_REMOVED=0
+
+if [ -d ".cursor/rules" ]; then
+    # Remove old foundation- and foundation_ prefixed files
+    while IFS= read -r -d '' existing_file; do
+        basename_file=$(basename "$existing_file")
+        if [[ "$basename_file" =~ ^foundation[-_] ]]; then
+            rm "$existing_file"
+            print_info "  ✓ Removed $basename_file"
+            RULES_REMOVED=$((RULES_REMOVED + 1))
+        fi
+    done < <(find .cursor/rules -maxdepth 1 \( -name "foundation_*.md" -o -name "foundation_*.mdc" -o -name "foundation-*.md" -o -name "foundation-*.mdc" \) -print0 2>/dev/null)
+    
+    # Remove unprefixed foundation files (will be recreated)
+    for rule_file in "$RULES_DIR"/*.mdc "$RULES_DIR"/*.md; do
+        if [ -f "$rule_file" ]; then
+            rule_name=$(basename "$rule_file")
+            target_file=".cursor/rules/$rule_name"
+            if [ -e "$target_file" ]; then
+                rm "$target_file"
+                print_info "  ✓ Removed $rule_name"
+                RULES_REMOVED=$((RULES_REMOVED + 1))
+            fi
+        fi
+    done
+fi
+
+if [ -d ".cursor/commands" ]; then
+    # Remove old foundation- and foundation_ prefixed files
+    while IFS= read -r -d '' existing_file; do
+        basename_file=$(basename "$existing_file")
+        if [[ "$basename_file" =~ ^foundation[-_] ]]; then
+            rm "$existing_file"
+            print_info "  ✓ Removed $basename_file"
+            COMMANDS_REMOVED=$((COMMANDS_REMOVED + 1))
+        fi
+    done < <(find .cursor/commands -maxdepth 1 \( -name "foundation_*.md" -o -name "foundation-*.md" \) -print0 2>/dev/null)
+    
+    # Remove unprefixed foundation files (will be recreated)
+    for cmd_file in "$COMMANDS_DIR"/*.md; do
+        if [ -f "$cmd_file" ]; then
+            cmd_name=$(basename "$cmd_file")
+            target_file=".cursor/commands/$cmd_name"
+            if [ -e "$target_file" ]; then
+                rm "$target_file"
+                print_info "  ✓ Removed $cmd_name"
+                COMMANDS_REMOVED=$((COMMANDS_REMOVED + 1))
+            fi
+        fi
+    done
+fi
+
+if [ $RULES_REMOVED -gt 0 ] || [ $COMMANDS_REMOVED -gt 0 ]; then
+    if [ $RULES_REMOVED -gt 0 ]; then
+        print_info "Removed $RULES_REMOVED existing rule file(s)"
+    fi
+    if [ $COMMANDS_REMOVED -gt 0 ]; then
+        print_info "Removed $COMMANDS_REMOVED existing command file(s)"
+    fi
+    print_info ""
+fi
+
+# Copy files for generic rules
+print_info "Copying generic cursor rules..."
+RULES_COPIED=0
+# Process both .md and .mdc files (prefer .mdc if both exist)
+# First, collect all .mdc files
+for rule_file in "$RULES_DIR"/*.mdc; do
+    if [ -f "$rule_file" ]; then
+        rule_name=$(basename "$rule_file")
+        # copy_name removed - using rule_name directly
+        target_file=".cursor/rules/$rule_name"
+        
+        if [ -e "$target_file" ] && [ ! -L "$target_file" ]; then
+            # File exists and is not a symlink (preserve customizations)
+            print_warn "File already exists (not a symlink): $rule_name (skipping to preserve existing file)"
+        else
+            # Create copy with header comment
+            {
+                echo "---"
+                echo "# ⚠️  DO NOT EDIT THIS FILE DIRECTLY"
+                echo "#"
+                echo "# This is a copy of: $rule_file"
+                echo "# Source of truth: $rule_file"
+                echo "#"
+                echo "# To edit this rule:"
+                echo "# 1. Edit the source file in foundation: $rule_file"
+                echo "# 2. Run '/setup_cursor_copies' to sync changes"
+                echo "#"
+                echo "# This file will be overwritten when running setup_cursor_copies."
+                echo "---"
+                echo ""
+                cat "$rule_file"
+            } > "$target_file"
+            print_info "  ✓ Copied $rule_name"
+            RULES_COPIED=$((RULES_COPIED + 1))
+        fi
+    fi
+done
+# Then, process .md files that don't have corresponding .mdc files
+for rule_file in "$RULES_DIR"/*.md; do
+    if [ -f "$rule_file" ]; then
+        rule_name=$(basename "$rule_file")
+        base_name="${rule_name%.md}"
+        # Skip if .mdc version exists
+        if [ -f "$RULES_DIR/${base_name}.mdc" ]; then
+            continue
+        fi
+        # copy_name removed - using rule_name directly
+        target_file=".cursor/rules/$rule_name"
+        
+        if [ -e "$target_file" ] && [ ! -L "$target_file" ]; then
+            # File exists and is not a symlink (preserve customizations)
+            print_warn "File already exists (not a symlink): $rule_name (skipping to preserve existing file)"
+        else
+            # Create copy with header comment
+            {
+                echo "---"
+                echo "# ⚠️  DO NOT EDIT THIS FILE DIRECTLY"
+                echo "#"
+                echo "# This is a copy of: $rule_file"
+                echo "# Source of truth: $rule_file"
+                echo "#"
+                echo "# To edit this rule:"
+                echo "# 1. Edit the source file in foundation: $rule_file"
+                echo "# 2. Run '/setup_cursor_copies' to sync changes"
+                echo "#"
+                echo "# This file will be overwritten when running setup_cursor_copies."
+                echo "---"
+                echo ""
+                cat "$rule_file"
+            } > "$target_file"
+            print_info "  ✓ Copied $rule_name"
+            RULES_COPIED=$((RULES_COPIED + 1))
+        fi
+    fi
+done
+
+# Copy files for generic commands
+print_info "Copying generic cursor commands..."
+COMMANDS_COPIED=0
+for cmd_file in "$COMMANDS_DIR"/*.md; do
+    if [ -f "$cmd_file" ]; then
+        cmd_name=$(basename "$cmd_file")
+        # copy_name removed - using cmd_name directly
+        target_file=".cursor/commands/$cmd_name"
+        
+        if [ -e "$target_file" ] && [ ! -L "$target_file" ]; then
+            # File exists and is not a symlink - check if header comment exists
+            if ! head -5 "$target_file" | grep -q "DO NOT EDIT THIS FILE DIRECTLY"; then
+                # Header missing, add it
+                {
+                    echo "<!--"
+                    echo "⚠️  DO NOT EDIT THIS FILE DIRECTLY"
+                    echo ""
+                    echo "This is a copy of: $cmd_file"
+                    echo "Source of truth: $cmd_file"
+                    echo ""
+                    echo "To edit this command:"
+                    echo "1. Edit the source file in foundation: $cmd_file"
+                    echo "2. Run '/setup_cursor_copies' to sync changes"
+                    echo ""
+                    echo "This file will be overwritten when running setup_cursor_copies."
+                    echo "-->"
+                    echo ""
+                    cat "$cmd_file"
+                } > "$target_file"
+                print_info "  ✓ Updated header in $cmd_name"
+                COMMANDS_COPIED=$((COMMANDS_COPIED + 1))
+            else
+                print_warn "File already exists (not a symlink): $cmd_name (skipping to preserve existing file)"
+            fi
+        else
+            # Create copy with header comment
+            {
+                echo "<!--"
+                echo "⚠️  DO NOT EDIT THIS FILE DIRECTLY"
+                echo ""
+                echo "This is a copy of: $cmd_file"
+                echo "Source of truth: $cmd_file"
+                echo ""
+                echo "To edit this command:"
+                echo "1. Edit the source file in foundation: $cmd_file"
+                echo "2. Run '/setup_cursor_copies' to sync changes"
+                echo ""
+                echo "This file will be overwritten when running setup_cursor_copies."
+                echo "-->"
+                echo ""
+                cat "$cmd_file"
+            } > "$target_file"
+            print_info "  ✓ Copied $cmd_name"
+            COMMANDS_COPIED=$((COMMANDS_COPIED + 1))
+        fi
+    fi
+done
+
+# Process repo rules from docs/ directory (copy instead of symlink since Cursor doesn't recognize symlinks)
+print_info ""
+print_info "Processing repository rules from docs/ directory..."
+REPO_RULES_REMOVED=0
+REPO_RULES_COPIED=0
+
+# Check if docs/ directory exists
+if [ -d "docs" ]; then
+    # Remove existing repo rule symlinks (ending in _rules.md, excluding foundation-* and foundation_*)
+        if [ -d ".cursor/rules" ]; then
+            if [ -n "$REPO_RULES_PREFIX" ]; then
+                # Remove symlinks with the repo prefix (both .md and .mdc)
+                for existing_link in .cursor/rules/${REPO_RULES_PREFIX}*_rules.{md,mdc}; do
+                    if [ -e "$existing_link" ]; then
+                        basename_file=$(basename "$existing_link")
+                        rm "$existing_link"
+                        print_info "  ✓ Removed repo rule: $basename_file"
+                        REPO_RULES_REMOVED=$((REPO_RULES_REMOVED + 1))
+                    fi
+                done
+            else
+                # Remove symlinks ending in _rules.md or _rules.mdc that don't start with foundation- or foundation_
+                for existing_link in .cursor/rules/*_rules.{md,mdc}; do
+                    if [ -L "$existing_link" ] && [ -e "$existing_link" ]; then
+                        basename_file=$(basename "$existing_link")
+                        # Skip if it starts with foundation- or foundation_
+                        if [[ ! "$basename_file" =~ ^foundation[-_] ]]; then
+                            rm "$existing_link"
+                            print_info "  ✓ Removed repo rule: $basename_file"
+                            REPO_RULES_REMOVED=$((REPO_RULES_REMOVED + 1))
+                        fi
+                    fi
+                done
+            fi
+        fi
+    
+    # Find all *_rules.mdc and *_rules.md files in docs/ directory (recursively)
+    # Prefer .mdc over .md if both exist
+    # For repo rules, we still use symlinks (they're repository-specific)
+    while IFS= read -r -d '' rule_file; do
+        # Get relative path from docs/ directory
+        rel_path="${rule_file#docs/}"
+        # Get directory path and filename
+        dir_path=$(dirname "$rel_path")
+        # Remove .mdc or .md extension
+        if [[ "$rel_path" == *.mdc ]]; then
+            file_name=$(basename "$rel_path" .mdc)
+        else
+            file_name=$(basename "$rel_path" .md)
+        fi
+        
+        # Determine file extension based on source file
+        if [[ "$rule_file" == *.mdc ]]; then
+            file_ext=".mdc"
+        else
+            file_ext=".md"
+        fi
+        
+        # Create symlink name by replacing / with _
+        if [ "$dir_path" = "." ]; then
+            base_symlink_name="${file_name}${file_ext}"
+        else
+            # Replace / with _ in path
+            path_prefix=$(echo "$dir_path" | tr '/' '_')
+            base_symlink_name="${path_prefix}_${file_name}${file_ext}"
+        fi
+        
+        # Apply repo rules prefix if set
+        if [ -n "$REPO_RULES_PREFIX" ]; then
+            symlink_name="${REPO_RULES_PREFIX}${base_symlink_name}"
+        else
+            symlink_name="$base_symlink_name"
+        fi
+        
+        target_file=".cursor/rules/$symlink_name"
+        
+        if [ -e "$target_file" ]; then
+            if [ -L "$target_file" ]; then
+                # Symlink already exists, remove it first (convert to copy)
+                rm "$target_file"
+            elif [ ! -f "$target_file" ]; then
+                # Not a regular file, skip
+                print_warn "File exists but is not a regular file: $symlink_name (skipping)"
+                continue
+            else
+                # File exists - check if it needs updating
+                if [ "$rule_file" -nt "$target_file" ]; then
+                    # Source is newer, update the copy with header comment
+                    {
+                        # Determine comment style based on file extension
+                        if [[ "$rule_file" == *.mdc ]]; then
+                            echo "---"
+                            echo "# ⚠️  DO NOT EDIT THIS FILE DIRECTLY"
+                            echo "#"
+                            echo "# This is a copy of: $rule_file"
+                            echo "# Source of truth: $rule_file"
+                            echo "#"
+                            echo "# To edit this rule:"
+                            echo "# 1. Edit the source file: $rule_file"
+                            echo "# 2. Run '/setup_cursor_copies' to sync changes"
+                            echo "#"
+                            echo "# This file will be overwritten when running setup_cursor_copies."
+                            echo "---"
+                        else
+                            echo "<!--"
+                            echo "⚠️  DO NOT EDIT THIS FILE DIRECTLY"
+                            echo ""
+                            echo "This is a copy of: $rule_file"
+                            echo "Source of truth: $rule_file"
+                            echo ""
+                            echo "To edit this rule:"
+                            echo "1. Edit the source file: $rule_file"
+                            echo "2. Run '/setup_cursor_copies' to sync changes"
+                            echo ""
+                            echo "This file will be overwritten when running setup_cursor_copies."
+                            echo "-->"
+                        fi
+                        echo ""
+                        cat "$rule_file"
+                    } > "$target_file"
+                    print_info "  ✓ Updated $symlink_name (source was newer)"
+                    REPO_RULES_COPIED=$((REPO_RULES_COPIED + 1))
+                else
+                    # Target is up to date or newer, but still update header comment if missing or outdated
+                    # Check if header comment exists
+                    if ! head -1 "$target_file" | grep -q "DO NOT EDIT THIS FILE DIRECTLY"; then
+                        # Header missing, add it
+                        {
+                            # Determine comment style based on file extension
+                            if [[ "$rule_file" == *.mdc ]]; then
+                                echo "---"
+                                echo "# ⚠️  DO NOT EDIT THIS FILE DIRECTLY"
+                                echo "#"
+                                echo "# This is a copy of: $rule_file"
+                                echo "# Source of truth: $rule_file"
+                                echo "#"
+                                echo "# To edit this rule:"
+                                echo "# 1. Edit the source file: $rule_file"
+                                echo "# 2. Run '/setup_cursor_copies' to sync changes"
+                                echo "#"
+                                echo "# This file will be overwritten when running setup_cursor_copies."
+                                echo "---"
+                            else
+                                echo "<!--"
+                                echo "⚠️  DO NOT EDIT THIS FILE DIRECTLY"
+                                echo ""
+                                echo "This is a copy of: $rule_file"
+                                echo "Source of truth: $rule_file"
+                                echo ""
+                                echo "To edit this rule:"
+                                echo "1. Edit the source file: $rule_file"
+                                echo "2. Run '/setup_cursor_copies' to sync changes"
+                                echo ""
+                                echo "This file will be overwritten when running setup_cursor_copies."
+                                echo "-->"
+                            fi
+                            echo ""
+                            cat "$rule_file"
+                        } > "$target_file"
+                        print_info "  ✓ Updated header in $symlink_name"
+                        REPO_RULES_COPIED=$((REPO_RULES_COPIED + 1))
+                    else
+                        print_warn "File already exists: $symlink_name (skipping to preserve existing file)"
+                    fi
+                    continue
+                fi
+            fi
+        else
+            # File doesn't exist, create copy with header comment
+            {
+                # Determine comment style based on file extension
+                if [[ "$rule_file" == *.mdc ]]; then
+                    echo "---"
+                    echo "# ⚠️  DO NOT EDIT THIS FILE DIRECTLY"
+                    echo "#"
+                    echo "# This is a copy of: $rule_file"
+                    echo "# Source of truth: $rule_file"
+                    echo "#"
+                    echo "# To edit this rule:"
+                    echo "# 1. Edit the source file: $rule_file"
+                    echo "# 2. Run '/setup_cursor_copies' to sync changes"
+                    echo "#"
+                    echo "# This file will be overwritten when running setup_cursor_copies."
+                    echo "---"
+                else
+                    echo "<!--"
+                    echo "⚠️  DO NOT EDIT THIS FILE DIRECTLY"
+                    echo ""
+                    echo "This is a copy of: $rule_file"
+                    echo "Source of truth: $rule_file"
+                    echo ""
+                    echo "To edit this rule:"
+                    echo "1. Edit the source file: $rule_file"
+                    echo "2. Run '/setup_cursor_copies' to sync changes"
+                    echo ""
+                    echo "This file will be overwritten when running setup_cursor_copies."
+                    echo "-->"
+                fi
+                echo ""
+                cat "$rule_file"
+            } > "$target_file"
+            print_info "  ✓ Copied $rule_file -> $symlink_name"
+            REPO_RULES_COPIED=$((REPO_RULES_COPIED + 1))
+        fi
+    done < <(find docs -type f \( -name "*_rules.mdc" -o -name "*_rules.md" \) -print0 | while IFS= read -r -d '' file; do
+        # If both .mdc and .md exist, prefer .mdc
+        base="${file%.mdc}"
+        base="${base%.md}"
+        if [ -f "${base}.mdc" ] && [ -f "${base}.md" ] && [[ "$file" == *.md ]]; then
+            continue  # Skip .md if .mdc exists
+        fi
+        echo -n "$file"
+        echo -ne '\0'
+    done)
+    
+    if [ $REPO_RULES_COPIED -eq 0 ] && [ $REPO_RULES_REMOVED -eq 0 ]; then
+        print_info "  No repo rules found in docs/ directory"
+    fi
+else
+    print_info "  No docs/ directory found, skipping repo rules"
+fi
+
+print_info ""
+if [ $RULES_COPIED -gt 0 ] || [ $COMMANDS_COPIED -gt 0 ] || [ $RULES_REMOVED -gt 0 ] || [ $COMMANDS_REMOVED -gt 0 ] || [ $REPO_RULES_COPIED -gt 0 ] || [ $REPO_RULES_REMOVED -gt 0 ]; then
+    print_info "✅ Cursor rules setup complete!"
+    if [ $RULES_REMOVED -gt 0 ]; then
+        print_info "  Foundation rules removed: $RULES_REMOVED"
+    fi
+    if [ $COMMANDS_REMOVED -gt 0 ]; then
+        print_info "  Foundation commands removed: $COMMANDS_REMOVED"
+    fi
+    if [ $REPO_RULES_REMOVED -gt 0 ]; then
+        print_info "  Repo rules removed: $REPO_RULES_REMOVED"
+    fi
+    print_info "  Foundation rules copied: $RULES_COPIED"
+    print_info "  Foundation commands copied: $COMMANDS_COPIED"
+    if [ $REPO_RULES_COPIED -gt 0 ]; then
+        print_info "  Repo rules copied: $REPO_RULES_COPIED"
+    fi
+    print_info ""
+    print_info "Files copied from foundation (independent copies)"
+    print_info "These files are now independent - updates to foundation will NOT automatically apply"
+    print_info "Files use original filenames (no prefix)"
+    
+    if [ $REPO_RULES_COPIED -gt 0 ]; then
+        if [ -n "$REPO_RULES_PREFIX" ]; then
+        # Determine example extension based on what was linked
+        if ls .cursor/rules/${REPO_RULES_PREFIX}*_rules.mdc 1>/dev/null 2>&1; then
+            print_info "Repo rules prefixed with '$REPO_RULES_PREFIX' (e.g., ${REPO_RULES_PREFIX}communication_rules.mdc)"
+        else
+            print_info "Repo rules prefixed with '$REPO_RULES_PREFIX' (e.g., ${REPO_RULES_PREFIX}communication_rules.md)"
+        fi
+    else
+        print_info "Repo rules use path-based naming (e.g., foundation_agent_instructions_rules.md)"
+    fi
+    fi
+    print_info ""
+    print_info "Next steps:"
+    print_info "  1. Review rules in .cursor/rules/ (foundation and repo rules are copies)"
+    print_info "  2. Configure foundation_config.yaml to enable cursor rules"
+    print_info "  3. See foundation/agent_instructions/README.md for documentation"
+    print_info ""
+    print_info "Note: Foundation files are independent copies. To update them, run this script again."
+else
+    print_warn "No new rules or commands copied (all already exist)"
+    print_info "  Existing files preserved"
+    print_info "  To replace with foundation versions, remove existing files first"
+fi
+
+# If running from foundation repo itself, also run in peer repos that symlink to this repo
+if [ -d "agent_instructions/cursor_commands" ]; then
+    print_info ""
+    print_info "Detected foundation repository - checking for peer repos..."
+    CURRENT_REPO=$(pwd -P)
+    PARENT_DIR=$(dirname "$CURRENT_REPO")
+    PEER_COUNT=0
+    
+    # Check each directory in parent directory
+    for peer_repo in "$PARENT_DIR"/*; do
+        # Skip if not a directory or if it's the current repo
+        if [ ! -d "$peer_repo" ] || [ "$peer_repo" = "$CURRENT_REPO" ]; then
+            continue
+        fi
+        
+        # Check if peer repo has foundation/ symlink pointing to this repo
+        if [ -L "$peer_repo/foundation" ]; then
+            SYMLINK_TARGET=$(readlink -f "$peer_repo/foundation" 2>/dev/null || readlink "$peer_repo/foundation")
+            if [ "$SYMLINK_TARGET" = "$CURRENT_REPO" ]; then
+                PEER_COUNT=$((PEER_COUNT + 1))
+                PEER_NAME=$(basename "$peer_repo")
+                print_info "Found peer repo with foundation symlink: $PEER_NAME"
+                print_info "Running copy setup script in $PEER_NAME..."
+                
+                # Run copy setup script in peer repo
+                if (cd "$peer_repo" && "$CURRENT_REPO/scripts/setup_cursor_copies.sh" 2>&1); then
+                    print_info "✓ Successfully updated $PEER_NAME"
+                else
+                    print_warn "Failed to run setup in $PEER_NAME (continuing with other repos)"
+                fi
+                print_info ""
+            fi
+        fi
+    done
+    
+    if [ $PEER_COUNT -eq 0 ]; then
+        print_info "No peer repos found with foundation symlink to this repo"
+    else
+        print_info "Updated $PEER_COUNT peer repo(s)"
+    fi
+fi

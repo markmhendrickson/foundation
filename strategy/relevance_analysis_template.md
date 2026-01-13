@@ -294,3 +294,4 @@ This template provides a framework for analyzing any resource (article, thought 
 
 
 
+
