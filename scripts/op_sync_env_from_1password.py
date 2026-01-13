@@ -274,24 +274,69 @@ class ParquetMCPClient:
             repo_root: Path to repository root
         """
         self.repo_root = repo_root
-        self.parquet_server_path = self._detect_parquet_server()
+        self.parquet_server_path, self.parquet_server_command = self._detect_parquet_server()
 
-    def _detect_parquet_server(self) -> str:
-        """Auto-detect parquet MCP server location."""
+    def _detect_parquet_server(self) -> tuple[str, str]:
+        """
+        Auto-detect parquet MCP server location.
+        
+        Returns:
+            Tuple of (server_path, command) where:
+            - server_path: Path to the server script
+            - command: Command to run (python3, bash, or from config)
+        """
         # Try environment variable first
         env_path = os.getenv("PARQUET_MCP_SERVER_PATH")
         if env_path and Path(env_path).exists():
-            return env_path
+            # Determine command based on file extension
+            if env_path.endswith(".sh"):
+                return (env_path, "bash")
+            else:
+                return (env_path, self._get_python_command())
 
-        # Check primary location: mcp/parquet/parquet_mcp_server.py
+        # Check Cursor config location: ~/.cursor/mcp.json
+        cursor_config_path = Path.home() / ".cursor" / "mcp.json"
+        if cursor_config_path.exists():
+            try:
+                import json
+                with open(cursor_config_path, encoding="utf-8") as f:
+                    cursor_config = json.load(f)
+                    mcp_servers = cursor_config.get("mcpServers", {})
+                    # Look for parquet server in Cursor config
+                    for server_name, server_config in mcp_servers.items():
+                        # Check if server name contains "parquet" (case-insensitive)
+                        if "parquet" in server_name.lower():
+                            # Get command path from config
+                            command = server_config.get("command")
+                            if command and Path(command).exists():
+                                # Determine command based on file extension
+                                if command.endswith(".sh"):
+                                    return (command, "bash")
+                                elif command.endswith(".py"):
+                                    return (command, self._get_python_command())
+                                else:
+                                    # Try to extract command from args if present
+                                    args = server_config.get("args", [])
+                                    if args and len(args) > 0:
+                                        # If args[0] is a Python script, use python command
+                                        if args[0].endswith(".py"):
+                                            return (args[0], self._get_python_command())
+                                    # Default to using the command as-is
+                                    return (command, command)
+            except (json.JSONDecodeError, KeyError, Exception) as e:
+                # Silently continue if config parsing fails
+                pass
+
+        # Check repo location: mcp/parquet/parquet_mcp_server.py
         server_path = self.repo_root / "mcp" / "parquet" / "parquet_mcp_server.py"
         if server_path.exists():
-            return str(server_path)
+            return (str(server_path), self._get_python_command())
 
         raise RuntimeError(
             "Could not find parquet MCP server. "
-            f"Expected location: {server_path}\n"
-            "Set PARQUET_MCP_SERVER_PATH environment variable or ensure the server is at mcp/parquet/parquet_mcp_server.py"
+            f"Checked: environment variable, ~/.cursor/mcp.json, and {server_path}\n"
+            "Set PARQUET_MCP_SERVER_PATH environment variable, configure in ~/.cursor/mcp.json, "
+            "or ensure the server is at mcp/parquet/parquet_mcp_server.py"
         )
 
     def _get_python_command(self) -> str:
@@ -314,7 +359,8 @@ class ParquetMCPClient:
         self, tool_name: str, arguments: dict[str, Any]
     ) -> dict[str, Any]:
         """Call a tool on the parquet MCP server."""
-        python_cmd = self._get_python_command()
+        # Use the command determined during detection (python3, bash, etc.)
+        cmd = self.parquet_server_command
 
         # Load .env file from repo root to get DATA_DIR and other env vars
         # Priority: 1) .env file, 2) environment variable, 3) default to repo_root/data
@@ -342,9 +388,17 @@ class ParquetMCPClient:
             env["DATA_DIR"] = str(data_dir.resolve())
 
         try:
+            # Prepare args: if command is bash/python3, pass server_path as arg
+            # If command is the script itself, use empty args
+            if cmd in ["bash", "python3", "python"] or cmd.endswith("python3") or cmd.endswith("python"):
+                args = [self.parquet_server_path]
+            else:
+                # Command is the script itself, no args needed
+                args = []
+            
             async with stdio_client(
                 StdioServerParameters(
-                    command=python_cmd, args=[self.parquet_server_path], env=env
+                    command=cmd, args=args, env=env
                 )
             ) as (read, write):
                 async with ClientSession(read, write) as session:

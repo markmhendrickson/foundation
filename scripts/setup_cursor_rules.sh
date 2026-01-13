@@ -1,7 +1,7 @@
 #!/bin/bash
 # Setup Cursor Rules Script
 # Creates symlinks to generic cursor rules and commands from foundation to .cursor/ directory
-# Prefixes all symlink names with "foundation_" to avoid conflicts with other repos
+# Uses original filenames (no prefix) to match setup_cursor_copies behavior
 
 set -e
 
@@ -61,50 +61,75 @@ RULES_RELATIVE_PATH="../../$FOUNDATION_DIR/agent_instructions/cursor_rules"
 COMMANDS_RELATIVE_PATH="../../$FOUNDATION_DIR/agent_instructions/cursor_commands"
 
 # Prefix for symlink names to avoid conflicts with other repos
-SYMLINK_PREFIX="foundation_"
+# Using empty prefix to match setup_cursor_copies behavior
+SYMLINK_PREFIX=""
 
 # Prefix for repository rules (can be set via REPO_RULES_PREFIX env var, defaults to empty)
 REPO_RULES_PREFIX="${REPO_RULES_PREFIX:-}"
 
-# Remove all existing symlinks with the prefix (both - and _ variants)
-print_info "Removing existing symlinks with prefix '$SYMLINK_PREFIX' (including underscore variant)..."
+# Remove all existing foundation symlinks (old prefixed and new unprefixed)
+print_info "Removing existing foundation symlinks (prefixed and unprefixed)..."
 RULES_REMOVED=0
 COMMANDS_REMOVED=0
 
 if [ -d ".cursor/rules" ]; then
-    # Remove foundation- prefixed symlinks
-    for existing_link in .cursor/rules/${SYMLINK_PREFIX}*.md; do
+    # Remove old foundation_ prefixed symlinks
+    for existing_link in .cursor/rules/foundation_*.{md,mdc}; do
         if [ -L "$existing_link" ]; then
             rm "$existing_link"
             print_info "  ✓ Removed $(basename "$existing_link")"
             RULES_REMOVED=$((RULES_REMOVED + 1))
         fi
     done
-    # Remove foundation_ prefixed symlinks
-    for existing_link in .cursor/rules/foundation_*.md; do
+    # Remove old foundation- prefixed symlinks
+    for existing_link in .cursor/rules/foundation-*.{md,mdc}; do
         if [ -L "$existing_link" ]; then
             rm "$existing_link"
             print_info "  ✓ Removed $(basename "$existing_link")"
             RULES_REMOVED=$((RULES_REMOVED + 1))
+        fi
+    done
+    # Remove unprefixed foundation rule symlinks (will be recreated)
+    for rule_file in "$RULES_DIR"/*.mdc "$RULES_DIR"/*.md; do
+        if [ -f "$rule_file" ]; then
+            rule_name=$(basename "$rule_file")
+            target_file=".cursor/rules/$rule_name"
+            if [ -L "$target_file" ]; then
+                rm "$target_file"
+                print_info "  ✓ Removed $rule_name"
+                RULES_REMOVED=$((RULES_REMOVED + 1))
+            fi
         fi
     done
 fi
 
 if [ -d ".cursor/commands" ]; then
-    # Remove foundation- prefixed symlinks
-    for existing_link in .cursor/commands/${SYMLINK_PREFIX}*.md; do
+    # Remove old foundation_ prefixed symlinks
+    for existing_link in .cursor/commands/foundation_*.md; do
         if [ -L "$existing_link" ]; then
             rm "$existing_link"
             print_info "  ✓ Removed $(basename "$existing_link")"
             COMMANDS_REMOVED=$((COMMANDS_REMOVED + 1))
         fi
     done
-    # Remove foundation_ prefixed symlinks
-    for existing_link in .cursor/commands/foundation_*.md; do
+    # Remove old foundation- prefixed symlinks
+    for existing_link in .cursor/commands/foundation-*.md; do
         if [ -L "$existing_link" ]; then
             rm "$existing_link"
             print_info "  ✓ Removed $(basename "$existing_link")"
             COMMANDS_REMOVED=$((COMMANDS_REMOVED + 1))
+        fi
+    done
+    # Remove unprefixed foundation command symlinks (will be recreated)
+    for cmd_file in "$COMMANDS_DIR"/*.md; do
+        if [ -f "$cmd_file" ]; then
+            cmd_name=$(basename "$cmd_file")
+            target_file=".cursor/commands/$cmd_name"
+            if [ -L "$target_file" ]; then
+                rm "$target_file"
+                print_info "  ✓ Removed $cmd_name"
+                COMMANDS_REMOVED=$((COMMANDS_REMOVED + 1))
+            fi
         fi
     done
 fi
@@ -312,7 +337,7 @@ if [ $RULES_LINKED -gt 0 ] || [ $COMMANDS_LINKED -gt 0 ] || [ $RULES_REMOVED -gt
     print_info ""
     print_info "Symlinks created to foundation (single source of truth)"
     print_info "Updates to foundation will automatically apply to these rules/commands"
-    print_info "Foundation symlinks are prefixed with 'foundation_' to avoid conflicts"
+    print_info "Foundation symlinks use original filenames (no prefix)"
     if [ $REPO_RULES_LINKED -gt 0 ]; then
         if [ -n "$REPO_RULES_PREFIX" ]; then
         # Determine example extension based on what was linked

@@ -28,7 +28,7 @@ This command performs systematic analysis following the framework defined in `fo
 
 **For Products/Projects:**
 1. Discover current repo context by loading foundational documents
-2. Research target project via browser tools
+2. Research target project via web scraper MCP (if ChatGPT/Twitter URL) or browser tools
 3. Generate competitive analysis using standardized template
 4. Generate partnership analysis using standardized template
 5. Save both analyses to private docs submodule
@@ -36,7 +36,7 @@ This command performs systematic analysis following the framework defined in `fo
 
 **For Content/Thought Leadership (Articles, Research, etc.):**
 1. Discover current repo context by loading foundational documents
-2. Research target resource via browser tools
+2. Research target resource via web scraper MCP (if ChatGPT/Twitter URL) or browser tools
 3. Generate holistic relevance analysis using relevance template
 4. Extract insights applicable to current repo
 5. Save analysis to private docs submodule
@@ -427,7 +427,78 @@ See: foundation/README.md (Private Docs Submodule Setup)
 Proceed? (yes/no)
 ```
 
+### Scenario: Web Scraper MCP Not Available
+
+**If web scraper URL is provided but MCP server is not configured:**
+
+```
+⚠️ Notice: Web scraper MCP server not configured for URL "[url]".
+
+Falling back to browser tools for research.
+
+To enable web scraper for ChatGPT/Twitter URLs:
+1. Add web scraper submodule: git submodule add https://github.com/markmhendrickson/mcp-server-web-scraper.git mcp/web-scraper
+2. Configure in .cursor/mcp.json (see Configuration section)
+
+Proceeding with browser tools...
+```
+
+**If web scraper MCP tool fails:**
+
+```
+⚠️ Warning: Web scraper failed for URL "[url]".
+
+Error: [error message]
+
+Falling back to browser tools...
+
+Proceeding with browser tools...
+```
+
 ## Configuration
+
+### MCP Server Configuration
+
+**Web Scraper MCP Server Setup:**
+
+The analyze command automatically uses the web scraper MCP server for ChatGPT and Twitter/X URLs when configured. To set up:
+
+1. **Add web scraper as submodule** (if not already added):
+   ```bash
+   git submodule add https://github.com/markmhendrickson/mcp-server-web-scraper.git mcp/web-scraper
+   git submodule update --init mcp/web-scraper
+   ```
+
+2. **Install dependencies:**
+   ```bash
+   cd mcp/web-scraper
+   pip install -r requirements.txt
+   playwright install chromium
+   ```
+
+3. **Configure in `.cursor/mcp.json`:**
+   ```json
+   {
+     "mcpServers": {
+       "web-scraper": {
+         "command": "/absolute/path/to/mcp/web-scraper/run-web-scraper-mcp.sh",
+         "cwd": "/absolute/path/to/mcp/web-scraper"
+       }
+     }
+   }
+   ```
+
+4. **Optional: Configure Apify API token** (for Apify scraping method):
+   - Set `APIFY_API_TOKEN` environment variable, or
+   - Configure in 1Password (item "Apify", field "API token" in vault "Private")
+
+**Supported URLs:**
+- ChatGPT: `https://chatgpt.com/share/...` or `https://chatgpt.com/c/...`
+- Twitter/X: `https://twitter.com/.../status/...` or `https://x.com/.../status/...`
+
+**Note:** If web scraper MCP server is not configured, the command will fall back to browser tools for all URLs.
+
+### Analysis Configuration
 
 **Optional configuration in `foundation-config.yaml`:**
 
