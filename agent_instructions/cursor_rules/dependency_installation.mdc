@@ -1,5 +1,6 @@
 ---
 description: "Ensures agents automatically install required dependencies when needed to fulfill prompts"
+globs: ["**/*"]
 alwaysApply: true
 ---
 # Dependency Installation Rule

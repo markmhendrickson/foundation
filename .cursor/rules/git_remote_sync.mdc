@@ -1,3 +1,8 @@
+---
+description: "Ensures agents always pull and merge remote changes before pushing, maintaining repository synchronization and preventing push rejections."
+alwaysApply: true
+---
+
 # Git Remote Sync Rule
 
 ## Purpose

@@ -1,5 +1,6 @@
 ---
 description: "Defines how agents MUST document important instructions, constraints, and guidelines in appropriate files"
+globs: ["**/*"]
 alwaysApply: true
 ---
 # Instruction Documentation Rule

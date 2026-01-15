@@ -1,5 +1,6 @@
 ---
 description: "Ensures agents load documentation in the correct order to establish proper context before proceeding with work"
+globs: ["**/*"]
 alwaysApply: true
 ---
 # Document Loading Order Rule

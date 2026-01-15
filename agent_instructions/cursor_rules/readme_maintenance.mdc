@@ -1,5 +1,6 @@
 ---
 description: "Ensures that README.md remains synchronized with documentation changes, providing accurate and comprehensive representation of the repository"
+globs: ["**/*"]
 alwaysApply: true
 ---
 # README Maintenance Rule

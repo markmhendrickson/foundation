@@ -1,5 +1,6 @@
 ---
 description: "Rules for managing environment files when working in git worktrees, especially Cursor worktrees"
+globs: ["**/*"]
 alwaysApply: true
 ---
 # Worktree Environment Rules

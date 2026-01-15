@@ -1,5 +1,6 @@
 ---
 description: "Ensures the README.md file always reflects the current status of all releases, maintaining accurate project status visibility"
+globs: ["**/*"]
 alwaysApply: true
 ---
 # Release Status README Update Rule

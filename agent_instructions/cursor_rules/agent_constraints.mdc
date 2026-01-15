@@ -1,5 +1,6 @@
 ---
 description: "Ensures agents enforce all absolute constraints, forbidden patterns, and validation requirements when working on the repository"
+globs: ["**/*"]
 alwaysApply: true
 ---
 # Agent Constraints Rule

@@ -1,5 +1,6 @@
 ---
 description: "Ensures agents always describe manual test cases after completing a release build"
+globs: ["**/*"]
 alwaysApply: true
 ---
 # Post-Build Testing Rule

@@ -1,5 +1,6 @@
 ---
 description: "Ensures agents always edit source files for cursor rules and commands, never the copies in .cursor/ directory"
+globs: ["**/*"]
 alwaysApply: true
 ---
 # Cursor Rules Editing Rule

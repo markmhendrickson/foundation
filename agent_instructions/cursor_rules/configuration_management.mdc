@@ -1,5 +1,6 @@
 ---
 description: "Ensures configuration files are placed in the correct location based on their scope and purpose"
+globs: ["**/*"]
 alwaysApply: true
 ---
 # Configuration Management Rule

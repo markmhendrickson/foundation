@@ -1,5 +1,6 @@
 ---
 description: "Automatically detects release intent from user patterns and triggers the release creation workflow"
+globs: ["**/*"]
 alwaysApply: true
 ---
 # Release Detection Rule

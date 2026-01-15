@@ -8,6 +8,7 @@ Foundation is a collection of generalized, composable development processes that
 
 - **Development Workflow** - Git branch strategy, PR process, code review guidelines, Feature Unit workflow, release orchestration
 - **Code Conventions** - Naming patterns, style guides for TypeScript, SQL, YAML, Shell
+- **Testing Conventions** - Integration test quality, mocking guidelines, assertion standards
 - **Documentation Standards** - Structure, formatting, and writing style
 - **Security Practices** - Pre-commit audits, credential management, security rules
 - **Agent Instructions** - Cursor rules and commands for AI coding assistants
@@ -112,6 +113,7 @@ foundation/
 ├── conventions/          # Code and documentation conventions
 │   ├── code-conventions.md
 │   ├── documentation-standards.md
+│   ├── testing-conventions.md
 │   └── naming-patterns.yaml
 ├── security/             # Security practices
 │   ├── security-rules.md
@@ -257,6 +259,7 @@ development:
 - **[Feature Unit Workflow](development/feature_unit_workflow.md)** - Spec-first development with Feature Units
 - **[Release Workflow](development/release_workflow.md)** - Release orchestration and coordination
 - **[Code Conventions](conventions/code-conventions.md)** - Style guides for all languages
+- **[Testing Conventions](conventions/testing-conventions.md)** - Integration test quality standards
 - **[Documentation Standards](conventions/documentation_standards.md)** - Doc structure and style
 - **[Security Rules](security/security_rules.md)** - Security best practices
 - **[Agent Instructions](agent_instructions/README.md)** - Cursor rules and commands for AI assistants

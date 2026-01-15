@@ -1,5 +1,6 @@
 ---
 description: "Rules for creating and maintaining documentation files to minimize context window usage while maintaining clarity"
+globs: ["**/*"]
 alwaysApply: true
 ---
 # Documentation Rules
