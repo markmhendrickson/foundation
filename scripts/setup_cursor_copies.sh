@@ -293,18 +293,18 @@ if [ -d "docs" ]; then
                     fi
                 done
             else
-                # Remove symlinks ending in _rules.md or _rules.mdc that don't start with foundation- or foundation_
-                for existing_link in .cursor/rules/*_rules.{md,mdc}; do
-                    if [ -L "$existing_link" ] && [ -e "$existing_link" ]; then
-                        basename_file=$(basename "$existing_link")
-                        # Skip if it starts with foundation- or foundation_
-                        if [[ ! "$basename_file" =~ ^foundation[-_] ]]; then
-                            rm "$existing_link"
-                            print_info "  ✓ Removed repo rule: $basename_file"
-                            REPO_RULES_REMOVED=$((REPO_RULES_REMOVED + 1))
-                        fi
+            # Remove repo rule copies ending in _rules.md or _rules.mdc that don't start with foundation- or foundation_
+            for existing_rule in .cursor/rules/*_rules.{md,mdc}; do
+                if [ -e "$existing_rule" ]; then
+                    basename_file=$(basename "$existing_rule")
+                    # Skip if it starts with foundation- or foundation_
+                    if [[ ! "$basename_file" =~ ^foundation[-_] ]]; then
+                        rm "$existing_rule"
+                        print_info "  ✓ Removed repo rule: $basename_file"
+                        REPO_RULES_REMOVED=$((REPO_RULES_REMOVED + 1))
                     fi
-                done
+                fi
+            done
             fi
         fi
     
