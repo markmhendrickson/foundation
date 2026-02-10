@@ -1,6 +1,6 @@
 # Analyze Project
 
-Analyze any project (URL or term) from both competitive and partnership perspectives relative to the current repository.
+Analyze any project (URL or term) from both competitive and partnership perspectives relative to **all** repositories (comparative analysis across your repos). Load repo list from the truth layer (per `neotoma_parquet_migration_rules.mdc`).
 
 ## Command
 
@@ -27,20 +27,21 @@ analyze <url_or_term>
 This command performs systematic analysis following the framework defined in `foundation/strategy/project_assessment_framework.md`. The analysis type depends on the resource:
 
 **For Products/Projects:**
-1. Discover current repo context by loading foundational documents
-2. Research target project via web scraper MCP (if ChatGPT/Twitter URL) or browser tools
-3. Generate competitive analysis using standardized template
-4. Generate partnership analysis using standardized template
-5. Save both analyses to private docs submodule
-6. Present summary to user
+1. Load all repos from truth layer (per `neotoma_parquet_migration_rules.mdc`)
+2. Discover repo context for current repo and all repos in the loaded list
+3. Research target project via web scraper MCP (if ChatGPT/Twitter URL) or browser tools
+4. Generate competitive analysis using standardized template (compare target vs. each repo)
+5. Generate partnership analysis using standardized template (compare target vs. each repo)
+6. Save both analyses to private docs submodule
+7. Present summary to user (including comparative summary across repos)
 
 **For Content/Thought Leadership (Articles, Research, etc.):**
-1. Discover current repo context by loading foundational documents
-2. Research target resource via web scraper MCP (if ChatGPT/Twitter URL) or browser tools
-3. Generate holistic relevance analysis using relevance template
-4. Extract insights applicable to current repo
+1. Load all repos from truth layer (per `neotoma_parquet_migration_rules.mdc`)
+2. Discover repo context for current repo and all repos in the loaded list
+3. Research target resource via web scraper MCP (if ChatGPT/Twitter URL) or browser tools
+4. Generate holistic relevance analysis using relevance template (applicable to each repo)
 5. Save analysis to private docs submodule
-6. Present summary to user
+6. Present summary to user (including relevance to each repo where applicable)
 
 **Output:**
 - Products/Projects:
@@ -53,41 +54,48 @@ This command performs systematic analysis following the framework defined in `fo
 
 ## Execution Instructions
 
-### Step 1: Discover Current Repo Context (REQUIRED FIRST)
+### Step 1a: Load All Repos from Truth Layer (REQUIRED FIRST)
 
-**Objective:** Dynamically discover the current repository's identity and positioning
+**Objective:** Load the list of all repositories so analysis is comparative across all your repos.
 
 **Actions:**
 
-1. **Check for foundational documents:**
-   ```
-   - Check: docs/foundation/core_identity.md
-   - Check: docs/foundation/product_positioning.md
-   - Check: docs/foundation/problem_statement.md
-   - Check: docs/foundation/philosophy.md
-   ```
+1. **Load repo list from truth layer** (per `neotoma_parquet_migration_rules.mdc`). For repositories: Neotoma first, then Parquet with `data_type="repositories"`. If still no records: run `execution/scripts/sync_repos_to_parquet.py` with `DATA_DIR` set, then query again; or warn that comparison will use only the current repo.
 
-2. **Extract repo identity:**
-   - Read document titles (e.g., "Neotoma Core Identity" → repo name is "Neotoma")
-   - Extract from first paragraph or explicit identity statements
-   - Extract core value proposition
-   - Extract defensible differentiators (if documented)
-   - Extract target users
-   - Extract core principles
+2. **Store repo list and paths:**
+   - For each record: `name`, `path`, `parent_dir`, `core_identity_path`, `product_positioning_path`, `problem_statement_path`, `philosophy_path`.
+   - Use these paths when discovering context in Step 1b.
+
+**Critical:** All subsequent discovery and comparison MUST use this repo list.
+
+---
+
+### Step 1b: Discover Repo Context for Current and All Repos (REQUIRED)
+
+**Objective:** Dynamically discover identity and positioning for the current repository and for every repo in the loaded list (so analysis is comparative).
+
+**Actions:**
+
+1. **For the current repo (workspace):**
+   - Check: `docs/foundation/core_identity.md`, `docs/foundation/product_positioning.md`, `docs/foundation/problem_statement.md`, `docs/foundation/philosophy.md`.
+   - Extract repo identity, positioning, differentiators, target users, principles.
+   - Store under a key for the current repo name.
+
+2. **For each other repo in the loaded list:**
+   - Use `path` (or foundation doc paths) from the repos record. Read each repo's foundational documents from the paths in the record (e.g. `core_identity_path`, `philosophy_path`) when those files exist.
+   - Extract same elements (identity, positioning, differentiators, target users, principles).
+   - Store under a key for that repo's `name`.
 
 3. **Handle missing docs:**
-   - If NO foundational docs found: Warn user, proceed with generic analysis
-   - If PARTIAL docs found: Use what's available, note gaps in analysis
-   - If ALL docs found: Proceed with full context-aware analysis
+   - If a repo has NO foundational docs: Note "No foundation docs" for that repo; comparisons will be partial.
+   - If PARTIAL docs found: Use what's available, note gaps.
+   - If ALL docs found for a repo: Proceed with full context for that repo.
 
-4. **Store discovered context:**
-   - Repo name: [Extracted name]
-   - Positioning: [Core value proposition]
-   - Differentiators: [List of defensible differentiators]
-   - Target users: [User segments]
-   - Principles: [Core principles]
+4. **Store discovered context keyed by repo name:**
+   - For each repo: Repo name, Positioning, Differentiators, Target users, Principles.
+   - Keep current repo's context clearly identified for summary output.
 
-**Critical:** ALL subsequent analysis will be relative to this discovered context.
+**Critical:** ALL subsequent analysis will compare the target against every repo's discovered context (comparative analysis across all repos).
 
 ---
 
@@ -190,8 +198,8 @@ This command performs systematic analysis following the framework defined in `fo
 2. **Fill out all sections:**
    - Use template structure exactly
    - Fill in resource info from Step 2
-   - Fill in current repo info from Step 1
-   - Focus on extracting insights applicable to current repo
+   - Fill in repo context from Step 1b for **all** repos in the loaded list
+   - Focus on extracting insights applicable to each repo; note which repos are most/least relevant
 
 3. **Key areas to analyze:**
    - **Relevance Summary:** Overall relevance and primary relevance areas
@@ -229,8 +237,8 @@ This command performs systematic analysis following the framework defined in `fo
 2. **Fill out all sections:**
    - Use template structure exactly
    - Fill in target info from Step 2
-   - Fill in current repo info from Step 1
-   - Make all comparisons explicit: "[Target] vs. [Current Repo Name]"
+   - Fill in repo context from Step 1b for **all** repos in the loaded list
+   - Make comparisons explicit for each repo: "[Target] vs. [Repo A]", "[Target] vs. [Repo B]", etc. Include a comparative summary across all repos.
 
 3. **Key assessments to make:**
    - **Competitive Dynamic:** Direct / Adjacent / Complementary / None
@@ -270,8 +278,8 @@ This command performs systematic analysis following the framework defined in `fo
 2. **Fill out all sections:**
    - Use template structure exactly
    - Fill in target info from Step 2
-   - Fill in current repo info from Step 1
-   - Frame as partnership opportunity: "[Target] partnership with [Current Repo]"
+   - Fill in repo context from Step 1b for **all** repos in the loaded list
+   - Frame partnership for each repo: "[Target] partnership with [Repo A]", etc. Include comparative assessment across all repos.
 
 3. **Key assessments to make:**
    - **Partnership Value:** High / Moderate / Low / Not Viable
@@ -540,7 +548,7 @@ If configuration doesn't exist, use defaults:
 ## Notes
 
 - This command is generic and works for any repo using foundation as submodule
-- All analysis is relative to dynamically discovered current repo context
+- **Comparative analysis:** All analysis is relative to **all** repos. Load repos from truth layer (per `neotoma_parquet_migration_rules.mdc`). Parquet fallback: `data_type="repositories"`; if empty, run `execution/scripts/sync_repos_to_parquet.py` (with `DATA_DIR` set).
 - Output documents are confidential and stored in private docs submodule
 - **Resource Type Detection:** Command automatically detects if resource is a product/project (competitive/partnership analysis) or content/thought leadership (relevance analysis)
 - Templates ensure consistent, thorough analysis across all assessments

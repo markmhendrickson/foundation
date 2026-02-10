@@ -1,6 +1,6 @@
 # Sync Environment Variables from 1Password
 
-Syncs selected environment variables from 1Password into a local `.env` file.
+Sync environment variables from 1Password to local `.env` file using environment variable mappings stored in the truth layer (per `neotoma_parquet_migration_rules.mdc`).
 
 ## Command
 
@@ -16,293 +16,278 @@ sync env from 1password
 
 ## Purpose
 
-This command executes the 1Password environment sync script, which:
+This command syncs environment variables from 1Password to your local `.env` file based on mappings stored in the truth layer (per `neotoma_parquet_migration_rules.mdc`). Parquet path when used: `$DATA_DIR/env_var_mappings/env_var_mappings.parquet`.
 
-1. Reads environment variable mappings from parquet file via MCP server (or direct parquet read as fallback)
-2. Uses 1Password CLI (`op`) to resolve each secret value
-3. Updates the `.env` file with resolved values from 1Password
-4. Creates a timestamped backup before modification
-5. Preserves unmanaged variables (variables not in 1Password mappings)
-6. Supports exclusion lists via configuration
+**Key features:**
+- Automatic backup before modification
+- Preserves unmanaged environment variables
+- Never prints secret values
+- Supports environment-based keys (e.g., different API keys for dev/prod)
+- Uses 1Password MCP server (preferred) or CLI (fallback)
 
-**Script Location:**
-- `scripts/op_sync_env_from_1password.py` - Wrapper script (delegates to foundation)
-- `foundation/scripts/op_sync_env_from_1password.py` - Foundation script (generalized, repository-agnostic)
+## Prerequisites
 
-## When to Use
+### Option 1: 1Password MCP Server (Recommended)
 
-- After setting up a new repository or environment
-- When environment variables need to be refreshed from 1Password
-- After updating environment variable mappings in the parquet file
-- When switching between environments (development/production)
-- When `.env` file is missing or needs to be regenerated
+**Benefits:**
+- Persistent connection (no session expiration)
+- Better error handling
+- No repeated authentication
+- Consistent with other MCP integrations
+
+**Setup:**
+
+1. **Ensure 1Password CLI is installed:**
+   ```bash
+   brew install 1password-cli
+   op signin
+   ```
+
+2. **Configure MCP server** in `~/.cursor/mcp.json`:
+   ```json
+   {
+     "mcpServers": {
+       "onepassword": {
+         "command": "bash",
+         "args": [
+           "/Users/markmhendrickson/repos/ateles/mcp/onepassword/run-onepassword-mcp.sh"
+         ],
+         "env": {}
+       }
+     }
+   }
+   ```
+
+3. **Verify MCP server is running:**
+   - Restart Cursor after updating mcp.json
+   - MCP server status visible in Cursor MCP panel
+
+**For detailed setup instructions, see:** `mcp/onepassword/README.md`
+
+### Option 2: 1Password CLI (Fallback)
+
+**When to use:**
+- MCP server not configured
+- Temporary/one-off sync
+- Troubleshooting MCP issues
+
+**Setup:**
+
+1. **Install 1Password CLI:**
+   ```bash
+   brew install 1password-cli
+   ```
+
+2. **Sign in:**
+   ```bash
+   op signin
+   ```
+
+**Note:** CLI sessions expire periodically and require re-authentication.
+
+## Configuration
+
+### Environment Variable Mappings
+
+Mappings are in the truth layer (per `neotoma_parquet_migration_rules.mdc`). Parquet path when used: `$DATA_DIR/env_var_mappings/env_var_mappings.parquet`.
+
+**Schema:**
+- `env_var` (string): Environment variable name (e.g., `OPENAI_API_KEY`)
+- `op_reference` (string): 1Password reference (e.g., `op://Personal/API-Keys/openai_token`)
+- `item_name` (string, optional): Friendly name of 1Password item
+- `field_label` (string, optional): Field label in 1Password
+- `notes` (string, optional): Additional notes
+- `environment_based` (boolean, optional): If true, key varies by environment
+- `environment_key` (string, optional): Environment identifier (e.g., "development", "production")
+
+### Adding/Updating Mappings
+
+**Via MCP parquet server:**
+```python
+# Add new mapping
+mcp_parquet_add_record(
+    data_type="env_var_mappings",
+    record={
+        "env_var": "MY_API_KEY",
+        "op_reference": "op://Personal/API-Keys/my_api_key",
+        "item_name": "API Keys",
+        "field_label": "my_api_key"
+    }
+)
+
+# Update existing mapping
+mcp_parquet_update_records(
+    data_type="env_var_mappings",
+    filters={"env_var": "MY_API_KEY"},
+    updates={"op_reference": "op://Personal/NewItem/field"}
+)
+```
+
+**Via direct parquet editing:**
+```python
+import pandas as pd
+from scripts.config import DATA_DIR
+
+# Read mappings
+mappings_file = DATA_DIR / "env_var_mappings" / "env_var_mappings.parquet"
+df = pd.read_parquet(mappings_file)
+
+# Add or modify rows
+# ...
+
+# Write back
+df.to_parquet(mappings_file)
+```
+
+### Environment-Based Keys
+
+For environment-specific keys (e.g., different API keys for dev/prod):
+
+```python
+# Development key
+{
+    "env_var": "OPENAI_API_KEY",
+    "op_reference": "op://Personal/API-Keys/openai_dev",
+    "environment_based": True,
+    "environment_key": "development"
+}
+
+# Production key
+{
+    "env_var": "OPENAI_API_KEY",
+    "op_reference": "op://Personal/API-Keys/openai_prod",
+    "environment_based": True,
+    "environment_key": "production"
+}
+```
+
+**Set environment:**
+```bash
+export ENVIRONMENT=production  # or "development"
+```
 
 ## Execution Instructions
 
 ### Step 1: Verify Prerequisites
 
-**Check 1Password CLI authentication:**
-- Ensure `op` CLI is installed
-- Verify you're signed in: `op whoami` should succeed
-- If not authenticated, sign in: `eval $(op signin)` or `op signin`
-
-**Check Python environment:**
-- Ensure Python 3.9+ is available
-- Verify required packages: `pandas`, `pyarrow` (for fallback), `mcp` (for primary method)
-- Install if needed: `pip install pandas pyarrow mcp`
-
-**Check repository structure:**
-- Ensure you're in a repository with `foundation-config.yaml` or `.git` directory
-- Verify the script exists: `scripts/op_sync_env_from_1password.py` or `foundation/scripts/op_sync_env_from_1password.py`
-
-### Step 2: Determine Script Location
-
-**Find the script path:**
+**If using MCP server:**
 ```bash
-# Check if foundation is in current repo
-if [ -f "scripts/op_sync_env_from_1password.py" ]; then
-  SCRIPT_PATH="scripts/op_sync_env_from_1password.py"
-elif [ -f "foundation/scripts/op_sync_env_from_1password.py" ]; then
-  SCRIPT_PATH="foundation/scripts/op_sync_env_from_1password.py"
-elif [ -f "../foundation/scripts/op_sync_env_from_1password.py" ]; then
-  SCRIPT_PATH="../foundation/scripts/op_sync_env_from_1password.py"
-else
-  echo "ERROR: Script not found. Please ensure foundation is installed."
-  exit 1
-fi
+# Verify MCP server is configured (check ~/.cursor/mcp.json)
+# Restart Cursor if you just added the configuration
 ```
 
-### Step 3: Determine Target .env File
-
-**Default behavior:**
-- Script defaults to `.env` in repository root
-- Can specify custom path as argument
-
-**Check if custom path needed:**
+**If using CLI fallback:**
 ```bash
-# Default: .env in repo root
-ENV_PATH=""
-
-# Or specify custom path (optional)
-# ENV_PATH="path/to/.env.custom"
+# Verify 1Password CLI is installed and signed in
+op whoami
+# If not signed in: op signin
 ```
 
-### Step 4: Execute Script
+### Step 2: Run Sync Command
 
-**Run the script:**
+**From repository root:**
 ```bash
-# From repository root
-python3 "$SCRIPT_PATH" $ENV_PATH
+python execution/scripts/op_sync_env_from_1password.py
 ```
 
-**Or if using custom .env path:**
+**Or with custom .env path:**
 ```bash
-python3 "$SCRIPT_PATH" path/to/.env.custom
+python execution/scripts/op_sync_env_from_1password.py /path/to/.env
 ```
 
-### Step 5: Verify Results
+### Step 3: Verify Results
 
 **Check output:**
-- Script should report repository root
-- Should verify 1Password session
-- Should create backup (if .env exists)
-- Should list variables being resolved
-- Should report success with updated variable names
+- ✓ Backup created (in `.env.backups/`)
+- ✓ Updated keys listed (values NOT shown for security)
+- ✓ Sync completed successfully
 
-**Expected output:**
+**Check .env file:**
+```bash
+# Verify variables were updated (don't print full file - contains secrets)
+grep -c "=" .env  # Count of variables
 ```
-Repository root: /path/to/repo
-
-Checking 1Password session...
-✓ 1Password session active
-
-Creating backup...
-✓ Backup created: .env.backups/.env-2024-01-15-143022
-
-Syncing environment variables from 1Password...
-
-Loading mappings via parquet MCP server...
-- Resolving OPENAI_API_KEY (using development key)...
-- Resolving DATABASE_URL...
-- Resolving API_SECRET...
-
-Preserving 2 unmanaged variable(s):
-  - LOCAL_DEBUG
-  - CUSTOM_SETTING
-
-✓ Replaced 3 managed variable(s) in .env (values NOT shown):
-  - API_SECRET
-  - DATABASE_URL
-  - OPENAI_API_KEY
-
-✓ Sync completed successfully!
-```
-
-**Verify .env file:**
-- Check that `.env` file exists and has been updated
-- Verify managed variables are present
-- Verify unmanaged variables are preserved
-- Check backup was created in `.env.backups/`
-
-## Configuration
-
-### Exclusion Lists
-
-**Default exclusions** (in `foundation-config.yaml`):
-```yaml
-tooling:
-  env_management:
-    onepassword_sync:
-      default_exclusions:
-        - LOCAL_OVERRIDE
-        - TEMP_VAR
-```
-
-**Instance-specific exclusions** (in `foundation-config.local.yaml` - gitignored):
-```yaml
-tooling:
-  env_management:
-    onepassword_sync:
-      exclusions:
-        - MY_LOCAL_VAR
-        - DEV_ONLY_VAR
-```
-
-### Environment-Based Keys
-
-**For environment-specific variables** (e.g., `OPENAI_API_KEY`):
-- Set `ENVIRONMENT` environment variable before running:
-  ```bash
-  export ENVIRONMENT=development  # or production
-  python3 "$SCRIPT_PATH"
-  ```
-- Script will use the appropriate key based on current environment
-
-### MCP Server Configuration
-
-**Parquet MCP server location:**
-- Script auto-detects from common locations
-- Can override with `PARQUET_MCP_SERVER_PATH` environment variable
-- Can override Python command with `PARQUET_MCP_PYTHON` environment variable
 
 ## Behavior
 
-**Backup Creation:**
-- Creates timestamped backup in `.env.backups/` before modification
-- Backup format: `.env-YYYY-MM-DD-HHMMSS`
-- Only creates backup if `.env` file exists
+### Backup
 
-**Variable Management:**
-- **Managed variables**: Replaced with values from 1Password
-- **Unmanaged variables**: Preserved from original `.env` file
-- **Excluded variables**: Removed (not preserved)
-- **Placeholder variables**: Skipped (preserved if exists, not added if missing)
+**Automatic backup before modification:**
+- Location: `.env.backups/.env-YYYY-MM-DD-HHMMSS`
+- Only created if `.env` file exists
+- Backup preserves exact file state
 
-**File Structure:**
-- Preserves comments and headers from original file
-- Adds section headers for managed vs unmanaged variables
-- Sorts variables alphabetically within each section
+### Variable Updates
 
-**Security:**
-- Script NEVER prints secret values
-- Only prints variable names that were updated
-- Error messages never include CLI output that might contain secrets
-- Backups stored in `.env.backups/` (gitignored via `.env.*` pattern)
+**For each mapped variable:**
+1. Resolve secret from 1Password (via MCP or CLI)
+2. Update existing variable or append new one
+3. Preserve other variables in `.env` (unmanaged variables untouched)
+
+**Variables with `PLACEHOLDER_` prefix are skipped** until configured with actual 1Password references.
+
+### Security
+
+**Security guarantees:**
+- Never prints secret values (only variable names)
+- Creates backup before modification
+- Error messages never expose secrets
+- Validates session before proceeding
 
 ## Error Handling
 
-### 1Password CLI Not Authenticated
+### "1Password CLI is not authenticated"
 
-**Error:**
-```
-ERROR: 1Password CLI is not authenticated.
-Please sign in to 1Password:
-  eval $(op signin)
-```
+**Problem:** Not signed in to 1Password CLI.
 
 **Solution:**
-- Run `op signin` or `eval $(op signin)`
-- Verify with `op whoami`
-- Ensure 1Password CLI is installed
-
-### Repository Root Not Found
-
-**Error:**
+```bash
+op signin
 ```
-ERROR: Could not find repository root. Ensure foundation-config.yaml or .git exists in the repository.
-```
+
+### "MCP failed, falling back to CLI"
+
+**Problem:** MCP server unavailable or misconfigured.
 
 **Solution:**
-- Ensure you're in a git repository or directory with `foundation-config.yaml`
-- Run script from repository root
-- Verify foundation is properly installed
+1. Check MCP server configuration in `~/.cursor/mcp.json`
+2. Restart Cursor after updating configuration
+3. Verify 1Password CLI is installed and signed in
+4. Script will automatically fall back to CLI
 
-### MCP Server Unavailable
+### "Environment variable mappings file not found"
 
-**Warning:**
-```
-WARNING: MCP server unavailable (...), falling back to direct parquet read
-```
+**Problem:** Mappings file doesn't exist.
 
 **Solution:**
-- This is expected if MCP dependencies aren't available
-- Script will fall back to direct parquet read
-- Ensure `data/env_var_mappings/env_var_mappings.parquet` exists
-- Or install MCP dependencies: `pip install mcp`
+```bash
+# Create mappings file structure
+mkdir -p $DATA_DIR/env_var_mappings
 
-### Parquet File Not Found
+# Add mappings via MCP parquet server or create parquet file
+# See Configuration section above
+```
 
-**Error:**
-```
-ERROR: Environment variable mappings file not found: data/env_var_mappings/env_var_mappings.parquet
-```
+### "Empty value returned for 1Password ref"
+
+**Problem:** Field exists but contains empty value.
 
 **Solution:**
-- Create the mappings file using MCP parquet server
-- Or ensure the file exists at the expected location
-- Update mappings via MCP server (add_record/update_record)
+- Verify field has value in 1Password app
+- Check spelling of field name in reference
+- Try: `op item get "<item-name>" --format=json` to see available fields
 
-### 1Password Reference Resolution Failed
+## Related Documentation
 
-**Warning:**
-```
-WARNING: Failed to resolve OPENAI_API_KEY: 1Password CLI error for op://...
-```
-
-**Solution:**
-- Verify the op:// reference is correct
-- Ensure you have access to the vault/item/field in 1Password
-- Check that the item exists: `op item get "<item-name>" --format=json`
-- Update the mapping if the reference is incorrect
-
-### Python Dependencies Missing
-
-**Error:**
-```
-ModuleNotFoundError: No module named 'pandas'
-```
-
-**Solution:**
-- Install required packages: `pip install pandas pyarrow`
-- For MCP support: `pip install mcp`
-- Use virtual environment if needed
-
-## Related Documents
-
-- `scripts/op_sync_env_from_1password.py` - Wrapper script (delegates to foundation)
-- `foundation/scripts/op_sync_env_from_1password.py` - Foundation script (generalized implementation)
-- `foundation/scripts/README.md` - Complete documentation for the 1Password sync script
-- `foundation-config.yaml` - Default exclusions configuration
-- `foundation-config.local.yaml` - Instance-specific exclusions (gitignored)
-- `data/env_var_mappings/env_var_mappings.parquet` - Environment variable mappings (accessed via MCP)
+- `mcp/onepassword/README.md` - 1Password MCP server documentation
+- `execution/scripts/onepassword_client.py` - MCP client implementation
+- `execution/scripts/op_sync_env_from_1password.py` - Sync script implementation
+- `$DATA_DIR/schemas/env_var_mappings_schema.json` - Mappings schema (if exists)
 
 ## Notes
 
-- **Security**: This script should be run locally, not in CI/CD pipelines
-- **Never commit `.env` files** to git (should be in `.gitignore`)
-- **Backups are gitignored** via `.env.*` pattern
-- **Placeholder variables** (with `PLACEHOLDER_` prefix) are skipped until configured
-- **Environment-based keys** require `ENVIRONMENT` variable to be set
-- **MCP integration** is the primary method; direct parquet read is fallback
-- Script preserves unmanaged variables to avoid losing local customizations
-- Exclusions allow instance-specific variables to be removed during sync
+- **MCP preferred over CLI:** Script tries MCP first, falls back to CLI automatically
+- **Persistent connection:** MCP eliminates session expiration issues
+- **Backward compatible:** Existing CLI-based workflows continue to work
+- **No breaking changes:** Same interface, enhanced implementation
+- **Security first:** All security guarantees preserved from original implementation

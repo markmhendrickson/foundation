@@ -67,34 +67,34 @@ SYMLINK_PREFIX=""
 # Prefix for repository rules (can be set via REPO_RULES_PREFIX env var, defaults to empty)
 REPO_RULES_PREFIX="${REPO_RULES_PREFIX:-}"
 
-# Remove all existing foundation symlinks (old prefixed and new unprefixed)
-print_info "Removing existing foundation symlinks (prefixed and unprefixed)..."
+# Remove all existing foundation files (symlinks or copies) so we can create fresh symlinks
+print_info "Removing existing foundation files (prefixed and unprefixed)..."
 RULES_REMOVED=0
 COMMANDS_REMOVED=0
 
 if [ -d ".cursor/rules" ]; then
-    # Remove old foundation_ prefixed symlinks
-    for existing_link in .cursor/rules/foundation_*.{md,mdc}; do
-        if [ -L "$existing_link" ]; then
-            rm "$existing_link"
-            print_info "  ✓ Removed $(basename "$existing_link")"
+    # Remove old foundation_ prefixed files (symlinks or copies)
+    for existing_file in .cursor/rules/foundation_*.{md,mdc}; do
+        if [ -e "$existing_file" ]; then
+            rm "$existing_file"
+            print_info "  ✓ Removed $(basename "$existing_file")"
             RULES_REMOVED=$((RULES_REMOVED + 1))
         fi
     done
-    # Remove old foundation- prefixed symlinks
-    for existing_link in .cursor/rules/foundation-*.{md,mdc}; do
-        if [ -L "$existing_link" ]; then
-            rm "$existing_link"
-            print_info "  ✓ Removed $(basename "$existing_link")"
+    # Remove old foundation- prefixed files (symlinks or copies)
+    for existing_file in .cursor/rules/foundation-*.{md,mdc}; do
+        if [ -e "$existing_file" ]; then
+            rm "$existing_file"
+            print_info "  ✓ Removed $(basename "$existing_file")"
             RULES_REMOVED=$((RULES_REMOVED + 1))
         fi
     done
-    # Remove unprefixed foundation rule symlinks (will be recreated)
+    # Remove unprefixed foundation rule files (will be recreated as symlinks)
     for rule_file in "$RULES_DIR"/*.mdc "$RULES_DIR"/*.md; do
         if [ -f "$rule_file" ]; then
             rule_name=$(basename "$rule_file")
             target_file=".cursor/rules/$rule_name"
-            if [ -L "$target_file" ]; then
+            if [ -e "$target_file" ]; then
                 rm "$target_file"
                 print_info "  ✓ Removed $rule_name"
                 RULES_REMOVED=$((RULES_REMOVED + 1))
@@ -104,28 +104,28 @@ if [ -d ".cursor/rules" ]; then
 fi
 
 if [ -d ".cursor/commands" ]; then
-    # Remove old foundation_ prefixed symlinks
-    for existing_link in .cursor/commands/foundation_*.md; do
-        if [ -L "$existing_link" ]; then
-            rm "$existing_link"
-            print_info "  ✓ Removed $(basename "$existing_link")"
+    # Remove old foundation_ prefixed files (symlinks or copies)
+    for existing_file in .cursor/commands/foundation_*.md; do
+        if [ -e "$existing_file" ]; then
+            rm "$existing_file"
+            print_info "  ✓ Removed $(basename "$existing_file")"
             COMMANDS_REMOVED=$((COMMANDS_REMOVED + 1))
         fi
     done
-    # Remove old foundation- prefixed symlinks
-    for existing_link in .cursor/commands/foundation-*.md; do
-        if [ -L "$existing_link" ]; then
-            rm "$existing_link"
-            print_info "  ✓ Removed $(basename "$existing_link")"
+    # Remove old foundation- prefixed files (symlinks or copies)
+    for existing_file in .cursor/commands/foundation-*.md; do
+        if [ -e "$existing_file" ]; then
+            rm "$existing_file"
+            print_info "  ✓ Removed $(basename "$existing_file")"
             COMMANDS_REMOVED=$((COMMANDS_REMOVED + 1))
         fi
     done
-    # Remove unprefixed foundation command symlinks (will be recreated)
+    # Remove unprefixed foundation command files (will be recreated as symlinks)
     for cmd_file in "$COMMANDS_DIR"/*.md; do
         if [ -f "$cmd_file" ]; then
             cmd_name=$(basename "$cmd_file")
             target_file=".cursor/commands/$cmd_name"
-            if [ -L "$target_file" ]; then
+            if [ -e "$target_file" ]; then
                 rm "$target_file"
                 print_info "  ✓ Removed $cmd_name"
                 COMMANDS_REMOVED=$((COMMANDS_REMOVED + 1))
@@ -136,10 +136,10 @@ fi
 
 if [ $RULES_REMOVED -gt 0 ] || [ $COMMANDS_REMOVED -gt 0 ]; then
     if [ $RULES_REMOVED -gt 0 ]; then
-        print_info "Removed $RULES_REMOVED existing rule symlink(s)"
+        print_info "Removed $RULES_REMOVED existing rule file(s)"
     fi
     if [ $COMMANDS_REMOVED -gt 0 ]; then
-        print_info "Removed $COMMANDS_REMOVED existing command symlink(s)"
+        print_info "Removed $COMMANDS_REMOVED existing command file(s)"
     fi
     print_info ""
 fi
@@ -156,13 +156,12 @@ for rule_file in "$RULES_DIR"/*.mdc; do
         target_file=".cursor/rules/$symlink_name"
         
         if [ -e "$target_file" ]; then
-            # File exists but is not a symlink (preserve customizations)
-            print_warn "File already exists (not a symlink): $symlink_name (skipping to preserve existing file)"
-        else
-            ln -s "$RULES_RELATIVE_PATH/$rule_name" "$target_file"
-            print_info "  ✓ Linked $rule_name -> $symlink_name"
-            RULES_LINKED=$((RULES_LINKED + 1))
+            rm "$target_file"
+            print_info "  ✓ Replaced $symlink_name with symlink to source"
         fi
+        ln -s "$RULES_RELATIVE_PATH/$rule_name" "$target_file"
+        print_info "  ✓ Linked $rule_name -> $symlink_name"
+        RULES_LINKED=$((RULES_LINKED + 1))
     fi
 done
 # Then, process .md files that don't have corresponding .mdc files
@@ -178,13 +177,12 @@ for rule_file in "$RULES_DIR"/*.md; do
         target_file=".cursor/rules/$symlink_name"
         
         if [ -e "$target_file" ]; then
-            # File exists but is not a symlink (preserve customizations)
-            print_warn "File already exists (not a symlink): $symlink_name (skipping to preserve existing file)"
-        else
-            ln -s "$RULES_RELATIVE_PATH/$rule_name" "$target_file"
-            print_info "  ✓ Linked $rule_name -> $symlink_name"
-            RULES_LINKED=$((RULES_LINKED + 1))
+            rm "$target_file"
+            print_info "  ✓ Replaced $symlink_name with symlink to source"
         fi
+        ln -s "$RULES_RELATIVE_PATH/$rule_name" "$target_file"
+        print_info "  ✓ Linked $rule_name -> $symlink_name"
+        RULES_LINKED=$((RULES_LINKED + 1))
     fi
 done
 
@@ -198,13 +196,12 @@ for cmd_file in "$COMMANDS_DIR"/*.md; do
         target_file=".cursor/commands/$symlink_name"
         
         if [ -e "$target_file" ]; then
-            # File exists but is not a symlink (preserve customizations)
-            print_warn "File already exists (not a symlink): $symlink_name (skipping to preserve existing file)"
-        else
-            ln -s "$COMMANDS_RELATIVE_PATH/$cmd_name" "$target_file"
-            print_info "  ✓ Linked $cmd_name -> $symlink_name"
-            COMMANDS_LINKED=$((COMMANDS_LINKED + 1))
+            rm "$target_file"
+            print_info "  ✓ Replaced $symlink_name with symlink to source"
         fi
+        ln -s "$COMMANDS_RELATIVE_PATH/$cmd_name" "$target_file"
+        print_info "  ✓ Linked $cmd_name -> $symlink_name"
+        COMMANDS_LINKED=$((COMMANDS_LINKED + 1))
     fi
 done
 
@@ -287,14 +284,8 @@ if [ -d "docs" ]; then
         rel_to_cursor="../../$rule_file"
         
         if [ -e "$target_file" ]; then
-            if [ -L "$target_file" ]; then
-                # Symlink already exists, remove it first
-                rm "$target_file"
-            else
-                # File exists but is not a symlink (preserve customizations)
-                print_warn "File already exists (not a symlink): $symlink_name (skipping to preserve existing file)"
-                continue
-            fi
+            rm "$target_file"
+            print_info "  ✓ Replaced $symlink_name with symlink to source"
         fi
         ln -sf "$rel_to_cursor" "$target_file"
         print_info "  ✓ Linked $rule_file -> $symlink_name"

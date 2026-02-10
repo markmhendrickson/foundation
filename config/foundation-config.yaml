@@ -306,7 +306,7 @@ agent_instructions:
       - final_review
       - fix_feature_bug
       - analyze
-      - setup_symlinks
+      - setup_cursor_copies
     custom_commands: []  # Repo-specific commands
   constraints: []
     # Project-specific constraints

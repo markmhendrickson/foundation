@@ -1,0 +1,81 @@
+---
+description: "MANDATORY: Neotoma-first data access, Parquet as backup and migration source. Proactive migration from Parquet to Neotoma with verification and cleanup."
+alwaysApply: true
+---
+# Neotoma and Parquet Migration Rules
+
+## Purpose
+
+Ensures incremental migration from Parquet MCP to Neotoma MCP by mandating Neotoma as the primary data layer, Parquet as backup when data is not found in Neotoma, and proactive migration of data from Parquet into Neotoma with full verification and Parquet cleanup.
+
+## Scope
+
+This rule applies to all agent operations that read or write normalized structured data (tasks, contacts, transactions, flows, execution plans, habits, posts, and all other types under `$DATA_DIR/[type]/`). It does not replace repository data-imports or snapshot policies defined in repository data rules.
+
+## Mandatory Data Access Order
+
+**MANDATORY:** For every data query or read operation:
+
+1. **Query Neotoma first** using Neotoma MCP tools (e.g. `mcp_neotoma_retrieve_entities`, `mcp_neotoma_retrieve_entity_snapshot`, `mcp_neotoma_retrieve_graph_neighborhood`, `mcp_neotoma_list_timeline_events`, or equivalent Neotoma tools for the entity type).
+2. **If data is found in Neotoma:** Use that result. Do not read from Parquet for the same request.
+3. **If data is not found in Neotoma:** Use Parquet MCP as backup. Query via `mcp_parquet_read_parquet`, `mcp_parquet_search_parquet`, or other parquet MCP tools. Never access parquet files directly.
+
+**MANDATORY:** For every data write or create operation:
+
+1. **Write to Neotoma first** using Neotoma MCP tools (e.g. `mcp_neotoma_store`, and relationship tools as appropriate).
+2. **When a rule or workflow still requires Parquet:** Also write or update via Parquet MCP (e.g. `mcp_parquet_add_record`, `mcp_parquet_update_records`, `mcp_parquet_upsert_record`) so that Parquet remains a valid backup and migration source until migration is complete for that data type.
+
+## Mandatory Proactive Migration from Parquet to Neotoma
+
+**MANDATORY:** When data is read from Parquet (because it was not found in Neotoma or as part of a migration check):
+
+1. **Migrate that data into Neotoma** using Neotoma MCP tools. Map parquet records to Neotoma entities (and relationships if applicable) according to Neotoma schema and entity model.
+2. **Verify migration is 100% accurate** before any cleanup:
+   - Compare every migrated field (or equivalent derived state) in Neotoma with the source Parquet record.
+   - Confirm relationships and references are correctly represented in Neotoma.
+   - If any discrepancy is found, correct the Neotoma data or re-run the migration for the affected records; do not proceed to cleanup until verification passes.
+3. **After verification passes:** Delete the migrated records from Parquet using Parquet MCP (e.g. `mcp_parquet_delete_records`) as cleanup. Delete only the records that were successfully migrated and verified; do not delete records that were not migrated or that failed verification.
+
+**MANDATORY:** Migration and cleanup MUST be done in that order: migrate → verify 100% → then delete from Parquet. Never delete from Parquet before verification is complete.
+
+## Trigger Patterns
+
+- Any read or query of normalized data (tasks, contacts, transactions, flows, execution plans, habits, posts, etc.)
+- Any write, create, or update of normalized data
+- Any workflow or rule that currently specifies "use parquet MCP" or "query parquet"
+- Discovery of data in Parquet that might not yet exist in Neotoma
+
+## Agent Actions
+
+### Step 1: Read Path
+
+1. Call Neotoma MCP with the appropriate tool and filters for the entity type and query.
+2. If Neotoma returns the needed data, use it and (if the same data exists in Parquet) consider triggering proactive migration for that data (Step 3).
+3. If Neotoma does not return the data (empty or not found), query Parquet MCP with the same intent (data type and filters). Use Parquet results. Then run proactive migration for the returned Parquet records (Step 3).
+
+### Step 2: Write Path
+
+1. Write to Neotoma first via Neotoma MCP.
+2. If the data type or workflow still persists in Parquet, also write or update via Parquet MCP so Parquet remains backup and migration source until that type is fully migrated.
+
+### Step 3: Proactive Migration (when Parquet was used or Parquet data is present)
+
+1. For each record (or batch) that was read from Parquet or that exists in Parquet and is in scope for migration:
+   - Create or update the corresponding entity (and relationships) in Neotoma via Neotoma MCP.
+   - Map all relevant fields and identifiers from Parquet to Neotoma schema.
+2. Verify 100% accuracy: for each migrated record, compare Neotoma state to the Parquet source (field-by-field or equivalent). Document or fix any mismatch.
+3. Only after verification passes for a record (or batch): delete that record from Parquet via `mcp_parquet_delete_records` (or equivalent) as cleanup.
+
+## Constraints
+
+- **MUST** query Neotoma before Parquet for all normalized data reads.
+- **MUST** use Parquet MCP as backup when data is not found in Neotoma; **MUST NOT** access parquet files directly (per repository MCP access policy).
+- **MUST** migrate data from Parquet to Neotoma proactively when reading from Parquet or when Parquet holds data for a type that is being migrated.
+- **MUST** verify migration is 100% accurate (field-level or equivalent) before deleting from Parquet.
+- **MUST** delete from Parquet only after successful migration and verification; **MUST NOT** delete from Parquet before verification.
+- **MUST** write to Neotoma first for new or updated data; **MUST** continue writing to Parquet where required so Parquet remains backup until migration for that type is complete.
+
+## Related Documents
+
+- Repository MCP access policy — MCP-only data access; Neotoma primary, Parquet via MCP only
+- Repository data rules — Data query decision tree, imports, parquet naming
