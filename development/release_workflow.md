@@ -1085,7 +1085,7 @@ g. **Cleanup worker agents** (terminate completed agents)
    
    - **Build Verification:**
      ```bash
-     rm -rf dist/ && npm run build
+     rm -rf dist/ && npm run build:server
      ```
      - MUST succeed, dist/ directory created
    
@@ -1099,7 +1099,7 @@ g. **Cleanup worker agents** (terminate completed agents)
    
    - **MCP Watch Mode:**
      ```bash
-     npm run dev:mcp
+     npm run dev:api
      ```
      - MUST compile without errors
      - Verify watch mode detects changes
