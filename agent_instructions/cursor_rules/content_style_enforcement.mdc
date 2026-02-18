@@ -1,3 +1,7 @@
+---
+alwaysApply: true
+---
+
 # Content Style Enforcement Rule
 
 **Reference:** `foundation/conventions/writing_style_guide.md` — Writing style guide
