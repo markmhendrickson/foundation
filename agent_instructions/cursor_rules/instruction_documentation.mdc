@@ -20,6 +20,7 @@ This rule covers:
 - Where to place rules (global vs repository-specific)
 - How rules are discovered via symlink structure
 - Format standards for rule files
+- Multi-model format (single-file structure for Claude, GPT-4, Gemini)
 
 This rule does NOT cover:
 - Content of specific rules (covered by individual rule files)
@@ -172,6 +173,35 @@ When [conditions], agents MUST [action].
 - MUST NOT use marketing language: "powerful", "seamless", "revolutionary"
 - Use simple, declarative sentences with active voice
 
+## Multi-Model Format (SHOULD use for new and revised rules)
+
+Structure rules so they work well across leading LLMs (Claude, GPT-4, Gemini) in a **single file**. Do NOT duplicate rules per model.
+
+**1. XML tags (Claude-optimized)**  
+Use once near the top and for key sections:
+- `<context>` — One short paragraph: what this rule does and why it exists
+- `<requirements>` — Wrap trigger patterns or “what must be true” lists
+- `<constraints>` — Wrap MUST/MUST NOT lists
+
+**2. Numbered step breakdowns (GPT-4-optimized)**  
+For workflows and procedures:
+- Use “Step N.M” sub-steps (e.g. Step 1.1, 1.2, 2.1)
+- One numbered action per line inside each step
+- Keep the same content; add structure, do not remove detail
+
+**3. Quick Reference section (Gemini-optimized)**  
+For rules with workflows or many constraints, add at the end:
+- **Domain:** Topic area (e.g. “Development Workflow”)
+- **Sequence:** Short flow (e.g. “Detect → Validate → Confirm → Execute”)
+- **Required:** Inputs and context (files, config, IDs)
+- **Outputs:** What the rule produces or updates
+- **Constraints:** Condensed MUST/MUST NOT list
+
+**Principles:**
+- One source of truth: one rule file, no per-model copies
+- Additive: keep existing sections; add XML, step numbers, and Quick Reference where they help
+- Optional: base format is required; multi-model elements are recommended for new and revised rules
+
 ## Workflow
 
 When user provides instructions (especially "always" or "never"), agents MUST:
@@ -266,3 +296,4 @@ Load this document when:
 - [ ] Rule file uses `*_rules.md` naming convention
 - [ ] No references to non-existent central reference files
 - [ ] Instructions documented immediately during same conversation
+- [ ] (Optional) New or revised rules use multi-model format: `<context>`/`<requirements>`/`<constraints>`, numbered sub-steps, Quick Reference for workflows

@@ -85,23 +85,74 @@ Load when implementing or modifying feature X.
 
 ## Generic Cursor Rules
 
-Seven generic Cursor rules for use across repositories:
+Eight generic Cursor rules for use across repositories:
 
-1. **Security** - Pre-commit security audit
-2. **Worktree Environment** - Environment file handling in worktrees
-3. **README Maintenance** - Automatic README synchronization
-4. **Downstream Doc Updates** - Documentation dependency management
-5. **Instruction Documentation** - Rules for documenting agent instructions
-6. **Configuration Management** - Configuration file placement and scope
-7. **Dependency Installation** - Automatic installation of required dependencies
+1. **Behavioral Self-Adaptation** - Proactive rule/skill/hook suggestions from user interventions
+2. **Security** - Pre-commit security audit
+3. **Worktree Environment** - Environment file handling in worktrees
+4. **README Maintenance** - Automatic README synchronization
+5. **Downstream Doc Updates** - Documentation dependency management
+6. **Instruction Documentation** - Rules for documenting agent instructions
+7. **Configuration Management** - Configuration file placement and scope
+8. **Dependency Installation** - Automatic installation of required dependencies
 
 All rules located in `foundation/agent_instructions/cursor_rules/`. Installed to `.cursor/rules/` directory via symlinks.
 
 ### Rule Details
 
-#### 1. Security Rule
+#### 1. Behavioral Self-Adaptation Rule
 
-3. Pull (`cursor_commands/pull.md`) - Pull latest from origin, commit local changes first, merge conflicts, run setup scripts
+**File:** `cursor_rules/behavioral_self_adaptation.mdc`
+
+Enables agents to learn from user interventions and proactively suggest behavioral improvements.
+
+**Key Features:**
+- Post-intervention analysis when user resolves agent stopping points
+- Pattern detection for generalizable behaviors
+- Automatic classification of intervention types (scope expansion, decision rule, workflow extension, etc.)
+- Integration with strategy/tactics/operations hierarchy
+- Proactive suggestions for rules, skills, or hooks
+- User approval required before implementation
+
+**How It Works:**
+
+When an agent stops and asks for guidance, and you provide a response that implies a persistent pattern:
+
+1. **Analysis:** Agent identifies the stopping point context and analyzes your intervention
+2. **Classification:** Determines intervention type (scope expansion, decision rule, workflow extension, constraint clarification, automation preference)
+3. **Alignment Check:** Verifies suggestion aligns with strategy/tactics/operations and respects constraints
+4. **Suggestion:** Presents specific rule/skill/hook with exact content and location
+5. **Implementation:** If approved, creates/updates the artifact and applies it immediately to current task
+
+**Example:**
+```
+Agent stops: "Should I update related tasks?"
+You: "Yes, always update related tasks for financial transactions"
+Agent: Analyzes pattern → Suggests rule enhancement to persistence_rules.mdc
+You: Approve
+Agent: Updates rule and applies to current task
+Future: Agent updates related tasks automatically
+```
+
+**Configuration:** No configuration needed - integrates with existing rules and frameworks.
+
+**When to Use:** Always enabled. Works alongside `prompt_integration_rules.mdc` (explicit instructions) by handling implicit patterns from interventions.
+
+**Integration:**
+- Works with `prompt_integration_rules.mdc` (explicit "always do X" instructions)
+- Respects `risk_management.mdc` (won't suggest bypassing security holds)
+- Validates against `agent_constraints.mdc` (respects architectural boundaries)
+- Checks `decision_framework_rules.mdc` (aligns with strategy/tactics/operations)
+
+**Benefits:**
+- Reduces repetitive guidance over time
+- Captures implicit preferences as explicit rules
+- Maintains user control through approval process
+- Continuously improves agent behavior
+- Transparent learning mechanism
+
+#### 2. Security Rule
+
 **File:** `cursor_rules/security.md`
 
 Prevents accidental commits of private, sensitive, or confidential documentation and data.
@@ -129,7 +180,7 @@ security:
 
 **When to Customize:** Add repository-specific protected paths, adjust credential scanning patterns, add custom security checks.
 
-#### 2. Worktree Environment Rule
+#### 3. Worktree Environment Rule
 
 **File:** `cursor_rules/worktree_env.md`
 
@@ -158,7 +209,7 @@ tooling:
 
 **When to Customize:** Adjust env file priority order, add custom worktree detection patterns.
 
-#### 3. README Maintenance Rule
+#### 4. README Maintenance Rule
 
 **File:** `cursor_rules/readme_maintenance.md`
 
@@ -184,7 +235,7 @@ tooling:
 
 **When to Customize:** Add repository-specific README sections, customize regeneration triggers, add custom README structure template.
 
-#### 4. Downstream Doc Updates Rule
+#### 5. Downstream Doc Updates Rule
 
 **File:** `cursor_rules/downstream_doc_updates.md`
 
@@ -209,7 +260,7 @@ tooling:
 
 **When to Customize:** Adjust documentation hierarchy to match your structure, add custom dependency types, customize validation rules.
 
-#### 5. Instruction Documentation Rule
+#### 6. Instruction Documentation Rule
 
 **File:** `cursor_rules/instruction_documentation.md`
 
@@ -235,7 +286,7 @@ agent_instructions:
 
 **When to Customize:** Adjust instruction classification logic, add custom instruction types, customize documentation format.
 
-#### 6. Configuration Management Rule
+#### 7. Configuration Management Rule
 
 **File:** `cursor_rules/configuration_management.md`
 
@@ -252,7 +303,7 @@ Ensures configuration files are placed in the correct location based on their sc
 
 **When to Customize:** Add repository-specific configuration placement rules if needed.
 
-#### 7. Dependency Installation Rule
+#### 8. Dependency Installation Rule
 
 **File:** `cursor_rules/dependency_installation.md`
 
@@ -279,7 +330,7 @@ Ensures agents automatically install required dependencies when needed to fulfil
 5. **Create Prototype** (`cursor_commands/create_prototype.md`) - Create interactive prototype for UI features (Checkpoint 1)
 6. **Final Review** (`cursor_commands/final_review.md`) - Present completed implementation for approval (Checkpoint 2)
 7. **Analyze** (`cursor_commands/analyze.md`) - Competitive and partnership analysis for any project/URL relative to current repo
-8. **Setup Symlinks** (`cursor_commands/setup_symlinks.md`) - Set up symlinks from foundation cursor rules and commands to `.cursor/` directory
+8. **Setup Cursor Copies** (`cursor_commands/setup_cursor_copies.md`) - Set up foundation cursor rules and commands in `.cursor/` (symlinks when foundation is a submodule, copies otherwise)
 
 ### Commit Command Details
 
@@ -377,6 +428,7 @@ If you prefer to create symlinks manually:
 ```bash
 # Create symlinks for generic rules (with "foundation-" prefix)
 cd .cursor/rules
+ln -s ../../foundation/agent_instructions/cursor_rules/behavioral_self_adaptation.mdc foundation-behavioral_self_adaptation.mdc
 ln -s ../../foundation/agent_instructions/cursor_rules/security.md foundation-security.md
 ln -s ../../foundation/agent_instructions/cursor_rules/worktree_env.md foundation-worktree_env.md
 ln -s ../../foundation/agent_instructions/cursor_rules/readme_maintenance.md foundation-readme_maintenance.md
@@ -455,6 +507,7 @@ agent_instructions:
     enabled: true
     location: ".cursor/rules/"
     generic_rules:
+      - behavioral_self_adaptation
       - security
       - worktree_env
       - readme_maintenance

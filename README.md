@@ -11,7 +11,7 @@ Foundation is a collection of generalized, composable development processes that
 - **Testing Conventions** - Integration test quality, mocking guidelines, assertion standards
 - **Documentation Standards** - Structure, formatting, and writing style
 - **Security Practices** - Pre-commit audits, credential management, security rules
-- **Agent Instructions** - Cursor rules and commands for AI coding assistants
+- **Agent Instructions** - Cursor rules and commands for AI coding assistants, including self-adaptive behavioral improvements
 - **Configuration System** - Flexible YAML-based configuration for repo-specific customization
 - **Strategy Frameworks** - Product discovery, competitive analysis, partnership evaluation (optional)
 - **Validation Systems** - Spec compliance validation, documentation dependency tracking (optional)
@@ -23,7 +23,7 @@ Foundation is a collection of generalized, composable development processes that
 ✅ **Configurable** - Adapt to your project's needs via `foundation_config.yaml`  
 ✅ **Composable** - Pick and choose what you need  
 ✅ **Shareable** - Use across multiple repositories via git submodules  
-✅ **Agent-Friendly** - Designed for AI coding assistants  
+✅ **Agent-Friendly** - Designed for AI coding assistants with self-adaptive learning  
 ✅ **Maintainable** - Single source of truth for best practices
 
 ## Quick Start
@@ -93,6 +93,28 @@ git push
 # Install Cursor rules and commands as symlinks
 ./foundation/scripts/setup_cursor_rules.sh
 ```
+
+### Self-Adaptive Agent Behavior
+
+Foundation includes a self-adaptive learning system for AI agents. When you provide guidance that resolves an agent stopping point, the agent will:
+
+1. **Analyze the intervention** - Identify if your guidance implies a generalizable pattern
+2. **Suggest improvements** - Propose new rules, skills, or hooks to prevent similar stops
+3. **Request approval** - Present the suggestion with specific content and location
+4. **Implement and apply** - Once approved, create the artifact and apply it immediately
+
+**Example:**
+```
+Agent stops: "Should I update related tasks?"
+You respond: "Yes, always update related tasks for financial transactions"
+Agent suggests: Add rule to persistence_rules.mdc
+You approve: Rule is created and applied to current task
+Future: Agent updates related tasks automatically without asking
+```
+
+This enables agents to continuously improve their behavior based on your preferences, reducing repetitive guidance over time while maintaining explicit control through user approval.
+
+See `foundation/agent_instructions/cursor_rules/behavioral_self_adaptation.mdc` for full details.
 
 ## Directory Structure
 
@@ -262,7 +284,8 @@ development:
 - **[Testing Conventions](conventions/testing-conventions.md)** - Integration test quality standards
 - **[Documentation Standards](conventions/documentation_standards.md)** - Doc structure and style
 - **[Security Rules](security/security_rules.md)** - Security best practices
-- **[Agent Instructions](agent_instructions/README.md)** - Cursor rules and commands for AI assistants
+- **[Agent Instructions](agent_instructions/README.md)** - Cursor rules and commands for AI assistants, including self-adaptive learning
+  - **[Behavioral Self-Adaptation](agent_instructions/cursor_rules/behavioral_self_adaptation.mdc)** - Proactive rule/skill/hook suggestions from interventions
 - **[Strategy Frameworks](strategy/README.md)** - Product discovery and competitive analysis (optional)
 - **[Tooling](tooling/README.md)** - Development tooling configuration (optional)
 - **[Validation Systems](validation/README.md)** - Spec compliance and doc dependency validation (optional)
