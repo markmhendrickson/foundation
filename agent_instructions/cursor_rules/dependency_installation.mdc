@@ -81,6 +81,7 @@ After installing:
 
 - **Do NOT ask for permission** - Install dependencies automatically when needed
 - **Do NOT skip installation** - If code requires a dependency, install it
+- **MUST NOT leave missing dependencies unresolved** - Install or report failure; do not proceed with broken imports or missing tools
 - **Use correct package manager** - Follow project conventions (don't mix npm/yarn/pnpm)
 - **Update dependency files** - Always update manifest files after installation
 - **Handle errors gracefully** - If installation fails, report the error and suggest alternatives

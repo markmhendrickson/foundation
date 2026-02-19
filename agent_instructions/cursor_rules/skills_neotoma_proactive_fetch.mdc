@@ -1,0 +1,52 @@
+---
+description: "Neotoma is source of truth for skills; sync index (metadata only) on interval; fetch content from Neotoma when using a skill; never store skill content in repo"
+globs: ["**/*"]
+alwaysApply: true
+---
+# Skills Neotoma Proactive Fetch
+
+## Purpose
+
+Neotoma is the source of truth for skills. Skill **content** is never stored in the repo. A **skill index** (metadata only: name, description, triggers, entity_id) may be synced from Neotoma into `.cursor/skills/` on an interval so Cursor can discover skills; when using a skill, agents MUST fetch full content from Neotoma. New skills are stored in Neotoma only.
+
+## Agent Actions
+
+### Proactive sync (when index is stale)
+
+Before relying on the local skill index (e.g. when considering which skill to use, or when listing skills), agents MUST check whether the index is stale and, if so, sync from Neotoma first.
+
+1. **Check freshness:** For stubs under `.cursor/skills/*/SKILL.md`, use the frontmatter field `synced_at` (ISO timestamp set when the stub was last written from Neotoma). If any stub has no `synced_at` or its `synced_at` is older than the refresh interval (e.g. 24 hours), treat the index as stale. If no stubs exist, treat as stale.
+2. **If stale:** Call Neotoma `retrieve_entities` with `entity_type=skill`. For each skill, write or update a **stub** under `.cursor/skills/{slug}/SKILL.md` with:
+   - Frontmatter: `name`, `description`, `triggers`, `entity_id`, and `synced_at` (current time in ISO format)
+   - Body: a single line instructing to fetch full content from Neotoma, e.g. "Content stored in Neotoma. Fetch via `retrieve_entity_snapshot` with the `entity_id` in frontmatter and use the snapshot content as the skill instructions."
+3. Do NOT write full skill content into the repo. Stubs are for discoverability only.
+4. **If not stale:** Use the local index; when using a skill, still fetch content from Neotoma by `entity_id`.
+
+### Fetch and use (before or during non-trivial tasks)
+
+When a non-trivial task matches a skill (from local index or from Neotoma list):
+
+1. If using a local stub: read `entity_id` from frontmatter, then call Neotoma `retrieve_entity_snapshot` with that `entity_id` to get full content. Follow the snapshot content as the skill instructions.
+2. If no local stub: call Neotoma `retrieve_entities` with `entity_type=skill`, filter by task, then for the chosen skill use its `content` or fetch snapshot by `entity_id`. Follow that content.
+3. Never treat stub body or any in-repo skill file as the authoritative skill content; always use content from Neotoma when Neotoma is available.
+
+### Create (when creating skills)
+
+When creating a new skill:
+
+1. Store the skill in Neotoma via `store_structured` with:
+   - `entity_type`: `skill`
+   - `name`: skill name
+   - `description`: skill description
+   - `triggers`: phrases that invoke the skill
+   - `content`: full markdown content of the skill
+2. Use an idempotency key: `skill-{name}` or `skill-{slug}`
+3. Do NOT write full skill content to `.cursor/skills/`. Optionally add or update a stub (metadata + fetch instruction only) so the index stays in sync.
+
+## Scope
+
+- **Source of truth:** Neotoma. Skill content is never stored in the repo.
+- **Repo role:** Only stubs (metadata + instruction to fetch from Neotoma) may live under `.cursor/skills/`. Agents proactively sync the index when stubs are stale (missing or old `synced_at`, e.g. older than 24h).
+- **Fetch when:** Non-trivial tasks; when using a skill, always load content from Neotoma (by entity_id or from retrieve_entities result).
+- **Create when:** User or workflow requests creation of a new skill. Store in Neotoma only; optionally add stub.
+- **Fallback:** If Neotoma MCP unavailable, use local stub or any existing full SKILL.md only for that session; do not write full content to repo as cache.

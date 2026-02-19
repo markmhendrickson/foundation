@@ -164,6 +164,7 @@ When [conditions], agents MUST [action].
 
 - MUST / MUST NOT statements (per RFC 2119)
 - ALWAYS / NEVER statements
+- Emphasize MUST NOT and "No X" where the goal is to define boundaries (e.g., no partial implementations, no marking complete without a required check).
 ```
 
 **Language requirements:**
@@ -172,6 +173,11 @@ When [conditions], agents MUST [action].
 - MUST NOT use vague qualifiers: "maybe", "perhaps", "possibly"
 - MUST NOT use marketing language: "powerful", "seamless", "revolutionary"
 - Use simple, declarative sentences with active voice
+
+**Constraints over instructions:**
+- Prefer stating boundaries (MUST NOT / no X) over reminders ("remember to X").
+- Models generally do good things by default; constraints define their boundaries.
+- Example: "No TODOs, no partial implementations" is more effective than "remember to finish implementations."
 
 ## Multi-Model Format (SHOULD use for new and revised rules)
 
