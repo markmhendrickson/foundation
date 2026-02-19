@@ -1,7 +1,7 @@
 ---
 description: "Ensures agents always implement tests as part of plan execution, not just create skeleton test files"
 globs: ["**/*"]
-alwaysApply: true
+alwaysApply: false
 ---
 # Plan Execution Testing Rule
 

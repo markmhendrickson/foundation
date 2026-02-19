@@ -1,6 +1,6 @@
 ---
 description: "MANDATORY: Neotoma-first data access, Parquet as backup and migration source. Proactive migration from Parquet to Neotoma with verification and cleanup."
-alwaysApply: true
+alwaysApply: false
 ---
 # Neotoma and Parquet Migration Rules
 

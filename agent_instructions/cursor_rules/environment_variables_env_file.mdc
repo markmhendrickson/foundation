@@ -1,5 +1,5 @@
 ---
-alwaysApply: true
+alwaysApply: false
 ---
 
 # Environment Variables from .env File Rule

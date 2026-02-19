@@ -1,6 +1,6 @@
 ---
 description: "Automatically detects feature unit creation intent from user patterns and triggers the feature unit creation workflow"
-alwaysApply: true
+alwaysApply: false
 ---
 # Feature Unit Creation Detection Rule
 

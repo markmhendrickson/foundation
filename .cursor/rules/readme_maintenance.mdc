@@ -1,6 +1,6 @@
 ---
 description: "Ensures that README.md remains synchronized with documentation changes, providing accurate and comprehensive representation of the repository"
-alwaysApply: true
+alwaysApply: false
 ---
 # README Maintenance Rule
 

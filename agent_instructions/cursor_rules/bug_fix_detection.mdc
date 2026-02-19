@@ -1,7 +1,7 @@
 ---
 description: "Automatically detects bug fix intent from user patterns and triggers the bug fix workflow"
 globs: ["**/*"]
-alwaysApply: true
+alwaysApply: false
 ---
 # Bug Fix Detection Rule
 

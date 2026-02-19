@@ -1,6 +1,6 @@
 ---
 description: "Ensures agents stop and request human approval for high-risk changes that could impact system stability, security, or architectural integrity"
-alwaysApply: true
+alwaysApply: false
 ---
 # Risk Management and Hold Points Rule
 

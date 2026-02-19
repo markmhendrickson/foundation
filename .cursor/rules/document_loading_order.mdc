@@ -1,6 +1,6 @@
 ---
 description: "Ensures agents load documentation in the correct order to establish proper context before proceeding with work"
-alwaysApply: true
+alwaysApply: false
 ---
 # Document Loading Order Rule
 

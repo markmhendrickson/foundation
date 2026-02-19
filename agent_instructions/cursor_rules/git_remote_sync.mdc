@@ -1,5 +1,5 @@
 ---
-alwaysApply: true
+alwaysApply: false
 ---
 
 # Git Remote Sync Rule

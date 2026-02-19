@@ -1,6 +1,6 @@
 ---
 description: "Defines how agents MUST document important instructions, constraints, and guidelines in appropriate files"
-alwaysApply: true
+alwaysApply: false
 ---
 # Instruction Documentation Rule
 

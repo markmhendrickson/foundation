@@ -1,6 +1,6 @@
 ---
 description: "Ensures agents enforce all absolute constraints, forbidden patterns, and validation requirements when working on the repository"
-alwaysApply: true
+alwaysApply: false
 ---
 # Agent Constraints Rule
 

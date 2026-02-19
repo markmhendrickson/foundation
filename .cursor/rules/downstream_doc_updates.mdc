@@ -1,6 +1,6 @@
 ---
 description: "Ensures that when upstream documentation is updated, all downstream documentation that depends on it is also updated to maintain consistency"
-alwaysApply: true
+alwaysApply: false
 ---
 # Downstream Documentation Update Rule
 

@@ -1,5 +1,5 @@
 ---
-alwaysApply: true
+alwaysApply: false
 ---
 
 # Prefer CLI Tools Rule

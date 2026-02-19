@@ -1,6 +1,6 @@
 ---
 description: "Ensures agents automatically install required dependencies when needed to fulfill prompts"
-alwaysApply: true
+alwaysApply: false
 ---
 # Dependency Installation Rule
 

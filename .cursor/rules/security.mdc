@@ -1,6 +1,6 @@
 ---
 description: "Prevents accidental commits of private, sensitive, or confidential documentation and data."
-alwaysApply: true
+alwaysApply: false
 ---
 # Security Rule
 

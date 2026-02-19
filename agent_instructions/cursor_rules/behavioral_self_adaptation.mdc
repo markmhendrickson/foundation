@@ -1,7 +1,7 @@
 ---
 description: "Self-adaptive behavior improvement through post-intervention analysis and proactive rule/skill/hook suggestions"
 globs: ["**/*"]
-alwaysApply: true
+alwaysApply: false
 ---
 # Behavioral Self-Adaptation Rule
 

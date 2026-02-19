@@ -1,7 +1,7 @@
 ---
 description: "Autonomous execution rule: proceed without asking except for high-stakes architectural/design ambiguities"
 globs: ["**/*"]
-alwaysApply: true
+alwaysApply: false
 ---
 
 # Autonomous Execution Rule

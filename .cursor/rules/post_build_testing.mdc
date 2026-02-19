@@ -1,6 +1,6 @@
 ---
 description: "Ensures agents always describe manual test cases after completing a release build"
-alwaysApply: true
+alwaysApply: false
 ---
 # Post-Build Testing Rule
 

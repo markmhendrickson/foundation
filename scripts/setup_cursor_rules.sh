@@ -34,6 +34,14 @@ else
     exit 1
 fi
 
+# If repo has selective manifest, use copy script (allowlist install)
+REPO_ROOT="$(pwd -P)"
+if [ -f "$REPO_ROOT/cursor_rules_manifest.json" ]; then
+    print_info "cursor_rules_manifest.json found; using setup_cursor_copies for selective install..."
+    SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+    exec bash "$SCRIPT_DIR/setup_cursor_copies.sh"
+fi
+
 # Check if foundation has cursor rules
 RULES_DIR="$FOUNDATION_DIR/agent_instructions/cursor_rules"
 COMMANDS_DIR="$FOUNDATION_DIR/agent_instructions/cursor_commands"

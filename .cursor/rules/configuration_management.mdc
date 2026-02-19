@@ -1,6 +1,6 @@
 ---
 description: "Ensures configuration files are placed in the correct location based on their scope and purpose"
-alwaysApply: true
+alwaysApply: false
 ---
 # Configuration Management Rule
 
