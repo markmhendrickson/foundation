@@ -1,5 +1,5 @@
 ---
-description: "Ensures agents stop and request human approval for high-risk changes that could impact system stability, security, or architectural integrity"
+description: "Stop and request human approval for high-risk changes (schema, security, foundation docs, architectural). Load when proposing schema, auth, or architectural changes."
 alwaysApply: false
 ---
 # Risk Management and Hold Points Rule

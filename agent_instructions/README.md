@@ -11,9 +11,9 @@ agent_instructions:
   cursor_rules:
     enabled: true
     location: ".cursor/rules/"
-  cursor_commands:
+  cursor_skills:
     enabled: true
-    location: ".cursor/commands/"
+    location: ".cursor/skills/"
   constraints: []
     # Project-specific constraints
     # - "Never commit secrets"
@@ -321,20 +321,22 @@ Ensures agents automatically install required dependencies when needed to fulfil
 
 **When to Customize:** No customization needed - rule applies to all package managers and dependency systems.
 
-## Generic Cursor Commands
+## Foundation Skills (replaced legacy commands)
 
-1. **Commit** (`cursor_commands/commit.md`) - Commit workflow with security audit, nested repo handling, configurable commit message generation
-2. **Create Release** (`cursor_commands/create_release.md`) - Release orchestration workflow for coordinating multiple Feature Units
-3. **Create Feature Unit** (`cursor_commands/create_feature_unit.md`) - Scaffold new Feature Unit with interactive spec creation and dependency validation
-4. **Run Feature Workflow** (`cursor_commands/run_feature_workflow.md`) - Implement Feature Unit following spec-first development flow
-5. **Create Prototype** (`cursor_commands/create_prototype.md`) - Create interactive prototype for UI features (Checkpoint 1)
-6. **Final Review** (`cursor_commands/final_review.md`) - Present completed implementation for approval (Checkpoint 2)
-7. **Analyze** (`cursor_commands/analyze.md`) - Competitive and partnership analysis for any project/URL relative to current repo
-8. **Setup Cursor Copies** (`cursor_commands/setup_cursor_copies.md`) - Set up foundation cursor rules and commands in `.cursor/` (symlinks when foundation is a submodule, copies otherwise)
+Foundation workflows are in `foundation/agent_instructions/cursor_skills/{slug}/SKILL.md` and are copied to `.cursor/skills/` by setup. Load the skill when the trigger matches (see router rule).
 
-### Commit Command Details
+1. **commit** - Commit workflow with security audit, nested repo handling, configurable commit message generation
+2. **create-release** - Release orchestration workflow for coordinating multiple Feature Units
+3. **create-feature-unit** - Scaffold new Feature Unit with interactive spec creation and dependency validation
+4. **run-feature-workflow** - Implement Feature Unit following spec-first development flow
+5. **create-prototype** - Create interactive prototype for UI features (Checkpoint 1)
+6. **final-review** - Present completed implementation for approval (Checkpoint 2)
+7. **analyze** - Competitive and partnership analysis for any project/URL relative to current repo
+8. **setup-cursor-copies** - Set up foundation cursor rules and skills in `.cursor/` (copies from foundation; skills replace legacy commands)
 
-**File:** `cursor_commands/commit.md`
+### Commit skill details
+
+**Skill:** `commit` (`.cursor/skills/commit/SKILL.md` or `foundation/agent_instructions/cursor_skills/commit/SKILL.md`)
 
 Comprehensive commit workflow with security audit and testing.
 
@@ -366,9 +368,9 @@ development:
 
 **When to Customize:** Customize commit message format, add repository-specific commit message sections, adjust change categorization logic.
 
-### Analyze Command Details
+### Analyze skill details
 
-**File:** `cursor_commands/analyze.md`
+**Skill:** `analyze` (`.cursor/skills/analyze/SKILL.md` or `foundation/agent_instructions/cursor_skills/analyze/SKILL.md`)
 
 Systematic competitive and partnership analysis for any project.
 
@@ -414,7 +416,7 @@ Use the foundation installation script:
 ./foundation/scripts/setup_cursor_rules.sh
 ```
 
-The setup script creates **symlinks** from `.cursor/rules/` and `.cursor/commands/` to foundation versions, ensuring:
+The setup script copies foundation rules and **copies foundation skills** into `.cursor/skills/`, ensuring:
 - Single source of truth (foundation)
 - Automatic updates when foundation is updated
 - Cursor agents can still auto-load them
@@ -436,10 +438,8 @@ ln -s ../../foundation/agent_instructions/cursor_rules/downstream_doc_updates.md
 ln -s ../../foundation/agent_instructions/cursor_rules/instruction_documentation.md foundation-instruction_documentation.md
 ln -s ../../foundation/agent_instructions/cursor_rules/configuration_management.md foundation-configuration_management.md
 
-# Create symlinks for generic commands (with "foundation-" prefix)
-cd ../commands
-ln -s ../../foundation/agent_instructions/cursor_commands/commit.md foundation-commit.md
-# Add other commands as needed
+# Foundation skills are copied (not symlinked) by setup_cursor_copies.sh from foundation/agent_instructions/cursor_skills/
+# Run ./foundation/scripts/setup_cursor_copies.sh to refresh .cursor/skills/
 ```
 
 Installation script removes all existing "foundation-" prefixed symlinks before creating new ones, ensuring a clean refresh. Preserves existing regular files (non-symlinks) to allow customizations. To customize a generic rule, remove the symlink and create your own file.
@@ -517,12 +517,10 @@ agent_instructions:
       - dependency_installation
     custom_rules: []  # Your repo-specific rules
 
-  cursor_commands:
+  cursor_skills:
     enabled: true
-    location: ".cursor/commands/"
-    generic_commands:
-      - commit
-    custom_commands: []  # Your repo-specific commands
+    location: ".cursor/skills/"
+    # Foundation skills (commit, create-release, fix-feature-bug, etc.) are copied from foundation/agent_instructions/cursor_skills/
 ```
 
 ## Example: Project-Specific Agent Instructions

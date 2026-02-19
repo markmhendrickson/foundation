@@ -122,7 +122,7 @@ See `foundation/agent_instructions/cursor_rules/behavioral_self_adaptation.mdc` 
 foundation/
 ├── agent_instructions/   # AI agent instructions (Cursor rules & commands)
 │   ├── cursor_rules/     # Generic Cursor rules
-│   ├── cursor_commands/  # Generic Cursor commands
+│   ├── cursor_skills/    # Foundation skills (replaced legacy commands)
 │   └── README.md
 ├── development/          # Development workflow and branch strategy
 │   ├── workflow.md

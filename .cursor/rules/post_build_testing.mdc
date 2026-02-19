@@ -1,5 +1,5 @@
 ---
-description: "Ensures agents always describe manual test cases after completing a release build"
+description: "Describe manual test cases after completing a release build. Load when finishing a release build or describing verification steps."
 alwaysApply: false
 ---
 # Post-Build Testing Rule

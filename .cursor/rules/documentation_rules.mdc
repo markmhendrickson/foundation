@@ -1,5 +1,5 @@
 ---
-description: "Rules for creating and maintaining documentation files to minimize context window usage while maintaining clarity"
+description: "Create and maintain documentation to minimize context usage while keeping clarity. Load when creating or editing documentation files."
 alwaysApply: false
 ---
 # Documentation Rules

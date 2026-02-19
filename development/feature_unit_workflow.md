@@ -418,6 +418,6 @@ Draft → In Progress → Review → Completed
 - `foundation/development/templates/feature_unit_spec_template.md` — Spec template
 - `foundation/development/templates/manifest_template_simple.yaml` — Simple manifest
 - `foundation/development/templates/manifest_template_extended.yaml` — Extended manifest
-- `foundation/agent_instructions/cursor_commands/create_feature_unit.md` — Creation command
-- `foundation/agent_instructions/cursor_commands/run_feature_workflow.md` — Implementation command
+- `foundation/agent_instructions/cursor_skills/create-feature-unit/SKILL.md` — Create Feature Unit skill
+- `foundation/agent_instructions/cursor_skills/run-feature-workflow/SKILL.md` — Run Feature Workflow skill
 

@@ -1,5 +1,5 @@
 ---
-description: "Ensures configuration files are placed in the correct location based on their scope and purpose"
+description: "Place configuration in correct location by scope (repo foundation-config.yaml vs foundation repo-adapters). Load when adding or moving config."
 alwaysApply: false
 ---
 # Configuration Management Rule

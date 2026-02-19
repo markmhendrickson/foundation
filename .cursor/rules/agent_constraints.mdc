@@ -1,5 +1,5 @@
 ---
-description: "Ensures agents enforce all absolute constraints, forbidden patterns, and validation requirements when working on the repository"
+description: "Enforce absolute constraints, forbidden patterns, and validation requirements. Load when validating work or when task touches architecture, data, or security."
 alwaysApply: false
 ---
 # Agent Constraints Rule

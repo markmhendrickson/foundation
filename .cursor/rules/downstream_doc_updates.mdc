@@ -1,5 +1,5 @@
 ---
-description: "Ensures that when upstream documentation is updated, all downstream documentation that depends on it is also updated to maintain consistency"
+description: "When upstream documentation is updated, update all downstream docs that depend on it. Load when editing docs that other docs reference."
 alwaysApply: false
 ---
 # Downstream Documentation Update Rule

@@ -189,7 +189,7 @@ Before creating a Release, verify:
 
 2. **If yes**, immediately:
    - Load `foundation/development/release_workflow.md` (this document)
-   - Load `foundation/agent_instructions/cursor_commands/create_release.md` (or `.cursor/commands/foundation_create_release.md` if symlinked)
+   - Load skill `create-release` (`.cursor/skills/create-release/SKILL.md` or `foundation/agent_instructions/cursor_skills/create-release/SKILL.md`)
    - Follow Step 0 (Checkpoint 0) of the release workflow
    - Create release structure in `docs/releases/in_progress/{release_id}/` with:
      - `release_plan.md` (overview and coordination)
