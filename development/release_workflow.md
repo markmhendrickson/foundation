@@ -1039,6 +1039,7 @@ g. **Cleanup worker agents** (terminate completed agents)
 - MCP protocol errors
 - RLS security issues
 - Service startup failures
+- Shipping known npm/Socket.dev vulnerabilities or supply-chain issues
 
 **Agent Actions:**
 
@@ -1088,6 +1089,19 @@ g. **Cleanup worker agents** (terminate completed agents)
      rm -rf dist/ && npm run build:server
      ```
      - MUST succeed, dist/ directory created
+   
+   - **Bundlephobia (pre-release):**
+     ```bash
+     npm run check:bundlephobia
+     ```
+     - Run for the version you are about to publish (or after publish) to catch Bundlephobia build errors
+     - For Node-only packages with `"browser": false`, BuildError is expected and the check passes
+     - Optional: run `npm run check:bundlephobia <version>` to check a specific version
+   
+   - **Socket / npm package security (pre-release):**
+     - Run `npm audit` (and `npm audit --omit=dev` for production-only view). MUST resolve all vulnerabilities before release; use overrides or upgrades as needed.
+     - Review [Socket.dev package page](https://socket.dev/npm/package/neotoma) for the release version: check Alerts and Overview for supply chain, quality, and vulnerability issues. Resolve or document any open issues before sign-off.
+     - Ensures published package does not ship known CVEs or Socket-flagged risks.
    
    - **MCP Server Startup:**
      ```bash
@@ -1287,15 +1301,38 @@ g. **Cleanup worker agents** (terminate completed agents)
    - Run deployment scripts or guide user through manual steps
    - Verify deployment success (health checks, smoke tests)
 
-3. **Update Release status:**
+3. **Create Git tag and GitHub Release (REQUIRED):**
+   - **REQUIRED:** Ensure a version tag exists for the release (for example `vX.Y.Z`).
+   - **REQUIRED:** Create or update a GitHub Release entry for that tag before marking the release complete.
+   - **REQUIRED:** Release notes MUST be human-authored and human-readable; auto-generated notes alone are not sufficient.
+   - **REQUIRED:** Release notes MUST describe all code changes in the release range (`previous_tag..current_tag`), including user-visible behavior and internal/refactor/test-only changes.
+   - **REQUIRED:** Release notes MUST include, at minimum:
+     - `What Changed` (grouped by subsystem/area)
+     - `Behavior Changes` (what users/operators will observe)
+     - `Internal Changes` (refactors, architecture, infra, tooling)
+     - `Fixes` (bug fixes with impact)
+     - `Tests and Validation`
+     - `Breaking Changes` (or explicit `None`)
+   - **REQUIRED:** Validate coverage of all merged code changes before publishing release notes. If any commit or code area in the release range is missing from notes, block completion and update notes.
+   - If the release tag does not exist yet, create it from the approved release commit and push it.
+   - If the GitHub Release entry is missing, create it with curated notes from a checked-in release notes file (for example `docs/releases/vX.Y.Z/release_notes.md`).
+   - Suggested commands:
+     ```bash
+     git tag vX.Y.Z <release_commit_sha>
+     git push origin vX.Y.Z
+     gh release create vX.Y.Z --title "vX.Y.Z" --notes-file docs/releases/vX.Y.Z/release_notes.md
+     ```
+   - **BLOCK completion** if GitHub Release creation fails or if release note coverage is incomplete.
+
+4. **Update Release status:**
    - Mark Release as `deployed`
    - **Record Deployment Date** in `status.md` (current date/time)
 
-4. **Setup post-release monitoring:**
+5. **Setup post-release monitoring:**
    - Verify metrics and alerts are active
    - Start monitoring key metrics from Release acceptance criteria
 
-5. **If marketed release:**
+6. **If marketed release:**
    - Proceed to Step 6 (Post-Release Marketing & Validation)
    - **If not_marketed release:**
      - **Record Completion Date** in `status.md` (current date/time)
@@ -1912,7 +1949,7 @@ marketing:
 - **Timeline:** Day 0
 - **Channels:** Product Hunt, Twitter, Email, Blog, Hacker News
 - **Messaging:** "[Release] is live! [Key features]. Try it now."
-- **CTA:** "Get Started" → Signup flow
+- **CTA:** "Quick Start" → Signup flow
 - **Metrics:** Signups, Press mentions, Social shares
 
 #### Paid Acquisition
