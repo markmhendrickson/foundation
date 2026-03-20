@@ -428,7 +428,7 @@ Before completing analysis:
 1. **Phase 1: Discover Context**
    - Load `docs/foundation/core_identity.md`
    - Extract: "Neotoma" as repo name
-   - Extract: "Truth Layer for AI Memory" as positioning
+   - Extract: "State Layer for AI Memory" as positioning
    - Extract: Privacy-first, Deterministic, Cross-platform as differentiators
 
 2. **Phase 2: Research Target**

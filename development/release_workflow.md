@@ -224,7 +224,7 @@ Before creating a Release, verify:
    - Present a concise, structured summary to the user covering:
      - What this Release will and will NOT change (in plain language).
      - Which subsystems and schema types are in scope.
-     - The critical constraints that MUST NOT be violated (determinism, schema-first, no LLM extraction in Truth Layer, etc.).
+     - The critical constraints that MUST NOT be violated (determinism, schema-first, no LLM extraction in State Layer, etc.).
    - Ask the user explicitly:
      - "Does this match your current mental model of this Release? (yes/no)"
      - "What feels off, missing, or over-scoped compared to what you actually want?"
