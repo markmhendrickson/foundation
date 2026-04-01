@@ -435,7 +435,7 @@ Before creating a Release, verify:
    **Process:**
 
    a. **Identify Recruitment Channels:**
-   - Review ICP profiles and priority tiers (`docs/specs/ICP_PRIORITY_TIERS.md`, `docs/specs/ICP_PROFILES.md`)
+   - Review ICP profiles and priority tiers (`docs/icp/primary_icp.md`, `docs/icp/profiles.md`)
    - Map discovery plan participant requirements to acquisition channels:
      - **AI-Native Individual Operators**: Twitter/X, Indie Hackers, Hacker News, AI tool communities (r/ChatGPT, r/ClaudeAI, Discord), GitHub, existing network
      - **High-Context Knowledge Workers**: LinkedIn, productivity communities, professional forums, existing network
@@ -1306,6 +1306,9 @@ g. **Cleanup worker agents** (terminate completed agents)
    - **REQUIRED:** Create or update a GitHub Release entry for that tag before marking the release complete.
    - **REQUIRED:** Release notes MUST be human-authored and human-readable; auto-generated notes alone are not sufficient.
    - **REQUIRED:** Release notes MUST describe all code changes in the release range (`previous_tag..current_tag`), including user-visible behavior and internal/refactor/test-only changes.
+   - **REQUIRED:** Public release notes MUST optimize for a reader deciding whether to upgrade. Prefer plain language, explain why a change matters, and group by user impact rather than by file path or raw diff inventory.
+   - **REQUIRED:** Public release notes MUST be concise enough to scan. Use a short opening summary and short explanatory bullets or paragraphs, not an exhaustive changelog dump.
+   - **REQUIRED:** Save deeper rationale, implementation history, exhaustive inventories, and storytelling for a separate artifact such as a blog post, engineering write-up, or internal release-prep note. Do not overload the public GitHub/npm notes with that material.
    - **REQUIRED:** Release notes MUST include, at minimum:
      - `What Changed` (grouped by subsystem/area)
      - `Behavior Changes` (what users/operators will observe)

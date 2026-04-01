@@ -1,5 +1,5 @@
 ---
-description: "Automatically detects release intent from user patterns and triggers the release creation workflow. Load when user mentions release, version, or launch."
+description: "Automatically detects release intent from user patterns and triggers the release creation workflow. Load when user mentions release, version, launch, or preparing a release."
 alwaysApply: false
 ---
 # Release Detection Rule
@@ -12,6 +12,7 @@ Configuration is read from `foundation-config.yaml`.
 
 When a user mentions any of the following patterns, automatically detect release intent:
 
+- "prepare a release" / "prepare release" / "prep release" / "release preparation" — **must** follow comprehensive GitHub/npm release notes (see below)
 - "new release"
 - "internal release"
 - "create release"
@@ -23,6 +24,16 @@ When a user mentions any of the following patterns, automatically detect release
 - "v0.X.Y release"
 - Version numbers in release context (e.g., "v1.1.0", "v2.0.0")
 - Release-related planning discussions
+
+## Prepare a release (comprehensive notes)
+
+When triggers include **prepare a release** (or **prepare release**, **prep release**, **release preparation**):
+
+1. Load **`.cursor/skills/create-release/SKILL.md`** and follow the section **Prepare a release (comprehensive GitHub and npm notes)**.
+2. Load **`docs/developer/github_release_process.md`** (repository root; Neotoma path) for wrap, supplement location, and `release-notes:render`.
+3. Do **not** satisfy the request with only auto-generated commit lists; curated `github_release_supplement.md` plus `foundation/development/release_workflow.md` Step 5 required sections are mandatory.
+
+Then continue with Step 1 (confirmation) if a full in-repo release plan is also needed.
 
 ## Agent Actions
 
@@ -40,13 +51,15 @@ If context suggests a release (mentions "release", version numbers, "split out",
    - Release type hints (internal/external, marketed/not_marketed)
    - Scope hints (what features/FUs are mentioned)
 
-3. **Ask for confirmation:**
+3. **Ask for confirmation** (unless below applies):
    ```
    I see you're requesting a new release. Should I create a release plan in 
    `{configured_releases_directory}/in_progress/{release_id}/` following the release workflow? (yes/no)
    ```
    
    If release ID was detected, include it in the path.
+
+   **Prepare-a-release exception:** If the user’s request is clearly **prepare a release** / **prepare release** / **prep release** / **release preparation** (curated GitHub/npm notes, supplement, render), **do not** block on this confirmation for the notes workflow — execute **Prepare a release (comprehensive notes)** first. Optionally ask whether they also want a full `release_plan.md` tree in `docs/releases/in_progress/`.
 
 4. **Exception handling:**
    - If user explicitly says "just a spec document" or "specification only" → create a spec document instead
@@ -58,7 +71,7 @@ If context suggests a release (mentions "release", version numbers, "split out",
 
 1. **Load required documents:**
    - `foundation/development/release_workflow.md` (primary workflow)
-   - Skill `create-release` (`.cursor/skills/create-release/SKILL.md` or `foundation/agent_instructions/cursor_skills/create-release/SKILL.md`)
+   - Skill `create-release` (`.cursor/skills/create-release/SKILL.md` or `foundation/agent_instructions/cursor_skills/create-release/SKILL.md`); if the user asked to **prepare a release**, follow that skill’s **Prepare a release (comprehensive GitHub and npm notes)** and `docs/developer/github_release_process.md`
    - `foundation/development/feature_unit_workflow.md` (for FU creation, if feature units enabled)
    - Repository-specific execution instructions (if they exist)
 
