@@ -220,7 +220,7 @@ Before creating a Release, verify:
 1. **Alignment Check (Spec vs Mental Model):**
 
    Before doing any planning work, the agent MUST:
-   - Load and summarize the **canonical specs** relevant to this Release (e.g., `NEOTOMA_MANIFEST.md`, `MVP_OVERVIEW.md`, `GENERAL_REQUIREMENTS.md`, `MVP_FEATURE_UNITS.md` for MVP).
+   - Load and summarize the **canonical specs** relevant to this Release (e.g., `NEOTOMA_MANIFEST.md`, `GENERAL_REQUIREMENTS.md`, release-specific specs, and relevant Feature Unit specs).
    - Present a concise, structured summary to the user covering:
      - What this Release will and will NOT change (in plain language).
      - Which subsystems and schema types are in scope.
@@ -815,7 +815,7 @@ g. **Cleanup worker agents** (terminate completed agents)
 
 5. **(Marketed / High-Risk Releases) Run Spec-Compliance Review Stage:**
    - **Scope:** Marketed releases (e.g., v1.0.0) and high-risk releases (crypto/privacy: v2.0.0, v2.1.0) MUST run spec-compliance checks after integration tests and coverage, before marking `ready_for_deployment`.
-   - **Artifacts:** `release_plan.md`, `manifest.yaml`, `acceptance_criteria.md`, `integration_tests.md`, `status.md`, and relevant specs (`MVP_OVERVIEW.md`, `MCP_SPEC.md`, subsystem docs).
+   - **Artifacts:** `release_plan.md`, `manifest.yaml`, `acceptance_criteria.md`, `integration_tests.md`, `status.md`, and relevant specs (`MCP_SPEC.md`, subsystem docs, release-specific specs).
    - **Execution:** Call `scripts/spec_compliance_check.ts --release vX.Y.Z` to run multi-agent, multi-model spec-compliance review.
    - **Outputs:** `docs/releases/vX.Y.Z/spec_compliance_report.json` and `spec_compliance_report.md` with findings and severities (P0–P3).
    - **Policy:** Any unresolved P0 findings MUST be addressed or explicitly deferred with an owner-approved decision log entry before the release can be marked `ready_for_deployment`.
@@ -851,7 +851,7 @@ g. **Cleanup worker agents** (terminate completed agents)
 1. **For each FU marked as "completed" in the release:**
 
    a. **Load FU specification:**
-   - Load spec from `docs/feature_units/completed/FU-XXX/FU-XXX_spec.md` or `docs/specs/MVP_FEATURE_UNITS.md`
+   - Load spec from `docs/feature_units/completed/FU-XXX/FU-XXX_spec.md` or `docs/feature_units/in_progress/FU-XXX/FU-XXX_spec.md`
    - Extract all "MUST", "MUST NOT", "REQUIRED", and "SHALL" requirements
 
    b. **Generate Implementation Decision Log:**
@@ -2014,7 +2014,7 @@ Load when:
 - `docs/feature_units/standards/execution_instructions.md` — FU execution flow
 - `docs/feature_units/standards/multi_agent_orchestration.md` — Multi-agent execution (if `execution_strategy.type: "multi_agent"` in manifest)
 - `docs/feature_units/standards/discovery_process.md` — Discovery process (for Step 0.5)
-- `docs/specs/MVP_FEATURE_UNITS.md` — For MVP Release (first release)
+- `docs/feature_units/completed/` and `docs/feature_units/in_progress/` — Feature Unit specs
 
 ### Constraints Agents Must Enforce
 
@@ -2106,7 +2106,7 @@ Planning → Discovery → In Progress → In Testing → Ready for Deployment �
 
 **MVP as First Release:**
 
-The MVP is treated as Release `v1.0.0`. The existing `docs/specs/MVP_EXECUTION_PLAN.md` and `docs/specs/MVP_FEATURE_UNITS.md` serve as the Release plan and FU inventory for `v1.0.0`.
+Historical MVP planning artifacts are archived in `docs/releases/archived/mvp_planning/`. Current releases should use release-specific plans and Feature Unit specs under `docs/feature_units/`.
 
 **Future Releases:**
 
