@@ -1099,7 +1099,7 @@ g. **Cleanup worker agents** (terminate completed agents)
    
    - **MCP Watch Mode:**
      ```bash
-     npm run dev:api
+     npm run dev:server:tunnel
      ```
      - MUST compile without errors
      - Verify watch mode detects changes
