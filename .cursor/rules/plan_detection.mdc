@@ -1,0 +1,74 @@
+---
+description: "Automatically detects plan creation intent from user patterns and triggers the plan creation workflow. Load when user mentions new plan, new feature, or planning-related discussions."
+alwaysApply: false
+---
+# Plan Creation Detection Rule
+
+**Reference:** `foundation/development/plan_workflow.md` — Complete workflow
+
+This is a foundation rule. Configuration is read from `foundation-config.yaml`.
+
+## Trigger Patterns
+
+When a user mentions any of the following patterns, automatically detect plan creation intent:
+
+- "create plan" / "new plan" / "add plan"
+- "create feature" / "new feature" / "implement feature"
+- "we need to" / "we should" / "let's build" (when describing new work)
+- Planning discussions about new functionality or changes
+- Requests to track a decision, goal, or initiative
+
+## Agent Actions
+
+### Step 1: Detection and Confirmation
+
+If context suggests plan creation:
+
+1. **Load configuration:**
+   - Read `foundation-config.yaml` to get plans settings
+   - Check if `plans.enabled` is true
+
+2. **Extract plan information** from context:
+   - Title or description of what to plan
+   - Priority hints (P0/P1/P2/P3)
+   - Scope hints (what functionality is mentioned)
+   - Related entities (releases, objectives, other plans)
+
+3. **Ask for confirmation:**
+   ```
+   I see you're describing new work. Should I create a plan in Neotoma
+   following the plan creation workflow? (yes/no)
+   ```
+
+4. **Exception handling:**
+   - If user says "no" → do not proceed
+   - If user says "just a note" → store as a `note` entity instead
+
+### Step 2: Execute Plan Creation Workflow
+
+**If user confirms (yes):**
+
+1. **Load required documents:**
+   - `foundation/development/plan_workflow.md` (primary workflow)
+   - Skill `create-plan` (`.cursor/skills/create-plan/SKILL.md`)
+
+2. **Follow the plan creation workflow:**
+   - Collect required fields (title, description, scope, out_of_scope, success_criteria)
+   - Run alignment check
+   - Store plan entity in Neotoma
+   - Create relationships to related entities
+
+## Constraints
+
+- Do NOT proceed without user confirmation — always ask before creating plans
+- Do NOT create plans as markdown files in a repo directory — store in Neotoma
+- Plans are mirrored to `plans/` automatically; do not edit mirror files directly
+- Always get user confirmation that the plan summary matches their intent
+
+## Integration with Commands
+
+This rule complements the explicit `/create-plan` command:
+- **Rule-based detection:** Triggers automatically when patterns are detected
+- **Explicit command:** User can call `/create-plan` directly
+
+Both paths lead to the same workflow execution.
