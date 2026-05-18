@@ -59,7 +59,7 @@ Before writing any code, store the plan in Neotoma.
    - `DEPENDS_ON` for plans this plan requires
    - `INFORMED_BY` for issues, feedback, or research that motivated the plan
 
-5. **Mirror refresh** (optional). The `neotoma-plans` mirror profile writes the plan to `plans/{title}.md` automatically on every write. Run `neotoma mirror rebuild --profile neotoma-plans` to force a full refresh.
+5. **Mirror refresh** (optional). The `neotoma-plans` mirror profile writes the plan to `docs/plans/{title}.md` automatically on every write. Run `neotoma mirror rebuild --profile neotoma-plans` to force a full refresh.
 
 ## Checkpoint 1 — Mid-execution review
 
@@ -95,7 +95,7 @@ Plans configuration in `foundation-config.yaml`:
 plans:
   enabled: true
   mirror_profile: "neotoma-plans"   # Mirror profile ID in canonical_mirror.ts defaults
-  mirror_output_path: "plans"        # Repo-relative path mirrored files are written to
+  mirror_output_path: "docs/plans"        # Repo-relative path mirrored files are written to
 ```
 
 ## Related documents
