@@ -1,5 +1,14 @@
 # Release Workflow
 
+> **Status (2026-07-30):** this document describes the file-based
+> Release/FeatureUnit/checkpoint model. No consuming repo currently runs it —
+> `neotoma/docs/releases/in_progress/` retains release *artifacts*
+> (`github_release_supplement.md`, `security_review.md`, `test_coverage_review.md`)
+> but not the `manifest.yaml` / `execution_schedule.md` orchestration, whose only
+> instances date to v0.3.11 (March 2026). `development/plan_workflow.md` replaced
+> the equivalent machinery for plans with Neotoma entities. Retained as reference
+> for the surviving artifact formats; treat the orchestration sections as historical.
+
 _(Orchestrating Multiple Feature Units into Cohesive Releases)_
 
 ---
@@ -703,7 +712,7 @@ d. **Continuous Discovery (during batch execution):**
 e. **Update Release status:**
 
 - Mark batch as `completed` in `status.md`
-- **Check and update checkpoints** (see `.cursor/rules/checkpoint_management.md`):
+- **Check and update checkpoints**:
   - Check `manifest.yaml` for `checkpoint_{id}_after_batch` triggers
   - If current batch ID matches a checkpoint trigger → mark checkpoint as `completed` in `status.md`
   - Add completion notes: batch ID, completed FUs, validation summary
@@ -743,7 +752,7 @@ g. **Cleanup worker agents** (terminate completed agents)
      - Follow `docs/feature_units/standards/release_report_generation.md` for complete structure
      - **Section 9 (Testing Guidance) is REQUIRED** and MUST include all manual test cases from `integration_tests.md`
      - Extract all test definitions from `integration_tests.md`
-     - Format each test as user-facing manual test instructions (see `.cursor/rules/post_build_testing.md`)
+     - Format each test as user-facing manual test instructions
      - Include step-by-step actions and expected results for each test
      - Mark all manual test cases as **REQUIRED BEFORE DEPLOYMENT**
      - Report must be complete before transitioning to `in_testing` status
@@ -1149,7 +1158,7 @@ g. **Cleanup worker agents** (terminate completed agents)
      - Format as user-facing manual test instructions
      - Include step-by-step actions and expected results
      - Mark all manual test cases as **REQUIRED BEFORE DEPLOYMENT**
-     - See `.cursor/rules/post_build_testing.md` for formatting requirements
+     - Keep the formatting consistent with the surrounding test entries
    - **If exists:** Verify Section 9 (Testing Guidance) is complete and includes all tests from `integration_tests.md`
    - **Note:** Report should have been generated in Step 1.4 after all batches completed. If missing, generate it now before proceeding.
 

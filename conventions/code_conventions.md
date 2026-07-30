@@ -21,7 +21,7 @@ This document covers:
 
 This document does NOT cover:
 
-- Documentation conventions (see `foundation/conventions/documentation-standards.md`)
+- Documentation conventions (see `foundation/conventions/documentation_standards.md`)
 - Testing patterns (see `foundation/testing/testing-standard.md`)
 - Architectural decisions (see project-specific architecture docs)
 - Error handling patterns (see project-specific error handling docs)

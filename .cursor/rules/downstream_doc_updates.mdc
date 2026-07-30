@@ -4,7 +4,7 @@ alwaysApply: false
 ---
 # Downstream Documentation Update Rule
 
-**Reference:** `foundation/conventions/documentation-standards.md` — Documentation standards
+**Reference:** `foundation/conventions/documentation_standards.md` — Documentation standards
 
 Ensures that when upstream documentation is updated, all downstream documentation that depends on it is also updated to maintain consistency across the documentation tree.
 

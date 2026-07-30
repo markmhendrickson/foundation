@@ -4,7 +4,7 @@ alwaysApply: false
 ---
 # Agent Constraints Rule
 
-**Reference:** `foundation/conventions/documentation-standards.md` - Documentation standards
+**Reference:** `foundation/conventions/documentation_standards.md` - Documentation standards
 
 ## Purpose
 
@@ -23,7 +23,6 @@ This document defines:
 This document does NOT cover:
 - Repository-specific constraints (configured in `foundation-config.yaml`)
 - Risk management and hold points (see `risk_management.md`)
-- Document loading order (see `document_loading_order.md`)
 
 ## Configuration
 
@@ -192,7 +191,7 @@ Before completing any work, verify:
 
 ## Related Documents
 
-- `foundation/conventions/documentation-standards.md` - Documentation standards
+- `foundation/conventions/documentation_standards.md` - Documentation standards
 - `foundation-config.yaml` - Repository-specific configuration
 - Repository foundation docs (e.g., `docs/foundation/philosophy.md`) - Core philosophy and architectural invariants
 - Repository architecture docs (e.g., `docs/architecture/architecture.md`) - System architecture

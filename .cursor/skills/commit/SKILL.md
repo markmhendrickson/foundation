@@ -729,7 +729,7 @@ fi
 
 If final security check passes, proceed to git commit with the comprehensive commit message and push to origin. **If push is rejected** (remote has new commits): run `git pull --rebase origin <current_branch>` (or `git pull origin <current_branch> --no-rebase --no-edit`), resolve any conflicts, then `git push origin HEAD` again. Always reconcile and retry before reporting push failure.
 
-**WORKTREE DETECTION:** Follow the Worktree Rule (`.cursor/rules/foundation_worktree_env.md` or `foundation/agent_instructions/cursor_rules/worktree_env.md`) to restrict all commit activity to the current worktree.
+**WORKTREE DETECTION:** Restrict all commit activity to the current worktree.
 
 **COMMIT MESSAGE DISPLAY**: After successfully committing and pushing, always display the full commit message to the user by running `git log -1 --pretty=format:"%B"` and showing the output. This allows the user to review what was committed.
 

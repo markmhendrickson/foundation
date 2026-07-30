@@ -260,14 +260,10 @@ agent_instructions:
     location: ".cursor/rules/"
     generic_rules:
       - security
-      - worktree_env
       - readme_maintenance
       - downstream_doc_updates
-      - instruction_documentation
       - feature_unit_detection
       - release_detection
-      - checkpoint_management
-      - post_build_testing
       - bug_fix_detection
     custom_rules: []  # Repo-specific rules
   cursor_commands:

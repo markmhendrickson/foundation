@@ -105,7 +105,7 @@ vim foundation/security/README.md
 
 ### Documentation
 
-- Follow documentation standards in `conventions/documentation-standards.md`
+- Follow documentation standards in `conventions/documentation_standards.md`
 - Use clear, directive language
 - Include examples
 - Update README.md when adding new components
