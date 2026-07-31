@@ -169,7 +169,7 @@ This command runs the foundation setup script (`foundation/scripts/setup_cursor_
 - `.cursor/rules/` contains **symlinks** to `foundation/agent_instructions/cursor_rules/`. `.cursor/skills/` is populated from `foundation/agent_instructions/cursor_skills/` (skills replace legacy commands). Updates to foundation apply when you re-run setup.
 
 **When foundation is not a submodule (copies):**
-- `.cursor/rules/` and `.cursor/skills/` contain **independent copies** of foundation rules and skills (e.g. `security.mdc`, `worktree_env.mdc`, and full skill workflows). Re-run to refresh after foundation updates.
+- `.cursor/rules/` and `.cursor/skills/` contain **independent copies** of foundation rules and skills (e.g. `security.mdc` and full skill workflows). Re-run to refresh after foundation updates.
 
 **Note:** Repository rules from `docs/` are handled per `setup_cursor_rules` (symlinks when submodule) or copied in copy mode. Source files in `docs/` remain the source of truth.
 
@@ -221,7 +221,7 @@ Foundation workflows are in `foundation/agent_instructions/cursor_skills/`. If p
 
 - `foundation/scripts/setup_cursor_copies.sh` - Entry script (delegates to symlink or copy logic)
 - `foundation/scripts/setup_cursor_rules.sh` - Symlink implementation (used when foundation is submodule)
-- `foundation/agent_instructions/README.md` - Cursor rules and commands documentation
+- `foundation/.cursor/rules/` - canonical foundation rules
 - `foundation/README.md` - Foundation overview and installation
 
 ## Notes

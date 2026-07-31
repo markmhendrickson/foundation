@@ -134,7 +134,7 @@ foundation/
 │   └── templates/        # Feature Unit templates
 ├── conventions/          # Code and documentation conventions
 │   ├── code-conventions.md
-│   ├── documentation-standards.md
+│   ├── documentation_standards.md
 │   ├── testing-conventions.md
 │   └── naming-patterns.yaml
 ├── security/             # Security practices
@@ -284,10 +284,8 @@ development:
 - **[Testing Conventions](conventions/testing-conventions.md)** - Integration test quality standards
 - **[Documentation Standards](conventions/documentation_standards.md)** - Doc structure and style
 - **[Security Rules](security/security_rules.md)** - Security best practices
-- **[Agent Instructions](agent_instructions/README.md)** - Cursor rules and commands for AI assistants, including self-adaptive learning
   - **[Behavioral Self-Adaptation](agent_instructions/cursor_rules/behavioral_self_adaptation.mdc)** - Proactive rule/skill/hook suggestions from interventions
 - **[Strategy Frameworks](strategy/README.md)** - Product discovery and competitive analysis (optional)
-- **[Tooling](tooling/README.md)** - Development tooling configuration (optional)
 - **[Validation Systems](validation/README.md)** - Spec compliance and doc dependency validation (optional)
 - **[Contributing](CONTRIBUTING.md)** - How to contribute to foundation
 
@@ -372,7 +370,7 @@ A: Yes, enable/disable components in `foundation_config.yaml`. Most components a
 A: Feature Units are a spec-first development workflow where changes are fully specified before implementation. See `foundation/development/feature_unit_workflow.md`.
 
 **Q: How do I set up agent instructions?**  
-A: Run `./foundation/scripts/setup_cursor_rules.sh` to create symlinks from `.cursor/` to foundation rules and commands. See `foundation/agent_instructions/README.md`.
+A: Foundation rules live in `foundation/.cursor/rules/`. Consuming repos symlink or copy from there; there is no setup script (the former `setup_cursor_rules.sh` was removed in c3255ba).
 
 ## Support
 

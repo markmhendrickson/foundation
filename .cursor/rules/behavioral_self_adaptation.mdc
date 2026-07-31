@@ -4,7 +4,11 @@ alwaysApply: false
 ---
 # Behavioral Self-Adaptation Rule
 
-**Reference:** `foundation/agent_instructions/cursor_rules/instruction_documentation.mdc` - Rule creation standards
+**Reference:** durable agent rules are authored as Neotoma `agent_policy` entities
+(canonical), never as harness rule files. See Neotoma agent_policy
+`ent_82b64b6c4104843e43853666`. This replaces the former
+`instruction_documentation.mdc`, which named a directory removed in c3255ba and
+directed rule-writing into `.cursor/rules/` — the opposite of the current policy.
 
 ## Purpose
 
@@ -21,7 +25,7 @@ This document defines:
 This document does NOT cover:
 - Explicit instruction capture (see `prompt_integration_rules.mdc`)
 - Risk management hold points (see `risk_management.mdc`)
-- Rule creation standards (see `instruction_documentation.mdc`)
+- Rule creation standards: Neotoma `agent_policy` (`ent_82b64b6c4104843e43853666`)
 
 ## Configuration
 
@@ -31,7 +35,7 @@ No additional configuration required. This rule integrates with existing systems
 # Uses existing configuration from:
 # - foundation-config.yaml (risk management, agent instructions)
 # - docs/prompt_integration_rules.mdc (explicit instruction patterns)
-# - foundation/agent_instructions/cursor_rules/instruction_documentation.mdc (rule standards)
+# - Neotoma agent_policy ent_82b64b6c4104843e43853666 (rule authoring location)
 ```
 
 ## Trigger Patterns
@@ -201,7 +205,7 @@ If approved, I'll create/update the artifact and apply it to the current task im
 If user approves suggestion:
 
 1. **Create or update artifact:**
-   - Follow `instruction_documentation.mdc` standards for format
+   - Author the rule as a Neotoma `agent_policy` entity (canonical), not a harness rule file
    - Use RFC 2119 terminology (MUST, MUST NOT, SHOULD, etc.)
    - Include proper frontmatter and structure
    - Add cross-references to related documents
@@ -238,7 +242,7 @@ Agents MUST NOT:
 - Suggest violating security, safety, or architectural constraints
 - Suggest changes that conflict with strategy/tactics/operations hierarchy
 - Analyze explicit "always do X" instructions (handled by `prompt_integration_rules.mdc`)
-- Create artifacts without following `instruction_documentation.mdc` standards
+- Create durable rule artifacts as harness files instead of Neotoma `agent_policy` entities
 - Skip alignment checks with existing decision frameworks
 
 ## Integration with Existing Meta-Rules
@@ -255,7 +259,7 @@ Agents MUST NOT:
   - Pattern implied but not explicitly stated as rule
   - Suggested for user approval before implementation
 
-- **`instruction_documentation.mdc`:** Defines how to create/format rules
+- **Neotoma `agent_policy` `ent_82b64b6c4104843e43853666`:** defines where durable rules live and how they are authored
   - Standards for rule structure and format
   - Where to place rules (global vs repository)
   - File naming and organization conventions
@@ -523,7 +527,7 @@ Before presenting suggestion, verify:
 ## Related Documents
 
 - `docs/prompt_integration_rules.mdc` - Explicit instruction integration (complementary)
-- `foundation/agent_instructions/cursor_rules/instruction_documentation.mdc` - Rule creation standards
+- Neotoma `agent_policy` `ent_82b64b6c4104843e43853666` - rule authoring location (canonical)
 - `foundation/agent_instructions/cursor_rules/risk_management.mdc` - Risk management and hold points
 - `foundation/agent_instructions/cursor_rules/agent_constraints.mdc` - Constraints and forbidden patterns
 - `docs/decision_framework_rules.mdc` - Strategy/tactics/operations hierarchy

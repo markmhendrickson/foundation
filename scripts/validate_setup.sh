@@ -70,7 +70,7 @@ fi
 KEY_FILES=(
     "foundation/README.md"
     "foundation/conventions/code-conventions.md"
-    "foundation/conventions/documentation-standards.md"
+    "foundation/conventions/documentation_standards.md"
     "foundation/development/workflow.md"
     "foundation/config/foundation_config.yaml"
 )

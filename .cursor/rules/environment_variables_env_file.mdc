@@ -57,7 +57,7 @@ If the variable is not in `.env`:
 
 1. **Check `env.example`** for expected variables
 2. **Check repository documentation** for setup instructions
-3. **Check if variable should be synced from 1Password** (see `foundation/agent_instructions/cursor_rules/environment_variables_1password.mdc` if applicable)
+3. **Check if the variable is managed in the secrets snapshot** (SOPS+age; materialize offline rather than reading 1Password directly)
 4. **Only then ask the user** if the variable is truly missing
 
 ## Examples
@@ -108,7 +108,7 @@ Agent: "What should DATA_DIR be set to?" # WRONG - should check .env first
 
 This rule works in conjunction with:
 
-- **`foundation/agent_instructions/cursor_rules/environment_variables_1password.mdc`** - For syncing variables from 1Password to `.env` (if applicable)
+- Secrets snapshot (SOPS+age) - for syncing managed variables into `.env`
 - **`foundation/agent_instructions/cursor_rules/configuration_management.mdc`** - Configuration file management
 - **Repository-specific environment documentation** - For setup instructions
 
